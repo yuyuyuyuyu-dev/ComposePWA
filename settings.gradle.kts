@@ -12,6 +12,8 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+
+        mavenLocal()
     }
 }
 
@@ -25,7 +27,10 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+       
+        mavenLocal()
     }
 }
 
 include(":composeApp")
+include(":plugin")
