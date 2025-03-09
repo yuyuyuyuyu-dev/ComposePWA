@@ -8,7 +8,6 @@ import org.gradle.kotlin.dsl.register
 @Suppress("unused")
 class ComposeMultiplatformPwaPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.pluginManager.apply("base")
         project.pluginManager.apply("com.github.node-gradle.node")
 
         project.tasks.register<NpxTask>("buildPWA") {

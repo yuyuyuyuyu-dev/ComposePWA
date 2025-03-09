@@ -1,11 +1,6 @@
-import com.github.gradle.node.npm.task.NpxTask
 import com.vanniktech.maven.publish.GradlePublishPlugin
 
 plugins {
-//    alias(libs.plugins.kotlinMultiplatform)
-//    alias(libs.plugins.composeMultiplatform)
-//    alias(libs.plugins.composeCompiler)
-
     kotlin("jvm")
     alias(libs.plugins.gradle.plugin.publish)
     `java-gradle-plugin`
@@ -13,16 +8,6 @@ plugins {
     `kotlin-dsl`
     alias(libs.plugins.nodeGradle)
 }
-
-//kotlin {
-//    sourceSets {
-//        getByName("main") {
-//            dependencies {
-//                implementation(kotlin("script-runtime"))
-//            }
-//        }
-//    }
-//}
 
 group = "dev.yuyuyuyuyu"
 version = "0.1.0"
@@ -44,22 +29,11 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation("com.github.node-gradle.node:com.github.node-gradle.node.gradle.plugin:7.0.0")
     implementation(gradleApi())
     implementation(localGroovy())
-//    implementation("com.github.node-gradle.node:com.github.node-gradle.node.gradle.plugin:7.1.0")
+    implementation("com.github.node-gradle.node:com.github.node-gradle.node.gradle.plugin:7.1.0")
 }
-
-//buildscript {
-//    dependencies {
-//        classpath("com.github.node-gradle.node:com.github.node-gradle.node.gradle.plugin:7.1.0")
-//    }
-//}
 
 mavenPublishing {
     configure(GradlePublishPlugin())
-}
-
-tasks.register<NpxTask>("npmtask") {
-    println("npmtask")
 }
