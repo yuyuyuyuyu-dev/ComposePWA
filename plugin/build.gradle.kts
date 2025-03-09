@@ -13,15 +13,15 @@ group = "dev.yuyuyuyuyu"
 version = "0.1.0"
 
 gradlePlugin {
-    website = "https://github.com/yu-ko-ba/ComposeMultiplatformPWA#readme"
-    vcsUrl = "https://github.com/yu-ko-ba/ComposeMultiplatformPWA"
+    website = "https://github.com/yu-ko-ba/ComposePWA#readme"
+    vcsUrl = "https://github.com/yu-ko-ba/ComposePWA"
 
     plugins {
-        create("Compose Multiplatform PWA") {
-            id = "dev.yuyuyuyuyu.composemultiplatformpwa"
-            implementationClass = "dev.yuyuyuyuyu.ComposeMultiplatformPwaPlugin"
+        create("Compose PWA") {
+            id = "dev.yuyuyuyuyu.composepwa"
+            implementationClass = "dev.yuyuyuyuyu.ComposePwaPlugin"
             description = "A Gradle plugin to convert Compose Multiplatform web apps to PWA"
-            displayName = "Compose Multiplatform PWA"
+            displayName = "Compose PWA"
             tags = listOf("compose multiplatform", "web", "pwa")
         }
     }

@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 
-    alias(libs.plugins.yuyuyuyuyu.plugin.composemultiplatformpwa)
+    alias(libs.plugins.yuyuyuyuyu.plugin.composePwa)
 }
 
 kotlin {

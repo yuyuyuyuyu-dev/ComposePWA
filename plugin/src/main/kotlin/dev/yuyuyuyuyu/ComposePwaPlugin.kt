@@ -11,7 +11,7 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 @Suppress("unused")
-class ComposeMultiplatformPwaPlugin : Plugin<Project> {
+class ComposePwaPlugin : Plugin<Project> {
     private val targetResourceDir = "src/wasmJsMain/resources"
 
     override fun apply(project: Project) {
@@ -21,7 +21,7 @@ class ComposeMultiplatformPwaPlugin : Plugin<Project> {
             dependsOn(
                 "clean",
                 "npmInstall",
-                "initializeComposeMultiplatformPWA",
+                "initializeComposePWA",
                 "wasmJsBrowserDistribution",
             )
 
@@ -29,7 +29,7 @@ class ComposeMultiplatformPwaPlugin : Plugin<Project> {
             args.set(listOf("generateSW", "workbox-config.js"))
         }
 
-        project.tasks.register("initializeComposeMultiplatformPWA") {
+        project.tasks.register("initializeComposePWA") {
             dependsOn(
                 "addNecessaryTagsForIndexHtml",
                 "copyWorkboxConfigJs",
