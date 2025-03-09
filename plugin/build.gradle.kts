@@ -19,10 +19,10 @@ gradlePlugin {
     plugins {
         create("Compose PWA") {
             id = "dev.yuyuyuyuyu.composepwa"
-            implementationClass = "dev.yuyuyuyuyu.ComposePwaPlugin"
-            description = "A Gradle plugin to convert Compose Multiplatform web apps to PWA"
             displayName = "Compose PWA"
+            description = "A Gradle plugin to convert Compose Multiplatform web apps to PWA"
             tags = listOf("compose multiplatform", "web", "pwa")
+            implementationClass = "dev.yuyuyuyuyu.ComposePwaPlugin"
         }
     }
 }
