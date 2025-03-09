@@ -1,0 +1,4 @@
+/workbox-config.js
+/src/wasmJsMain/resources/manifest.json
+/src/wasmJsMain/resources/registerServiceWorker.js
+/src/wasmJsMain/resources/icons

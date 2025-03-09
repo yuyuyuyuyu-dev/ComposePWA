@@ -17,11 +17,10 @@ gradlePlugin {
     vcsUrl = "https://github.com/yu-ko-ba/ComposeMultiplatformPWA"
 
     plugins {
-
-        create("dev.yuyuyuyuyu.composemultiplatformpwa") {
+        create("Compose Multiplatform PWA") {
             id = "dev.yuyuyuyuyu.composemultiplatformpwa"
             implementationClass = "dev.yuyuyuyuyu.ComposeMultiplatformPwaPlugin"
-            description = "hoge"
+            description = "A Gradle plugin to convert Compose Multiplatform web apps to PWA"
             displayName = "Compose Multiplatform PWA"
             tags = listOf("compose multiplatform", "web", "pwa")
         }
