@@ -6,6 +6,7 @@ kotlin = "2.1.0"
 gradle-plugin-publish = "1.3.1"
 vanniktech-maven-publish = "0.31.0"
 nodeGradle = "7.1.0"
+jsoup = "1.19.1"
 yuyuyuyuyu-composemultiplatformpwa = "0.1.0"
 
 [libraries]
@@ -14,6 +15,8 @@ kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+nodeGradle = { group = "com.github.node-gradle.node", name = "com.github.node-gradle.node.gradle.plugin", version.ref = "nodeGradle" }
+jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 
 [plugins]
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

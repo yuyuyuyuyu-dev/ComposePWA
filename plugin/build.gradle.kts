@@ -30,7 +30,8 @@ gradlePlugin {
 dependencies {
     implementation(gradleApi())
     implementation(localGroovy())
-    implementation("com.github.node-gradle.node:com.github.node-gradle.node.gradle.plugin:7.1.0")
+    implementation(libs.nodeGradle)
+    implementation(libs.jsoup)
 }
 
 mavenPublishing {
