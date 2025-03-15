@@ -20,7 +20,8 @@ gradlePlugin {
         create("Compose PWA") {
             id = "dev.yuyuyuyuyu.composepwa"
             displayName = "Compose PWA"
-            description = "A Gradle plugin to convert Compose Multiplatform web apps to PWA"
+            description =
+                "This Gradle plugin provides a Gradle Task, that build your Compose Multiplatform Web App as a PWA."
             tags = listOf("compose multiplatform", "web", "pwa")
             implementationClass = "dev.yuyuyuyuyu.ComposePwaPlugin"
         }
