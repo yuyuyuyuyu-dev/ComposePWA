@@ -74,7 +74,7 @@ class ComposePwaPlugin : Plugin<Project> {
 
             from(file)
             into(destDir)
-            onlyIf { !project.file("${destDir}/${fileName}").exists() }
+            onlyIf { !destinationDir.resolve(fileName).exists() }
         }
 
         project.tasks.register<Copy>("copyResisterServiceWorkerJs") {
@@ -89,7 +89,7 @@ class ComposePwaPlugin : Plugin<Project> {
 
             from(file)
             into(destDir)
-            onlyIf { !project.file("${destDir}/${fileName}").exists() }
+            onlyIf { !destinationDir.resolve(fileName).exists() }
         }
 
         project.tasks.register<Copy>("copyManifestJson") {
@@ -104,7 +104,7 @@ class ComposePwaPlugin : Plugin<Project> {
 
             from(file)
             into(destDir)
-            onlyIf { !project.file("${destDir}/${fileName}").exists() }
+            onlyIf { !destinationDir.resolve(fileName).exists() }
         }
 
         project.tasks.register<Copy>("copyIcons") {
@@ -119,7 +119,7 @@ class ComposePwaPlugin : Plugin<Project> {
 
             from(project.zipTree(file))
             into(destDir)
-            onlyIf { !project.file("${destDir}/${dirName}").exists() }
+            onlyIf { !destinationDir.resolve(dirName).exists() }
         }
     }
 
