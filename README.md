@@ -10,7 +10,7 @@ gradle/libs.versions.toml
 [versions]
 ...
 
-+ yuyuyuyuyu-composePwa = "0.1.0"
++ yuyuyuyuyu-composePwa = "0.2.0"
 
 [libraries]
 ...
