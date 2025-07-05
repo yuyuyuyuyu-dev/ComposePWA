@@ -121,6 +121,12 @@ class ComposePwaPlugin : Plugin<Project> {
             into(destDir)
             onlyIf { !destinationDir.resolve(dirName).exists() }
         }
+
+        project.afterEvaluate {
+            project.tasks
+                .findByName("copyNonXmlValueResourcesForWasmJsMain")
+                ?.dependsOn(project.tasks.named("copyWorkboxConfigJs"))
+        }
     }
 
     private fun readResourceFile(fileName: String): File? {
