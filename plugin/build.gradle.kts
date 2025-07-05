@@ -1,12 +1,16 @@
 import com.vanniktech.maven.publish.GradlePublishPlugin
 
 plugins {
-    kotlin("jvm")
-    alias(libs.plugins.gradle.plugin.publish)
+    id("org.jetbrains.kotlin.jvm") version "2.2.0"
+    id("com.gradle.plugin-publish") version "1.3.1"
     `java-gradle-plugin`
-    alias(libs.plugins.vanniktech.maven.publish)
+    id("com.vanniktech.maven.publish") version "0.31.0"
     `kotlin-dsl`
-    alias(libs.plugins.nodeGradle)
+    id("com.github.node-gradle.node") version "7.1.0"
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 group = "dev.yuyuyuyuyu"
@@ -31,8 +35,8 @@ gradlePlugin {
 dependencies {
     implementation(gradleApi())
     implementation(localGroovy())
-    implementation(libs.nodeGradle)
-    implementation(libs.jsoup)
+    implementation("com.github.node-gradle.node:com.github.node-gradle.node.gradle.plugin:7.1.0")
+    implementation("org.jsoup:jsoup:1.19.1")
 }
 
 mavenPublishing {
