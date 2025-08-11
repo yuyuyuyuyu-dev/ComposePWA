@@ -8,47 +8,59 @@ gradle/libs.versions.toml
 
 ```diff
 [versions]
-...
+// ...
 
-+ yuyuyuyuyu-composePwa = "0.2.0"
++ composePwa = "x.x.x" // Please replace with the latest version.
 
 [libraries]
-...
+// ...
 
 [plugins]
-...
+// ...
 
-+ yuyuyuyuyu-composePwa = { id = "dev.yuyuyuyuyu.composepwa", version.ref = "yuyuyuyuyu-composePwa" }
++ composePwa = { id = "dev.yuyuyuyuyu.composepwa", version.ref = "composePwa" }
 ```
 
 composeApp/build.gradle.kts
 
 ```diff
-...
+// ...
 
 plugins {
-    ...
+    // ...
 
-+   alias(libs.plugins.yuyuyuyuyu.composePwa)
++   alias(libs.plugins.composePwa)
 }
 ```
 
 ## How to use
 
-Run `./gradlew :composeApp:buildPWA` instead of `./gradlew :composeApp:wasmJsBrowserDistribution`.
+Just apply the plugin and run the `wasmJsBrowserDistribution` task as usual.
 
-Then your app will be output as a PWA in `composeApp/build/dist/wasmJs/productionExecutable`.
+```bash
+./gradlew :composeApp:wasmJsBrowserDistribution
+```
 
-`buildPWA` builds your app as a PWA with the following steps:
+Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable`.
 
-1. `./gradlew clean`
-1. Generates `composeApp/workbox-config.js`, `composeApp/src/wasmJsMain/resources/manifest.json`,
-   `composeApp/src/wasmJsMain/resources/registerServiceWorker.js` and `composeApp/src/wasmJsMain/resources/icons/*`, if
-   not exists.
-1. Add `<script type="application/javascript" src="registerServiceWorker.js"></script>` and
-   `<link rel="manifest" href="manifest.json">` to `composeApp/src/wasmJsMain/resources/index.html`, if not exists.
-1. `./gradlew wasmJsBrowserDistribution`
-1. `npx workbox-cli generateSW workbox-config.js`
+## What this plugin does
+
+When you run the `wasmJsBrowserDistribution` task, this plugin automatically does the following:
+
+- Creates these files:
+    - `workbox-config.js`
+    - `src/wasmJsMain/resources/manifest.json`
+    - `src/wasmJsMain/resources/registerServiceWorker.js`
+    - `src/wasmJsMain/resources/icons/*`
+- Adds the necessary tags to `src/wasmJsMain/resources/index.html`.
+
+## How to customize your PWA
+
+You can edit the following files to customize your PWA:
+
+- `workbox-config.js`
+- `src/wasmJsMain/resources/manifest.json`
+- `src/wasmJsMain/resources/icons/*`
 
 ## Custom icon
 
