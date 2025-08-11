@@ -65,6 +65,10 @@ class ComposePwa : Plugin<Project> {
             project.tasks
                 .findByName("convertXmlValueResourcesForCommonMain")
                 ?.mustRunAfter(project.tasks.named("copyWorkboxConfigJs"))
+
+            project.tasks
+                .findByName("copyNonXmlValueResourcesForCommonMain")
+                ?.mustRunAfter(project.tasks.named("copyWorkboxConfigJs"))
         }
     }
 
