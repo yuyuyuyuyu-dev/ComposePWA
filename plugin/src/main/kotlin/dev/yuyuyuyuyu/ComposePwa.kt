@@ -1,88 +1,60 @@
 package dev.yuyuyuyuyu
 
 import com.github.gradle.node.npm.task.NpxTask
+import dev.yuyuyuyuyu.tasks.AddNecessaryHtmlTags
+import dev.yuyuyuyuyu.tasks.shared.targetResourcesDirPath
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.kotlin.dsl.register
-import org.jsoup.Jsoup
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 @Suppress("unused")
-class ComposePwaPlugin : Plugin<Project> {
-    private val targetResourceDir = "src/wasmJsMain/resources"
-
+class ComposePwa : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply("com.github.node-gradle.node")
 
-        registerBuildPwa(project)
-
-        registerInitializeComposePwa(project)
-
-        registerAddNecessaryTagsForIndexHtml(project)
+        project.tasks.register<AddNecessaryHtmlTags>("addNecessaryHtmlTags")
         registerCopyWorkboxConfigJs(project)
         registerCopyResisterServiceWorkerJs(project)
         registerCopyManifestJson(project)
         registerCopyIcons(project)
-
-        project.afterEvaluate {
-            project.tasks
-                .findByName("copyNonXmlValueResourcesForWasmJsMain")
-                ?.dependsOn(project.tasks.named("copyWorkboxConfigJs"))
-        }
-    }
-
-    private fun registerBuildPwa(project: Project) {
-        project.tasks.register<NpxTask>("buildPWA") {
+        project.tasks.register("initializeComposePwa") {
             dependsOn(
-                "npmInstall",
-                "initializeComposePWA",
-                "wasmJsBrowserDistribution",
-            )
-
-            command.set("workbox-cli")
-            args.set(listOf("generateSW", "workbox-config.js"))
-        }
-    }
-
-    private fun registerInitializeComposePwa(project: Project) {
-        project.tasks.register("initializeComposePWA") {
-            dependsOn(
-                "addNecessaryTagsForIndexHtml",
+                "addNecessaryHtmlTags",
                 "copyWorkboxConfigJs",
                 "copyResisterServiceWorkerJs",
                 "copyManifestJson",
                 "copyIcons",
             )
         }
-    }
+        project.tasks.register<NpxTask>("buildAsPwa") {
+            dependsOn(
+                "npmInstall",
+                "wasmJsBrowserDistribution",
+                "initializeComposePwa",
+            )
 
-    private fun registerAddNecessaryTagsForIndexHtml(project: Project) {
-        project.tasks.register("addNecessaryTagsForIndexHtml") {
-            val indexHtmlFile = project.file("${targetResourceDir}/index.html")
+            command.set("workbox-cli")
+            args.set(listOf("generateSW", "workbox-config.js"))
+        }
 
-            val html = Jsoup.parse(indexHtmlFile, "UTF-8")
-            val head = html.head()
-
-            if (head.selectFirst("script[src=registerServiceWorker.js][type=application/javascript]") == null) {
-                head.appendElement("script").apply {
-                    attr("type", "application/javascript")
-                    attr("src", "registerServiceWorker.js")
-                }
+        project.plugins.withId("org.jetbrains.kotlin.wasm.js") {
+            project.tasks.named("wasmJsBrowserDistribution") {
+                dependsOn("initializeComposePwa")
+                finalizedBy("buildAsPwa")
             }
+        }
 
-            if (head.selectFirst("link[rel=manifest][href=manifest.json]") == null) {
-                head.appendElement("link").apply {
-                    attr("rel", "manifest")
-                    attr("href", "manifest.json")
-                }
-            }
-
-            indexHtmlFile.writeText(html.outerHtml(), Charsets.UTF_8)
+        project.afterEvaluate {
+            project.tasks
+                .findByName("copyNonXmlValueResourcesForWasmJsMain")
+                ?.dependsOn(project.tasks.named("initializeComposePwa"))
         }
     }
+
 
     private fun registerCopyWorkboxConfigJs(project: Project) {
         project.tasks.register<Copy>("copyWorkboxConfigJs") {
@@ -104,7 +76,7 @@ class ComposePwaPlugin : Plugin<Project> {
     private fun registerCopyResisterServiceWorkerJs(project: Project) {
         project.tasks.register<Copy>("copyResisterServiceWorkerJs") {
             val fileName = "registerServiceWorker.js"
-            val destDir = targetResourceDir
+            val destDir = targetResourcesDirPath
 
             val file = readResourceFile(fileName)
             if (file == null) {
@@ -121,7 +93,7 @@ class ComposePwaPlugin : Plugin<Project> {
     private fun registerCopyManifestJson(project: Project) {
         project.tasks.register<Copy>("copyManifestJson") {
             val fileName = "manifest.json"
-            val destDir = targetResourceDir
+            val destDir = targetResourcesDirPath
 
             val file = readResourceFile(fileName)
             if (file == null) {
@@ -138,7 +110,7 @@ class ComposePwaPlugin : Plugin<Project> {
     private fun registerCopyIcons(project: Project) {
         project.tasks.register<Copy>("copyIcons") {
             val dirName = "icons"
-            val destDir = targetResourceDir
+            val destDir = targetResourcesDirPath
 
             val file = readResourceFile("${dirName}.zip")
             if (file == null) {

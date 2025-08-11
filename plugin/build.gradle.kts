@@ -27,7 +27,7 @@ gradlePlugin {
             description =
                 "This Gradle plugin provides a Gradle Task, that build your Compose Multiplatform Web App as a PWA."
             tags = listOf("compose multiplatform", "web", "pwa")
-            implementationClass = "dev.yuyuyuyuyu.ComposePwaPlugin"
+            implementationClass = "dev.yuyuyuyuyu.ComposePwa"
         }
     }
 }
