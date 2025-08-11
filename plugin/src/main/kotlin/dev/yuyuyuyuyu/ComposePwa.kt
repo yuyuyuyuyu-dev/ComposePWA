@@ -16,11 +16,16 @@ class ComposePwa : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply("com.github.node-gradle.node")
 
-        project.tasks.register<AddNecessaryHtmlTags>("addNecessaryHtmlTags")
         registerCopyWorkboxConfigJs(project)
         registerCopyResisterServiceWorkerJs(project)
         registerCopyManifestJson(project)
         registerCopyIcons(project)
+        project.tasks.register<AddNecessaryHtmlTags>("addNecessaryHtmlTags") {
+            dependsOn("copyWorkboxConfigJs")
+            dependsOn("copyResisterServiceWorkerJs")
+            dependsOn("copyManifestJson")
+            dependsOn("copyIcons")
+        }
         project.tasks.register("initializeComposePwa") {
             dependsOn(
                 "addNecessaryHtmlTags",
@@ -52,6 +57,10 @@ class ComposePwa : Plugin<Project> {
             project.tasks
                 .findByName("copyNonXmlValueResourcesForWasmJsMain")
                 ?.dependsOn(project.tasks.named("initializeComposePwa"))
+
+            project.tasks
+                .findByName("processSkikoRuntimeForKWasm")
+                ?.dependsOn(project.tasks.named("copyWorkboxConfigJs"))
         }
     }
 
