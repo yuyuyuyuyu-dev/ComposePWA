@@ -56,14 +56,17 @@ class ComposePwa : Plugin<Project> {
         project.afterEvaluate {
             project.tasks
                 .findByName("copyNonXmlValueResourcesForWasmJsMain")
-                ?.dependsOn(project.tasks.named("initializeComposePwa"))
+                ?.mustRunAfter(project.tasks.named("initializeComposePwa"))
 
             project.tasks
                 .findByName("processSkikoRuntimeForKWasm")
-                ?.dependsOn(project.tasks.named("copyWorkboxConfigJs"))
+                ?.mustRunAfter(project.tasks.named("copyWorkboxConfigJs"))
+
+            project.tasks
+                .findByName("convertXmlValueResourcesForCommonMain")
+                ?.mustRunAfter(project.tasks.named("copyWorkboxConfigJs"))
         }
     }
-
 
     private fun registerCopyWorkboxConfigJs(project: Project) {
         project.tasks.register<Copy>("copyWorkboxConfigJs") {
