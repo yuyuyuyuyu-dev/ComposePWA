@@ -26,7 +26,7 @@ class ComposePwa : Plugin<Project> {
             dependsOn("copyManifestJson")
             dependsOn("copyIcons")
         }
-        project.tasks.register("initializeComposePwa") {
+        project.tasks.register("initComposePwa") {
             dependsOn(
                 "addNecessaryHtmlTags",
                 "copyWorkboxConfigJs",
@@ -39,7 +39,7 @@ class ComposePwa : Plugin<Project> {
             dependsOn(
                 "npmInstall",
                 "wasmJsBrowserDistribution",
-                "initializeComposePwa",
+                "initComposePwa",
             )
 
             command.set("workbox-cli")
@@ -48,7 +48,7 @@ class ComposePwa : Plugin<Project> {
 
         project.plugins.withId("org.jetbrains.kotlin.wasm.js") {
             project.tasks.named("wasmJsBrowserDistribution") {
-                dependsOn("initializeComposePwa")
+                dependsOn("initComposePwa")
                 finalizedBy("buildAsPwa")
             }
         }
@@ -56,7 +56,7 @@ class ComposePwa : Plugin<Project> {
         project.afterEvaluate {
             project.tasks
                 .findByName("copyNonXmlValueResourcesForWasmJsMain")
-                ?.mustRunAfter(project.tasks.named("initializeComposePwa"))
+                ?.mustRunAfter(project.tasks.named("initComposePwa"))
 
             project.tasks
                 .findByName("processSkikoRuntimeForKWasm")

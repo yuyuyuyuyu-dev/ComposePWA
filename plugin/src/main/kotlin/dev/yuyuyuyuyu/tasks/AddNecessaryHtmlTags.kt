@@ -20,7 +20,7 @@ abstract class AddNecessaryHtmlTags : DefaultTask() {
     )
 
     @TaskAction
-    fun initializeComposePwa() {
+    fun initComposePwa() {
         val indexHtmlFile = indexHtml.asFile.get()
 
         val html = Jsoup.parse(indexHtmlFile, "UTF-8")
