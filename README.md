@@ -1,5 +1,8 @@
 # ComposePWA
 
+[![Publish](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/publish.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/publish.yml)
+[![Tests](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/tests.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/tests.yml)
+
 This Gradle plugin provides a Gradle Task, that build your Compose Multiplatform Web App as a PWA.
 
 ## Installation
