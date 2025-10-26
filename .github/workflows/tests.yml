@@ -25,5 +25,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run buildAsPwa
-        run: ./gradlew :composeApp:buildAsPwa
+      - name: Run buildWasmAsPwa
+        run: ./gradlew :composeApp:buildWasmAsPwa
+
+      - name: Run buildJsAsPwa
+        run: ./gradlew :composeApp:buildJsAsPwa
