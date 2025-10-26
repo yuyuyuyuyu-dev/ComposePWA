@@ -30,5 +30,5 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp")
 includeBuild("plugin")
+include(":composeApp")

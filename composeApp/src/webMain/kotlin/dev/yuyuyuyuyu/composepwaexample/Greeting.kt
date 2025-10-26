@@ -1,4 +1,4 @@
-package dev.yuyuyuyuyu.composemultiplatformpwa
+package dev.yuyuyuyuyu.composepwaexample
 
 class Greeting {
     private val platform = getPlatform()
