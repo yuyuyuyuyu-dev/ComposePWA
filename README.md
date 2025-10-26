@@ -38,32 +38,49 @@ plugins {
 
 ## How to use
 
-Just apply the plugin and run the `wasmJsBrowserDistribution` task as usual.
+Just apply the plugin and run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task as
+usual.
 
 ```bash
 ./gradlew :composeApp:wasmJsBrowserDistribution
 ```
 
-Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable`.
+or
+
+```bash
+./gradlew :composeApp:jsBrowserDistribution
+```
+
+Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable` or
+`composeApp/build/dist/js/productionExecutable`.
 
 ## What this plugin does
 
 When you run the `wasmJsBrowserDistribution` task, this plugin automatically does the following:
 
 - Creates these files:
-    - `workbox-config.js`
-    - `src/wasmJsMain/resources/manifest.json`
-    - `src/wasmJsMain/resources/registerServiceWorker.js`
-    - `src/wasmJsMain/resources/icons/*`
-- Adds the necessary tags to `src/wasmJsMain/resources/index.html`.
+    - `workbox-config-for-wasm.js`
+    - `src/webMain/resources/manifest.json`
+    - `src/webMain/resources/registerServiceWorker.js`
+    - `src/webMain/resources/icons/*`
+- Adds the necessary tags to `src/webMain/resources/index.html`.
+
+When you run the `jsBrowserDistribution` task, this plugin automatically does the following:
+
+- Creates these files:
+    - `workbox-config-for-js.js`
+    - `src/webMain/resources/manifest.json`
+    - `src/webMain/resources/registerServiceWorker.js`
+    - `src/webMain/resources/icons/*`
+- Adds the necessary tags to `src/webMain/resources/index.html`.
 
 ## How to customize your PWA
 
 You can edit the following files to customize your PWA:
 
 - `workbox-config.js`
-- `src/wasmJsMain/resources/manifest.json`
-- `src/wasmJsMain/resources/icons/*`
+- `src/webMain/resources/manifest.json`
+- `src/webMain/resources/icons/*`
 
 ## Custom icon
 
