@@ -199,6 +199,10 @@ class ComposePwa : Plugin<Project> {
             .configureEach { mustRunAfter("copyWorkboxConfigForWasm") }
 
         project.tasks
+            .matching { it.name == "wasmJsProcessResources" }
+            .configureEach { mustRunAfter("copyManifestJson") }
+
+        project.tasks
             .matching { it.name == "copyNonXmlValueResourcesForWebMain" }
             .configureEach {
                 mustRunAfter(

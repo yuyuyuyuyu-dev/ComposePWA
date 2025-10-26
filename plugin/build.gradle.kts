@@ -14,7 +14,7 @@ kotlin {
 }
 
 group = "dev.yuyuyuyuyu"
-version = "0.4.0"
+version = "0.4.1"
 
 gradlePlugin {
     website = "https://github.com/yu-ko-ba/ComposePWA#readme"
