@@ -172,6 +172,11 @@ class ComposePwa : Plugin<Project> {
     }
 
     private fun addExecutionOrderOfTasks(project: Project) {
+        // Common
+        project.tasks
+            .matching { it.name == "copyNonXmlValueResourcesForCommonMain" }
+            .configureEach { mustRunAfter("copyWorkboxConfigForWasm") }
+
         project.tasks
             .matching { it.name == "convertXmlValueResourcesForCommonMain" }
             .configureEach {
@@ -190,6 +195,7 @@ class ComposePwa : Plugin<Project> {
                 )
             }
 
+        // Wasm
         project.tasks
             .matching { it.name == "copyNonXmlValueResourcesForWasmJsMain" }
             .configureEach { mustRunAfter("copyWorkboxConfigForWasm") }
@@ -203,6 +209,11 @@ class ComposePwa : Plugin<Project> {
             .configureEach { mustRunAfter("copyManifestJson") }
 
         project.tasks
+            .matching { it.name == "convertXmlValueResourcesForWasmJsMain" }
+            .configureEach { mustRunAfter("copyWorkboxConfigForWasm") }
+
+        // Web
+        project.tasks
             .matching { it.name == "copyNonXmlValueResourcesForWebMain" }
             .configureEach {
                 mustRunAfter(
@@ -210,6 +221,10 @@ class ComposePwa : Plugin<Project> {
                     "copyWorkboxConfigForJs",
                 )
             }
+
+        project.tasks
+            .matching { it.name == "convertXmlValueResourcesForWebMain" }
+            .configureEach { mustRunAfter("copyWorkboxConfigForWasm") }
     }
 
     private fun readResourceFile(fileName: String): File? {
