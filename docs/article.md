@@ -1,6 +1,6 @@
-# ComposePWA: Build Progressive Web Apps with Compose Multiplatform
+# `ComposePWA`: Build Progressive Web Apps with Compose Multiplatform
 
-ComposePWA is a Gradle plugin that makes it easy to create Progressive Web Apps (PWAs) from your
+`ComposePWA` is a Gradle plugin that makes it easy to create Progressive Web Apps (PWAs) from your
 Compose Multiplatform projects. This article will show you how to use it.
 
 ## What is a Progressive Web App (PWA)?
@@ -12,9 +12,9 @@ A Progressive Web App is a web application that works like a mobile app. Users c
 - Get notifications
 - See it in their app drawer
 
-## What is ComposePWA?
+## What is `ComposePWA`?
 
-ComposePWA is a tool that turns your Compose Multiplatform web app into a PWA automatically. It does
+`ComposePWA` is a tool that turns your Compose Multiplatform web app into a PWA automatically. It does
 all the hard work for you.
 
 ## Installation
@@ -49,7 +49,7 @@ plugins {
 
 That's it! Installation is complete.
 
-## How to Use ComposePWA
+## How to Use `ComposePWA`
 
 ### Building Your PWA
 
@@ -63,7 +63,7 @@ Your PWA will be ready in the `composeApp/build/dist/wasmJs/productionExecutable
 
 ### What Files Are Created?
 
-When you run the build command, ComposePWA automatically creates these files:
+When you run the build command, `ComposePWA` automatically creates these files:
 
 1. **`workbox-config.js`** - Configuration for offline support
 2. **`src/wasmJsMain/resources/manifest.json`** - App information for browsers
@@ -91,7 +91,7 @@ You can change your PWA's name, colors, and other settings by editing the `manif
 
 ### App Icons
 
-ComposePWA includes default icons, but you can replace them with your own:
+`ComposePWA` includes default icons, but you can replace them with your own:
 
 1. Create icons in these sizes: 72x72, 96x96, 128x128, 144x144, 152x152, 192x192, 384x384, 512x512
 2. Put them in the `src/wasmJsMain/resources/icons/` folder
@@ -123,7 +123,7 @@ module.exports = {
 
 ## Example Project Structure
 
-After using ComposePWA, your project will look like this:
+After using `ComposePWA`, your project will look like this:
 
 ```
 composeApp/
@@ -156,7 +156,7 @@ native mobile app.
 The plugin handles all the complex PWA setup automatically, so you can focus on building your app
 instead of configuring PWA features.
 
-Try ComposePWA today and give your users a better app experience!
+Try `ComposePWA` today and give your users a better app experience!
 
 ## Resources
 
@@ -165,4 +165,4 @@ Try ComposePWA today and give your users a better app experience!
 
 ## License
 
-ComposePWA is available under the Apache License 2.0.
+`ComposePWA` is available under the Apache License 2.0.

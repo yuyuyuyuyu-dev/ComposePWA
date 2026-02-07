@@ -1,11 +1,10 @@
 import com.vanniktech.maven.publish.GradlePublishPlugin
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.2.0"
-    id("com.gradle.plugin-publish") version "1.3.1"
+    id("org.jetbrains.kotlin.jvm") version "2.3.10"
+    id("com.gradle.plugin-publish") version "2.0.0"
     `java-gradle-plugin`
-    id("com.vanniktech.maven.publish") version "0.33.0"
-    `kotlin-dsl`
+    id("com.vanniktech.maven.publish") version "0.36.0"
     id("com.github.node-gradle.node") version "7.1.0"
 }
 
@@ -34,9 +33,10 @@ gradlePlugin {
 
 dependencies {
     implementation(gradleApi())
+    implementation(gradleKotlinDsl())
     implementation(localGroovy())
     implementation("com.github.node-gradle.node:com.github.node-gradle.node.gradle.plugin:7.1.0")
-    implementation("org.jsoup:jsoup:1.21.1")
+    implementation("org.jsoup:jsoup:1.22.1")
 }
 
 mavenPublishing {

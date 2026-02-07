@@ -6,7 +6,6 @@ import dev.yuyuyuyuyu.tasks.shared.targetResourcesDirPath
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
-import org.gradle.kotlin.dsl.register
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -22,8 +21,9 @@ class ComposePwa : Plugin<Project> {
         registerCopyManifestJson(project)
         registerCopyIcons(project)
         registerAddNecessaryHtmlTags(project)
-        project.tasks.register("initComposePwaForWasm") {
-            dependsOn(
+
+        project.tasks.register("initComposePwaForWasm") { task ->
+            task.dependsOn(
                 "addNecessaryHtmlTags",
                 "copyWorkboxConfigForWasm",
                 "copyResisterServiceWorkerJs",
@@ -31,8 +31,9 @@ class ComposePwa : Plugin<Project> {
                 "copyIcons",
             )
         }
-        project.tasks.register("initComposePwaForJs") {
-            dependsOn(
+
+        project.tasks.register("initComposePwaForJs") { task ->
+            task.dependsOn(
                 "addNecessaryHtmlTags",
                 "copyWorkboxConfigForJs",
                 "copyResisterServiceWorkerJs",
@@ -40,32 +41,35 @@ class ComposePwa : Plugin<Project> {
                 "copyIcons",
             )
         }
-        project.tasks.register<NpxTask>("buildWasmAsPwa") {
-            dependsOn(
+
+        project.tasks.register("buildWasmAsPwa", NpxTask::class.java) { task ->
+            task.dependsOn(
                 "npmInstall",
                 "wasmJsBrowserDistribution",
                 "initComposePwaForWasm",
             )
-            command.set("workbox-cli")
-            args.set(listOf("generateSW", "workbox-config-for-wasm.js"))
+            task.command.set("workbox-cli")
+            task.args.set(listOf("generateSW", "workbox-config-for-wasm.js"))
         }
-        project.tasks.register<NpxTask>("buildJsAsPwa") {
-            dependsOn(
+
+        project.tasks.register("buildJsAsPwa", NpxTask::class.java) { task ->
+            task.dependsOn(
                 "npmInstall",
                 "jsBrowserDistribution",
                 "initComposePwaForJs",
             )
-            command.set("workbox-cli")
-            args.set(listOf("generateSW", "workbox-config-for-js.js"))
+            task.command.set("workbox-cli")
+            task.args.set(listOf("generateSW", "workbox-config-for-js.js"))
         }
 
-        project.tasks.matching { it.name == "wasmJsBrowserDistribution" }.configureEach {
-            dependsOn("initComposePwaForWasm")
-            finalizedBy("buildWasmAsPwa")
+        project.tasks.matching { it.name == "wasmJsBrowserDistribution" }.configureEach { task ->
+            task.dependsOn("initComposePwaForWasm")
+            task.finalizedBy("buildWasmAsPwa")
         }
-        project.tasks.matching { it.name == "jsBrowserDistribution" }.configureEach {
-            dependsOn("initComposePwaForJs")
-            finalizedBy("buildJsAsPwa")
+
+        project.tasks.matching { it.name == "jsBrowserDistribution" }.configureEach { task ->
+            task.dependsOn("initComposePwaForJs")
+            task.finalizedBy("buildJsAsPwa")
         }
 
         addExecutionOrderOfTasks(project)
@@ -75,7 +79,7 @@ class ComposePwa : Plugin<Project> {
     }
 
     private fun registerCopyWorkboxConfigForWasm(project: Project) {
-        project.tasks.register<Copy>("copyWorkboxConfigForWasm") {
+        project.tasks.register("copyWorkboxConfigForWasm", Copy::class.java) { task ->
             val fileName = "workbox-config-for-wasm.js"
             val destDir = "."
 
@@ -85,14 +89,14 @@ class ComposePwa : Plugin<Project> {
                 return@register
             }
 
-            from(file)
-            into(destDir)
-            onlyIf { !destinationDir.resolve(fileName).exists() }
+            task.from(file)
+            task.into(destDir)
+            task.onlyIf { !task.destinationDir.resolve(fileName).exists() }
         }
     }
 
     private fun registerCopyWorkboxConfigForJs(project: Project) {
-        project.tasks.register<Copy>("copyWorkboxConfigForJs") {
+        project.tasks.register("copyWorkboxConfigForJs", Copy::class.java) { task ->
             val fileName = "workbox-config-for-js.js"
             val destDir = "."
 
@@ -102,14 +106,14 @@ class ComposePwa : Plugin<Project> {
                 return@register
             }
 
-            from(file)
-            into(destDir)
-            onlyIf { !destinationDir.resolve(fileName).exists() }
+            task.from(file)
+            task.into(destDir)
+            task.onlyIf { !task.destinationDir.resolve(fileName).exists() }
         }
     }
 
     private fun registerCopyResisterServiceWorkerJs(project: Project) {
-        project.tasks.register<Copy>("copyResisterServiceWorkerJs") {
+        project.tasks.register("copyResisterServiceWorkerJs", Copy::class.java) { task ->
             val fileName = "registerServiceWorker.js"
             val destDir = targetResourcesDirPath
 
@@ -119,14 +123,14 @@ class ComposePwa : Plugin<Project> {
                 return@register
             }
 
-            from(file)
-            into(destDir)
-            onlyIf { !destinationDir.resolve(fileName).exists() }
+            task.from(file)
+            task.into(destDir)
+            task.onlyIf { !task.destinationDir.resolve(fileName).exists() }
         }
     }
 
     private fun registerCopyManifestJson(project: Project) {
-        project.tasks.register<Copy>("copyManifestJson") {
+        project.tasks.register("copyManifestJson", Copy::class.java) { task ->
             val fileName = "manifest.json"
             val destDir = targetResourcesDirPath
 
@@ -136,14 +140,14 @@ class ComposePwa : Plugin<Project> {
                 return@register
             }
 
-            from(file)
-            into(destDir)
-            onlyIf { !destinationDir.resolve(fileName).exists() }
+            task.from(file)
+            task.into(destDir)
+            task.onlyIf { !task.destinationDir.resolve(fileName).exists() }
         }
     }
 
     private fun registerCopyIcons(project: Project) {
-        project.tasks.register<Copy>("copyIcons") {
+        project.tasks.register("copyIcons", Copy::class.java) { task ->
             val dirName = "icons"
             val destDir = targetResourcesDirPath
 
@@ -153,15 +157,15 @@ class ComposePwa : Plugin<Project> {
                 return@register
             }
 
-            from(project.zipTree(file))
-            into(destDir)
-            onlyIf { !destinationDir.resolve(dirName).exists() }
+            task.from(project.zipTree(file))
+            task.into(destDir)
+            task.onlyIf { !task.destinationDir.resolve(dirName).exists() }
         }
     }
 
     private fun registerAddNecessaryHtmlTags(project: Project) {
-        project.tasks.register<AddNecessaryHtmlTags>("addNecessaryHtmlTags") {
-            mustRunAfter(
+        project.tasks.register("addNecessaryHtmlTags", AddNecessaryHtmlTags::class.java) { task ->
+            task.mustRunAfter(
                 "copyWorkboxConfigForWasm",
                 "copyWorkboxConfigForJs",
                 "copyResisterServiceWorkerJs",
@@ -175,12 +179,17 @@ class ComposePwa : Plugin<Project> {
         // Common
         project.tasks
             .matching { it.name == "copyNonXmlValueResourcesForCommonMain" }
-            .configureEach { mustRunAfter("copyWorkboxConfigForWasm") }
+            .configureEach { task ->
+                task.mustRunAfter(
+                    "copyWorkboxConfigForWasm",
+                    "copyWorkboxConfigForJs",
+                )
+            }
 
         project.tasks
             .matching { it.name == "convertXmlValueResourcesForCommonMain" }
-            .configureEach {
-                mustRunAfter(
+            .configureEach { task ->
+                task.mustRunAfter(
                     "copyWorkboxConfigForWasm",
                     "copyWorkboxConfigForJs",
                 )
@@ -188,8 +197,8 @@ class ComposePwa : Plugin<Project> {
 
         project.tasks
             .matching { it.name == "CopyNonXmlValueResourcesTask" }
-            .configureEach {
-                mustRunAfter(
+            .configureEach { task ->
+                task.mustRunAfter(
                     "copyWorkboxConfigForWasm",
                     "copyWorkboxConfigForJs",
                 )
@@ -198,25 +207,30 @@ class ComposePwa : Plugin<Project> {
         // Wasm
         project.tasks
             .matching { it.name == "copyNonXmlValueResourcesForWasmJsMain" }
-            .configureEach { mustRunAfter("copyWorkboxConfigForWasm") }
+            .configureEach { task -> task.mustRunAfter("copyWorkboxConfigForWasm") }
 
         project.tasks
             .matching { it.name == "processSkikoRuntimeForKWasm" }
-            .configureEach { mustRunAfter("copyWorkboxConfigForWasm") }
+            .configureEach { task -> task.mustRunAfter("copyWorkboxConfigForWasm") }
 
         project.tasks
             .matching { it.name == "wasmJsProcessResources" }
-            .configureEach { mustRunAfter("copyManifestJson") }
+            .configureEach { task ->
+                task.mustRunAfter(
+                    "copyManifestJson",
+                    "copyResisterServiceWorkerJs",
+                )
+            }
 
         project.tasks
             .matching { it.name == "convertXmlValueResourcesForWasmJsMain" }
-            .configureEach { mustRunAfter("copyWorkboxConfigForWasm") }
+            .configureEach { task -> task.mustRunAfter("copyWorkboxConfigForWasm") }
 
         // Web
         project.tasks
             .matching { it.name == "copyNonXmlValueResourcesForWebMain" }
-            .configureEach {
-                mustRunAfter(
+            .configureEach { task ->
+                task.mustRunAfter(
                     "copyWorkboxConfigForWasm",
                     "copyWorkboxConfigForJs",
                 )
@@ -224,7 +238,7 @@ class ComposePwa : Plugin<Project> {
 
         project.tasks
             .matching { it.name == "convertXmlValueResourcesForWebMain" }
-            .configureEach { mustRunAfter("copyWorkboxConfigForWasm") }
+            .configureEach { task -> task.mustRunAfter("copyWorkboxConfigForWasm") }
     }
 
     private fun readResourceFile(fileName: String): File? {
