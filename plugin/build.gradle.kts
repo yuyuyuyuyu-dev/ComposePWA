@@ -1,8 +1,8 @@
 import com.vanniktech.maven.publish.GradlePublishPlugin
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.3.10"
-    id("com.gradle.plugin-publish") version "2.0.0"
+    id("org.jetbrains.kotlin.jvm") version "2.3.20"
+    id("com.gradle.plugin-publish") version "2.1.1"
     `java-gradle-plugin`
     id("com.vanniktech.maven.publish") version "0.36.0"
     id("com.github.node-gradle.node") version "7.1.0"
