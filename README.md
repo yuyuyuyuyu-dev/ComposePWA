@@ -6,6 +6,10 @@
 
 This Gradle plugin provides a Gradle Task, that build your Compose Multiplatform Web App as a PWA.
 
+## Prerequisites
+
+- Node.js (The author uses [Volta](https://volta.sh/) to install Node.js)
+
 ## Installation
 
 gradle/libs.versions.toml
@@ -74,6 +78,12 @@ When you run the `jsBrowserDistribution` task, this plugin automatically does th
     - `src/webMain/resources/registerServiceWorker.js`
     - `src/webMain/resources/icons/*`
 - Adds the necessary tags to `src/webMain/resources/index.html`.
+
+## Deploy to GitHub Pages
+
+You can find a sample GitHub Actions workflow for deploying your PWA to GitHub Pages here:
+
+[.github/workflows/deploy-to-github-pages-as-pwa.yml](.github/workflows/deploy-to-github-pages-as-pwa.yml)
 
 ## How to customize your PWA
 
