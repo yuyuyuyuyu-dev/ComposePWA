@@ -37,6 +37,8 @@ dependencies {
     implementation(localGroovy())
     implementation("com.github.node-gradle.node:com.github.node-gradle.node.gradle.plugin:7.1.0")
     implementation("org.jsoup:jsoup:1.22.1")
+
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0")
 }
 
 mavenPublishing {

@@ -6,9 +6,11 @@ import dev.yuyuyuyuyu.tasks.shared.targetResourcesDirPath
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import kotlin.jvm.java
 
 @Suppress("unused")
 class ComposePwa : Plugin<Project> {
@@ -176,69 +178,14 @@ class ComposePwa : Plugin<Project> {
     }
 
     private fun addExecutionOrderOfTasks(project: Project) {
-        // Common
-        project.tasks
-            .matching { it.name == "copyNonXmlValueResourcesForCommonMain" }
-            .configureEach { task ->
-                task.mustRunAfter(
-                    "copyWorkboxConfigForWasm",
-                    "copyWorkboxConfigForJs",
-                )
+        project.extensions.configure(KotlinMultiplatformExtension::class.java) { kmpExt ->
+            kmpExt.sourceSets.matching { it.name == "wasmJsMain" }.configureEach { sourceSet ->
+                sourceSet.resources.srcDirs(project.tasks.named("initComposePwaForWasm"))
             }
-
-        project.tasks
-            .matching { it.name == "convertXmlValueResourcesForCommonMain" }
-            .configureEach { task ->
-                task.mustRunAfter(
-                    "copyWorkboxConfigForWasm",
-                    "copyWorkboxConfigForJs",
-                )
+            kmpExt.sourceSets.matching { it.name == "jsMain" }.configureEach { sourceSet ->
+                sourceSet.resources.srcDirs(project.tasks.named("initComposePwaForJs"))
             }
-
-        project.tasks
-            .matching { it.name == "CopyNonXmlValueResourcesTask" }
-            .configureEach { task ->
-                task.mustRunAfter(
-                    "copyWorkboxConfigForWasm",
-                    "copyWorkboxConfigForJs",
-                )
-            }
-
-        // Wasm
-        project.tasks
-            .matching { it.name == "copyNonXmlValueResourcesForWasmJsMain" }
-            .configureEach { task -> task.mustRunAfter("copyWorkboxConfigForWasm") }
-
-        project.tasks
-            .matching { it.name == "processSkikoRuntimeForKWasm" }
-            .configureEach { task -> task.mustRunAfter("copyWorkboxConfigForWasm") }
-
-        project.tasks
-            .matching { it.name == "wasmJsProcessResources" }
-            .configureEach { task ->
-                task.mustRunAfter(
-                    "copyManifestJson",
-                    "copyResisterServiceWorkerJs",
-                )
-            }
-
-        project.tasks
-            .matching { it.name == "convertXmlValueResourcesForWasmJsMain" }
-            .configureEach { task -> task.mustRunAfter("copyWorkboxConfigForWasm") }
-
-        // Web
-        project.tasks
-            .matching { it.name == "copyNonXmlValueResourcesForWebMain" }
-            .configureEach { task ->
-                task.mustRunAfter(
-                    "copyWorkboxConfigForWasm",
-                    "copyWorkboxConfigForJs",
-                )
-            }
-
-        project.tasks
-            .matching { it.name == "convertXmlValueResourcesForWebMain" }
-            .configureEach { task -> task.mustRunAfter("copyWorkboxConfigForWasm") }
+        }
     }
 
     private fun readResourceFile(fileName: String): File? {
