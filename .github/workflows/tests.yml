@@ -3,30 +3,77 @@ name: Tests
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+  workflow_dispatch:
 
 jobs:
-  tests:
-    name: Run buildAsPwa
+  test-wasm:
+    name: Test Wasm PWA
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - name: Clone Repository
+        uses: actions/checkout@v6
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'jetbrains'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
-      - name: Run buildWasmAsPwa
-        run: ./gradlew :composeApp:buildWasmAsPwa
+      - name: Build WASM as PWA
+        run: ./gradlew :composeApp:wasmJsBrowserDistribution
 
-      - name: Run buildJsAsPwa
-        run: ./gradlew :composeApp:buildJsAsPwa
+      - name: Assert Wasm PWA generated files
+        run: |
+          test -f composeApp/build/dist/wasmJs/productionExecutable/serviceWorker.js || { echo '::error::serviceWorker.js Not Found'; exit 1; }
+          test -f composeApp/workbox-config-for-wasm.js || { echo '::error::workbox-config-for-wasm.js Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/manifest.json || { echo '::error::manifest.json Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
+          test -d composeApp/src/webMain/resources/icons || { echo '::error::icons directory Not Found'; exit 1; }
+          
+          grep -q 'registerServiceWorker.js' composeApp/src/webMain/resources/index.html || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
+          grep -q 'manifest.json' composeApp/src/webMain/resources/index.html || { echo '::error::manifest.json is missing from index.html'; exit 1; }
+
+  test-js:
+    name: Test JS PWA
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'jetbrains'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build JS as PWA
+        run: ./gradlew :composeApp:jsBrowserDistribution
+
+      - name: Assert JS PWA generated files
+        run: |
+          test -f composeApp/build/dist/js/productionExecutable/serviceWorker.js || { echo '::error::serviceWorker.js Not Found'; exit 1; }
+          test -f composeApp/workbox-config-for-js.js || { echo '::error::workbox-config-for-js.js Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/manifest.json || { echo '::error::manifest.json Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
+          test -d composeApp/src/webMain/resources/icons || { echo '::error::icons directory Not Found'; exit 1; }
+          
+          grep -q 'registerServiceWorker.js' composeApp/src/webMain/resources/index.html || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
+          grep -q 'manifest.json' composeApp/src/webMain/resources/index.html || { echo '::error::manifest.json is missing from index.html'; exit 1; }
