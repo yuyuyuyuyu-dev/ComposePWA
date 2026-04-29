@@ -18,3 +18,9 @@ captures
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 /article.html
+
+/composeApp/workbox-config-for-wasm.js
+/composeApp/workbox-config-for-js.js
+/composeApp/src/webMain/resources/manifest.json
+/composeApp/src/webMain/resources/icons/*
+/composeApp/src/webMain/resources/registerServiceWorker.js
