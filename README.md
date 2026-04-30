@@ -85,6 +85,10 @@ You can find a sample GitHub Actions workflow for deploying your PWA to GitHub P
 
 [.github/workflows/deploy-to-github-pages-as-pwa.yml](.github/workflows/deploy-to-github-pages-as-pwa.yml)
 
+And you can check out a live example here:
+
+https://compose-pwa-example.yuyuyuyuyu.dev
+
 ## How to customize your PWA
 
 You can edit the following files to customize your PWA:
