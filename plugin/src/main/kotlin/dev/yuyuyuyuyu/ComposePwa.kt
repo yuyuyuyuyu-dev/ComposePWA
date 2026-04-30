@@ -2,6 +2,7 @@ package dev.yuyuyuyuyu
 
 import com.github.gradle.node.npm.task.NpxTask
 import dev.yuyuyuyuyu.tasks.AddNecessaryHtmlTags
+import dev.yuyuyuyuyu.tasks.DeployResourceFile
 import dev.yuyuyuyuyu.tasks.shared.targetResourcesDirPath
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -10,7 +11,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import kotlin.jvm.java
 
 @Suppress("unused")
 class ComposePwa : Plugin<Project> {
@@ -81,36 +81,22 @@ class ComposePwa : Plugin<Project> {
     }
 
     private fun registerCopyWorkboxConfigForWasm(project: Project) {
-        project.tasks.register("copyWorkboxConfigForWasm", Copy::class.java) { task ->
+        project.tasks.register("copyWorkboxConfigForWasm", DeployResourceFile::class.java) { task ->
             val fileName = "workbox-config-for-wasm.js"
-            val destDir = "."
 
-            val file = readResourceFile(fileName)
-            if (file == null) {
-                println("error: $fileName not found")
-                return@register
-            }
-
-            task.from(file)
-            task.into(destDir)
-            task.onlyIf { !task.destinationDir.resolve(fileName).exists() }
+            task.resourceFileName.set(fileName)
+            task.destinationFileProperty.set(project.layout.projectDirectory.file(fileName))
+            task.onlyIf { !task.destinationFileProperty.get().asFile.exists() }
         }
     }
 
     private fun registerCopyWorkboxConfigForJs(project: Project) {
-        project.tasks.register("copyWorkboxConfigForJs", Copy::class.java) { task ->
+        project.tasks.register("copyWorkboxConfigForJs", DeployResourceFile::class.java) { task ->
             val fileName = "workbox-config-for-js.js"
-            val destDir = "."
 
-            val file = readResourceFile(fileName)
-            if (file == null) {
-                println("error: $fileName not found")
-                return@register
-            }
-
-            task.from(file)
-            task.into(destDir)
-            task.onlyIf { !task.destinationDir.resolve(fileName).exists() }
+            task.resourceFileName.set(fileName)
+            task.destinationFileProperty.set(project.layout.projectDirectory.file(fileName))
+            task.onlyIf { !task.destinationFileProperty.get().asFile.exists() }
         }
     }
 
@@ -188,6 +174,7 @@ class ComposePwa : Plugin<Project> {
         }
     }
 
+    @Suppress("NewApi")
     private fun readResourceFile(fileName: String): File? {
         val tempDir = Files.createTempDirectory("resources").toFile()
         val resourceUrl = this::class.java.classLoader.getResource(fileName)
