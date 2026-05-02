@@ -23,4 +23,4 @@ jobs:
           distribution: 'jetbrains'
 
       - name: Send dependencies to Dependabot
-        uses: gradle/actions/dependency-submission@v4
+        uses: gradle/actions/dependency-submission@v6
