@@ -106,6 +106,15 @@ use [ngx-pwa-icons](https://github.com/pverhaert/ngx-pwa-icons) like this.
 npx ngx-pwa-icons
 ```
 
+## Dependencies & Acknowledgments
+
+This plugin depends on the following open-source projects.<br />
+Thanks to these projects!
+
+- [Jsoup](https://jsoup.org/) (MIT License) - Used to modify HTML files.
+- [Node Gradle Plugin](https://github.com/node-gradle/gradle-node-plugin) (Apache License 2.0) - Used to call the `npx` command.
+- [Workbox](https://developer.chrome.com/docs/workbox) / `workbox-cli` (MIT License) - Used via `npx` to generate the Service Worker for the PWA.
+
 ## License
 
 Apache License 2.0
