@@ -7,9 +7,11 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
+@DisableCachingByDefault(because = "Not worth caching")
 abstract class DeployResourceFile : DefaultTask() {
     @get:Input
     abstract val resourceFileName: Property<String>

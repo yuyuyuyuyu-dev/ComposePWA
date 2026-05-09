@@ -5,15 +5,20 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import org.jsoup.Jsoup
 import javax.inject.Inject
 
+@DisableCachingByDefault(because = "Not worth caching")
 abstract class AddNecessaryHtmlTags : DefaultTask() {
 
     @get:Inject
     abstract val objects: ObjectFactory
 
+    @get:PathSensitive(PathSensitivity.NONE)
     @get:InputFile
     val indexHtml: RegularFileProperty = objects.fileProperty().convention(
         project.layout.projectDirectory.file("${targetResourcesDirPath}/index.html"),
