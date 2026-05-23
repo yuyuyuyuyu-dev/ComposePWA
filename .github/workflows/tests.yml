@@ -48,7 +48,15 @@ jobs:
           test -f composeApp/${{ matrix.config-file }} || { echo '::error::${{ matrix.config-file }} Not Found'; exit 1; }
           test -f composeApp/src/webMain/resources/manifest.json || { echo '::error::manifest.json Not Found'; exit 1; }
           test -f composeApp/src/webMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
-          test -d composeApp/src/webMain/resources/icons || { echo '::error::icons directory Not Found'; exit 1; }
+          
+          test -f composeApp/src/webMain/resources/icons/icon-72x72.png || { echo '::error::icons/icon-72x72.png Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/icons/icon-96x96.png || { echo '::error::icons/icon-96x96.png Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/icons/icon-128x128.png || { echo '::error::icons/icon-128x128.png Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/icons/icon-144x144.png || { echo '::error::icons/icon-144x144.png Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/icons/icon-152x152.png || { echo '::error::icons/icon-152x152.png Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/icons/icon-192x192.png || { echo '::error::icons/icon-192x192.png Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/icons/icon-384x384.png || { echo '::error::icons/icon-384x384.png Not Found'; exit 1; }
+          test -f composeApp/src/webMain/resources/icons/icon-512x512.png || { echo '::error::icons/icon-512x512.png Not Found'; exit 1; }
           
           grep -q 'registerServiceWorker.js' composeApp/src/webMain/resources/index.html || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
           grep -q 'manifest.json' composeApp/src/webMain/resources/index.html || { echo '::error::manifest.json is missing from index.html'; exit 1; }
