@@ -101,36 +101,22 @@ class ComposePwa : Plugin<Project> {
     }
 
     private fun registerCopyResisterServiceWorkerJs(project: Project) {
-        project.tasks.register("copyResisterServiceWorkerJs", Copy::class.java) { task ->
+        project.tasks.register("copyResisterServiceWorkerJs", DeployResourceFile::class.java) { task ->
             val fileName = "registerServiceWorker.js"
-            val destDir = targetResourcesDirPath
 
-            val file = readResourceFile(fileName)
-            if (file == null) {
-                println("error: $fileName not found")
-                return@register
-            }
-
-            task.from(file)
-            task.into(destDir)
-            task.onlyIf { !task.destinationDir.resolve(fileName).exists() }
+            task.resourceFileName.set(fileName)
+            task.destinationFileProperty.set(project.layout.projectDirectory.dir(targetResourcesDirPath).file(fileName))
+            task.onlyIf { !task.destinationFileProperty.get().asFile.exists() }
         }
     }
 
     private fun registerCopyManifestJson(project: Project) {
-        project.tasks.register("copyManifestJson", Copy::class.java) { task ->
+        project.tasks.register("copyManifestJson", DeployResourceFile::class.java) { task ->
             val fileName = "manifest.json"
-            val destDir = targetResourcesDirPath
 
-            val file = readResourceFile(fileName)
-            if (file == null) {
-                println("error: $fileName not found")
-                return@register
-            }
-
-            task.from(file)
-            task.into(destDir)
-            task.onlyIf { !task.destinationDir.resolve(fileName).exists() }
+            task.resourceFileName.set(fileName)
+            task.destinationFileProperty.set(project.layout.projectDirectory.dir(targetResourcesDirPath).file(fileName))
+            task.onlyIf { !task.destinationFileProperty.get().asFile.exists() }
         }
     }
 
