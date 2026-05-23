@@ -3,14 +3,11 @@ package dev.yuyuyuyuyu
 import com.github.gradle.node.npm.task.NpxTask
 import dev.yuyuyuyuyu.tasks.AddNecessaryHtmlTags
 import dev.yuyuyuyuyu.tasks.DeployResourceFile
+import dev.yuyuyuyuyu.tasks.DeployZipResource
 import dev.yuyuyuyuyu.tasks.shared.targetResourcesDirPath
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Copy
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 
 @Suppress("unused")
 class ComposePwa : Plugin<Project> {
@@ -121,19 +118,12 @@ class ComposePwa : Plugin<Project> {
     }
 
     private fun registerCopyIcons(project: Project) {
-        project.tasks.register("copyIcons", Copy::class.java) { task ->
+        project.tasks.register("copyIcons", DeployZipResource::class.java) { task ->
             val dirName = "icons"
-            val destDir = targetResourcesDirPath
 
-            val file = readResourceFile("${dirName}.zip")
-            if (file == null) {
-                println("error: ${dirName}.zip not found")
-                return@register
-            }
-
-            task.from(project.zipTree(file))
-            task.into(destDir)
-            task.onlyIf { !task.destinationDir.resolve(dirName).exists() }
+            task.resourceFileName.set("${dirName}.zip")
+            task.destinationDirectoryProperty.set(project.layout.projectDirectory.dir(targetResourcesDirPath))
+            task.onlyIf { !task.destinationDirectoryProperty.get().asFile.resolve(dirName).exists() }
         }
     }
 
@@ -158,22 +148,5 @@ class ComposePwa : Plugin<Project> {
                 sourceSet.resources.srcDirs(project.tasks.named("initComposePwaForJs"))
             }
         }
-    }
-
-    @Suppress("NewApi")
-    private fun readResourceFile(fileName: String): File? {
-        val tempDir = Files.createTempDirectory("resources").toFile()
-        val resourceUrl = this::class.java.classLoader.getResource(fileName)
-        if (resourceUrl == null) {
-            println("$fileName not found")
-            return null
-        }
-
-        val tempFile = File(tempDir, File(fileName).name)
-        resourceUrl.openStream().use { input ->
-            Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-        }
-
-        return tempFile
     }
 }
