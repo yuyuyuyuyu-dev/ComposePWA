@@ -71,7 +71,7 @@ class ComposePwa : Plugin<Project> {
             task.finalizedBy("buildJsAsPwa")
         }
 
-        addExecutionOrderOfTasks(project)
+//        addExecutionOrderOfTasks(project)
 
         project.afterEvaluate {
         }
@@ -98,11 +98,18 @@ class ComposePwa : Plugin<Project> {
     }
 
     private fun registerCopyResisterServiceWorkerJs(project: Project) {
-        project.tasks.register("copyResisterServiceWorkerJs", DeployResourceFile::class.java) { task ->
+        project.tasks.register(
+            "copyResisterServiceWorkerJs",
+            DeployResourceFile::class.java
+        ) { task ->
             val fileName = "registerServiceWorker.js"
 
             task.resourceFileName.set(fileName)
-            task.destinationFileProperty.set(project.layout.projectDirectory.dir(targetResourcesDirPath).file(fileName))
+            task.destinationFileProperty.set(
+                project.layout.projectDirectory.dir(
+                    targetResourcesDirPath
+                ).file(fileName)
+            )
             task.onlyIf { !task.destinationFileProperty.get().asFile.exists() }
         }
     }
@@ -112,7 +119,11 @@ class ComposePwa : Plugin<Project> {
             val fileName = "manifest.json"
 
             task.resourceFileName.set(fileName)
-            task.destinationFileProperty.set(project.layout.projectDirectory.dir(targetResourcesDirPath).file(fileName))
+            task.destinationFileProperty.set(
+                project.layout.projectDirectory.dir(
+                    targetResourcesDirPath
+                ).file(fileName)
+            )
             task.onlyIf { !task.destinationFileProperty.get().asFile.exists() }
         }
     }
@@ -122,8 +133,14 @@ class ComposePwa : Plugin<Project> {
             val dirName = "icons"
 
             task.resourceFileName.set("${dirName}.zip")
-            task.destinationDirectoryProperty.set(project.layout.projectDirectory.dir(targetResourcesDirPath))
-            task.onlyIf { !task.destinationDirectoryProperty.get().asFile.resolve(dirName).exists() }
+            task.destinationDirectoryProperty.set(
+                project.layout.projectDirectory.dir(
+                    targetResourcesDirPath
+                )
+            )
+            task.onlyIf {
+                !task.destinationDirectoryProperty.get().asFile.resolve(dirName).exists()
+            }
         }
     }
 
@@ -142,10 +159,14 @@ class ComposePwa : Plugin<Project> {
     private fun addExecutionOrderOfTasks(project: Project) {
         project.extensions.configure(KotlinMultiplatformExtension::class.java) { kmpExt ->
             kmpExt.sourceSets.matching { it.name == "wasmJsMain" }.configureEach { sourceSet ->
-                sourceSet.resources.srcDirs(project.tasks.named("initComposePwaForWasm"))
+                sourceSet.resources.srcDir(project.tasks.named("copyResisterServiceWorkerJs"))
+                sourceSet.resources.srcDir(project.tasks.named("copyManifestJson"))
+                sourceSet.resources.srcDir(project.tasks.named("copyIcons"))
             }
             kmpExt.sourceSets.matching { it.name == "jsMain" }.configureEach { sourceSet ->
-                sourceSet.resources.srcDirs(project.tasks.named("initComposePwaForJs"))
+                sourceSet.resources.srcDir(project.tasks.named("copyResisterServiceWorkerJs"))
+                sourceSet.resources.srcDir(project.tasks.named("copyManifestJson"))
+                sourceSet.resources.srcDir(project.tasks.named("copyIcons"))
             }
         }
     }
