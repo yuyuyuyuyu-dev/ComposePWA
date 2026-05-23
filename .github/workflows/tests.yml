@@ -61,3 +61,6 @@ jobs:
           grep -q 'registerServiceWorker.js' composeApp/src/webMain/resources/index.html || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
           grep -q 'manifest.json' composeApp/src/webMain/resources/index.html || { echo '::error::manifest.json is missing from index.html'; exit 1; }
           
+          test ! -e composeApp/src/webMain/resources/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in resources'; exit 1; }
+          test ! -e composeApp/src/webMain/resources/icons/.DS_Store || { echo '::error::.DS_Store metadata file should not exist in icons'; exit 1; }
+          test ! -e composeApp/build/dist/${{ matrix.build-dir }}/productionExecutable/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in dist'; exit 1; }
