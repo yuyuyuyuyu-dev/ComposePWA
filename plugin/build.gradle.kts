@@ -13,7 +13,9 @@ kotlin {
 }
 
 group = "dev.yuyuyuyuyu"
-version = "0.6.1"
+version = (findProperty("version") as String?)
+    ?.takeIf { it.isNotBlank() && it != "unspecified" }
+    ?: "0.0.0-SNAPSHOT"
 
 gradlePlugin {
     website = "https://github.com/yu-ko-ba/ComposePWA#readme"
