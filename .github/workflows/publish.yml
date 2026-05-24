@@ -1,7 +1,7 @@
 name: Publish
 on:
   release:
-    types: [ released ]
+    types: [ released, prereleased ]
 jobs:
   publish:
     name: Release build and publish
@@ -14,8 +14,18 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 21
+      - name: Resolve version from release tag
+        id: version
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          version="${tag#v}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+].+)?$ ]]; then
+            echo "::error::Release tag '$tag' does not match expected vX.Y.Z format" >&2
+            exit 1
+          fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
       - name: Publish to MavenCentral
-        run: ./gradlew :plugin:publishPlugins
+        run: ./gradlew :plugin:publishPlugins -Pversion=${{ steps.version.outputs.value }}
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
