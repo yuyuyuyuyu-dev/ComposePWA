@@ -28,23 +28,61 @@ abstract class AddNecessaryHtmlTags : DefaultTask() {
     fun initComposePwa() {
         val indexHtmlFile = indexHtml.asFile.get()
 
-        val html = Jsoup.parse(indexHtmlFile, "UTF-8")
-        val head = html.head()
+        val original = indexHtmlFile.readText(Charsets.UTF_8)
+        val updated = ensureNecessaryHtmlTags(original)
 
-        if (head.selectFirst("script[src=registerServiceWorker.js][type=application/javascript]") == null) {
-            head.appendElement("script").apply {
-                attr("type", "application/javascript")
-                attr("src", "registerServiceWorker.js")
-            }
+        // Only write when a tag was actually added; an already-complete file is left byte-for-byte
+        // untouched so repeated builds don't fight the user's formatter.
+        if (updated != original) {
+            indexHtmlFile.writeText(updated, Charsets.UTF_8)
         }
-
-        if (head.selectFirst("link[rel=manifest][href=manifest.json]") == null) {
-            head.appendElement("link").apply {
-                attr("rel", "manifest")
-                attr("href", "manifest.json")
-            }
-        }
-
-        indexHtmlFile.writeText(html.outerHtml(), Charsets.UTF_8)
     }
+}
+
+/**
+ * Ensures the service-worker `<script>` and manifest `<link>` exist in the `<head>` of [html],
+ * without reformatting the rest of the file.
+ *
+ * That constraint is the whole point. Tags are detected with Jsoup (so the check is independent of
+ * formatting), but a missing one is inserted as raw text rather than via `Document.outerHtml()`,
+ * which would re-serialize the entire document in Jsoup's style and fight the user's formatter.
+ * When nothing is missing the same [html] instance is returned, so the caller can skip the write.
+ */
+internal fun ensureNecessaryHtmlTags(html: String): String {
+    val missingTags = missingNecessaryHeadTags(html)
+    val closeHeadIndex = html.indexOf("</head>", ignoreCase = true)
+    if (missingTags.isEmpty() || closeHeadIndex < 0) return html
+
+    val lineStart = html.lastIndexOf('\n', closeHeadIndex - 1) + 1
+    val lineEnding = if (html.contains("\r\n")) "\r\n" else "\n"
+    val indent = headContentIndent(html, lineStart)
+    val insertion = missingTags.joinToString(separator = "") { "$indent$it$lineEnding" }
+
+    return html.substring(0, lineStart) + insertion + html.substring(lineStart)
+}
+
+private fun missingNecessaryHeadTags(html: String): List<String> {
+    val head = Jsoup.parse(html).head()
+    return buildList {
+        if (head.selectFirst("script[src=registerServiceWorker.js][type=application/javascript]") == null) {
+            add("""<script type="application/javascript" src="registerServiceWorker.js"></script>""")
+        }
+        if (head.selectFirst("link[rel=manifest][href=manifest.json]") == null) {
+            add("""<link rel="manifest" href="manifest.json">""")
+        }
+    }
+}
+
+/** Indentation of the last non-blank line before `</head>`, used to align the inserted tags. */
+private fun headContentIndent(
+    html: String,
+    headCloseLineStart: Int,
+): String {
+    val lastContentLine =
+        html
+            .take(headCloseLineStart)
+            .lineSequence()
+            .lastOrNull { it.isNotBlank() }
+            .orEmpty()
+    return lastContentLine.takeWhile { it == ' ' || it == '\t' }
 }

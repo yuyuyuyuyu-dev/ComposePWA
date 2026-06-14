@@ -6,14 +6,11 @@
 .claude/
 node_modules/
 
-# Generated or rewritten by the ComposePWA plugin at build time
-composeApp/workbox-config-for-*.js
-composeApp/src/webMain/resources/manifest.json
-composeApp/src/webMain/resources/registerServiceWorker.js
-composeApp/src/webMain/resources/icons/
-# index.html is rewritten in place by the plugin's Jsoup task on every build,
-# which would otherwise fight Prettier's formatting.
-composeApp/src/webMain/resources/index.html
+# NOTE: the web assets the ComposePWA plugin emits (index.html, manifest.json,
+# registerServiceWorker.js, workbox-config-*.js) are deliberately NOT ignored.
+# In a real consumer project they are committed source that must pass Prettier, so
+# the "ComposePWA output" CI job generates and checks them like any other file.
+# They are .gitignored here only so CI can confirm the plugin regenerates them.
 
 # Lockfiles & Gradle wrapper
 kotlin-js-store/

@@ -48,6 +48,9 @@ dependencies {
     implementation(libs.jsoup)
 
     compileOnly(libs.kotlin.gradlePlugin)
+
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.junit)
 }
 
 mavenPublishing {
