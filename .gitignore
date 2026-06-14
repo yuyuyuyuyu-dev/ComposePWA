@@ -22,6 +22,8 @@ captures
 
 /article.html
 
+# Web assets the ComposePWA plugin generates.
+# Git-ignored only so CI can check the plugin regenerates them; real apps commit these.
 /composeApp/workbox-config-for-wasm.js
 /composeApp/workbox-config-for-js.js
 /composeApp/src/webMain/resources/manifest.json
