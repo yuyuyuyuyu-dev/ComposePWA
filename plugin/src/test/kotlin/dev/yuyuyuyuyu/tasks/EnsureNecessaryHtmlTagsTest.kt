@@ -9,6 +9,7 @@ import kotlin.test.assertSame
 class EnsureNecessaryHtmlTagsTest {
     @Test
     fun returnsSameInstanceWhenBothTagsArePresent() {
+        // Arrange
         val html =
             """
             <!doctype html>
@@ -23,13 +24,18 @@ class EnsureNecessaryHtmlTagsTest {
             </html>
             """.trimIndent()
 
+        // Act
+        val result = ensureNecessaryHtmlTags(html)
+
+        // Assert
         // Returning the very same instance is what lets the task skip the write entirely, leaving
         // the file byte-for-byte unchanged and out of the formatter's way.
-        assertSame(html, ensureNecessaryHtmlTags(html))
+        assertSame(html, result)
     }
 
     @Test
     fun insertsBothMissingTagsAndPreservesExistingFormatting() {
+        // Arrange
         val html =
             """
             <!doctype html>
@@ -43,7 +49,6 @@ class EnsureNecessaryHtmlTagsTest {
               <body></body>
             </html>
             """.trimIndent()
-
         val expected =
             """
             <!doctype html>
@@ -60,11 +65,16 @@ class EnsureNecessaryHtmlTagsTest {
             </html>
             """.trimIndent()
 
-        assertEquals(expected, ensureNecessaryHtmlTags(html))
+        // Act
+        val result = ensureNecessaryHtmlTags(html)
+
+        // Assert
+        assertEquals(expected, result)
     }
 
     @Test
     fun insertsOnlyTheMissingTag() {
+        // Arrange
         val html =
             """
             <!doctype html>
@@ -76,7 +86,6 @@ class EnsureNecessaryHtmlTagsTest {
               <body></body>
             </html>
             """.trimIndent()
-
         val expected =
             """
             <!doctype html>
@@ -90,11 +99,16 @@ class EnsureNecessaryHtmlTagsTest {
             </html>
             """.trimIndent()
 
-        assertEquals(expected, ensureNecessaryHtmlTags(html))
+        // Act
+        val result = ensureNecessaryHtmlTags(html)
+
+        // Assert
+        assertEquals(expected, result)
     }
 
     @Test
     fun isIdempotent() {
+        // Arrange
         val html =
             """
             <!doctype html>
@@ -107,9 +121,11 @@ class EnsureNecessaryHtmlTagsTest {
             </html>
             """.trimIndent()
 
+        // Act
         val once = ensureNecessaryHtmlTags(html)
         val twice = ensureNecessaryHtmlTags(once)
 
+        // Assert
         // The second run finds both tags already present, so it is a no-op down to the instance.
         assertEquals(once, twice)
         assertSame(once, twice)
@@ -117,6 +133,7 @@ class EnsureNecessaryHtmlTagsTest {
 
     @Test
     fun insertsTagsUsingTheFilesExistingLineEndings() {
+        // Arrange
         // A CRLF document, e.g. an index.html checked out on Windows.
         val crlf =
             listOf(
@@ -128,17 +145,19 @@ class EnsureNecessaryHtmlTagsTest {
                 "  <body></body>",
                 "</html>",
             ).joinToString("\r\n")
+        val script = """<script type="application/javascript" src="registerServiceWorker.js"></script>"""
+        val link = """<link rel="manifest" href="manifest.json">"""
 
+        // Act
         val result = ensureNecessaryHtmlTags(crlf)
 
+        // Assert
         // The inserted tags must use CRLF like the rest of the file, never a lone LF — otherwise the
         // service-worker/manifest lines would have different line endings from everything around them.
         assertFalse(
             result.replace("\r\n", "").contains('\n'),
             "an inserted tag introduced a lone LF into a CRLF document",
         )
-        val script = """<script type="application/javascript" src="registerServiceWorker.js"></script>"""
-        val link = """<link rel="manifest" href="manifest.json">"""
         assertContains(result, "\r\n    $script\r\n")
         assertContains(result, "\r\n    $link\r\n")
     }
