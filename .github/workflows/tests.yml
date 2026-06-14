@@ -33,6 +33,65 @@ jobs:
       - name: Run plugin tests
         run: ./gradlew -p plugin test
 
+  plugin-output:
+    name: ComposePWA output (web assets the plugin emits)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "jetbrains"
+        # The JetBrains distribution resolves its version via the GitHub API;
+        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Run the plugin against the sample app so it copies its resources and
+      # ensures the PWA tags in index.html, exactly as a consumer's build would.
+      - name: Generate ComposePWA outputs
+        run: ./gradlew :composeApp:initComposePwaForWasm :composeApp:initComposePwaForJs
+
+      # The headline guarantee: running the plugin must not rewrite any committed,
+      # formatter-clean file (index.html in particular). A non-empty diff fails here.
+      - name: Verify the plugin left tracked files untouched
+        run: git diff --exit-code
+
+      # Verify every text file the plugin emits passes the project's formatters and
+      # linters. These outputs are only .gitignored so CI can confirm the plugin
+      # regenerates them; they are not formatter-ignored, so they are checked here as
+      # the committed source they would be in a real consumer project.
+      - name: Run formatters & linters on the generated outputs
+        run: |
+          npx prettier --check \
+            composeApp/src/webMain/resources/index.html \
+            composeApp/src/webMain/resources/manifest.json \
+            composeApp/src/webMain/resources/registerServiceWorker.js \
+            composeApp/workbox-config-for-wasm.js \
+            composeApp/workbox-config-for-js.js
+          npx eslint \
+            composeApp/src/webMain/resources/manifest.json \
+            composeApp/src/webMain/resources/registerServiceWorker.js \
+            composeApp/workbox-config-for-wasm.js \
+            composeApp/workbox-config-for-js.js
+
   test-pwa:
     name: Test ${{ matrix.target-name }} PWA
     runs-on: ubuntu-latest
