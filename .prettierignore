@@ -6,14 +6,15 @@
 .claude/
 node_modules/
 
-# Generated or rewritten by the ComposePWA plugin at build time
+# Git-ignored copies the ComposePWA plugin generates into the sample app at
+# build time. They are byte-for-byte copies of plugin/src/main/resources/* (which
+# Prettier already checks) and are verified directly by the "ComposePWA output"
+# job in .github/workflows/lint.yml. index.html is intentionally NOT listed: the
+# plugin no longer rewrites it, so Prettier owns its formatting like any other file.
 composeApp/workbox-config-for-*.js
 composeApp/src/webMain/resources/manifest.json
 composeApp/src/webMain/resources/registerServiceWorker.js
 composeApp/src/webMain/resources/icons/
-# index.html is rewritten in place by the plugin's Jsoup task on every build,
-# which would otherwise fight Prettier's formatting.
-composeApp/src/webMain/resources/index.html
 
 # Lockfiles & Gradle wrapper
 kotlin-js-store/
