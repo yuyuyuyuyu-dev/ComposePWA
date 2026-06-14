@@ -2,9 +2,9 @@ name: Dependabot
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   dependabot:
@@ -19,8 +19,12 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
-          java-version: '21'
-          distribution: 'jetbrains'
+          java-version: "21"
+          distribution: "jetbrains"
+        # The JetBrains distribution resolves its version via the GitHub API;
+        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Send dependencies to Dependabot
         uses: gradle/actions/dependency-submission@v6

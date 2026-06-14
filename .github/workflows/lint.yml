@@ -1,0 +1,70 @@
+name: Lint
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  kotlin:
+    name: ktlint & Detekt (Kotlin)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "jetbrains"
+        # The JetBrains distribution resolves its version via the GitHub API;
+        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Lint Kotlin (root project & composeApp)
+        run: ./gradlew ktlintCheck detekt
+
+      - name: Lint Kotlin (Gradle plugin build)
+        run: ./gradlew -p plugin ktlintCheck detekt
+
+  web:
+    name: Prettier & linters (web assets)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run formatters & linters
+        run: npm run lint
+
+  actions:
+    name: actionlint (GitHub Actions)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v6
+
+      - name: Lint workflows with actionlint
+        uses: raven-actions/actionlint@v2
