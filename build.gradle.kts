@@ -6,4 +6,6 @@ plugins {
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
+    // Applied here so the root Gradle scripts are linted as well.
+    alias(libs.plugins.ktlint)
 }

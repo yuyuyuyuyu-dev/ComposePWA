@@ -1,0 +1,14 @@
+# Detekt configuration.
+#
+# Only the deltas from Detekt's bundled default config are listed here;
+# `buildUponDefaultConfig = true` merges them onto the default ruleset.
+naming:
+  FunctionNaming:
+    # Compose @Composable functions conventionally use PascalCase.
+    ignoreAnnotated:
+      - "Composable"
+  MatchingDeclarationName:
+    # Exclude only the Kotlin Multiplatform `Platform.<target>.kt` files in the
+    # composeApp sample; the rule stays active everywhere else (e.g. the plugin).
+    excludes:
+      - "**/composeApp/**/Platform.*.kt"
