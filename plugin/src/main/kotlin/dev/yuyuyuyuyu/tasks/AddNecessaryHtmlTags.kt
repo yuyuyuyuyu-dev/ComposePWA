@@ -31,9 +31,8 @@ abstract class AddNecessaryHtmlTags : DefaultTask() {
         val original = indexHtmlFile.readText(Charsets.UTF_8)
         val updated = ensureNecessaryHtmlTags(original)
 
-        // Only rewrite when a tag was actually added. Leaving an already-complete file untouched
-        // keeps it byte-for-byte as the user (or their formatter) left it, so repeated builds no
-        // longer fight Prettier, dprint, Biome, and friends.
+        // Only write when a tag was actually added; an already-complete file is left byte-for-byte
+        // untouched so repeated builds don't fight the user's formatter.
         if (updated != original) {
             indexHtmlFile.writeText(updated, Charsets.UTF_8)
         }
@@ -41,14 +40,13 @@ abstract class AddNecessaryHtmlTags : DefaultTask() {
 }
 
 /**
- * Returns [html] with the service-worker `<script>` and the manifest `<link>` guaranteed to be
- * present in the document `<head>`.
+ * Ensures the service-worker `<script>` and manifest `<link>` exist in the `<head>` of [html],
+ * without reformatting the rest of the file.
  *
- * Jsoup is used only to DETECT whether each tag already exists, so detection is independent of how
- * the file happens to be formatted. Any missing tag is then spliced in as plain text immediately
- * before `</head>`, leaving the rest of the document exactly as it was rather than re-serializing
- * the whole thing. When both tags are already present the very same [html] instance is returned,
- * which lets the caller skip rewriting the file altogether.
+ * That constraint is the whole point. Tags are detected with Jsoup (so the check is independent of
+ * formatting), but a missing one is inserted as raw text rather than via `Document.outerHtml()`,
+ * which would re-serialize the entire document in Jsoup's style and fight the user's formatter.
+ * When nothing is missing the same [html] instance is returned, so the caller can skip the write.
  */
 internal fun ensureNecessaryHtmlTags(html: String): String {
     val missingTags = missingNecessaryHeadTags(html)
