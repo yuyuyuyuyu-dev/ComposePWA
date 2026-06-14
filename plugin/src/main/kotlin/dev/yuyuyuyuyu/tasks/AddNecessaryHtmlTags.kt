@@ -1,6 +1,6 @@
 package dev.yuyuyuyuyu.tasks
 
-import dev.yuyuyuyuyu.tasks.shared.targetResourcesDirPath
+import dev.yuyuyuyuyu.tasks.shared.TARGET_RESOURCES_DIR_PATH
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
@@ -14,15 +14,15 @@ import javax.inject.Inject
 
 @DisableCachingByDefault(because = "Not worth caching")
 abstract class AddNecessaryHtmlTags : DefaultTask() {
-
     @get:Inject
     abstract val objects: ObjectFactory
 
     @get:PathSensitive(PathSensitivity.NONE)
     @get:InputFile
-    val indexHtml: RegularFileProperty = objects.fileProperty().convention(
-        project.layout.projectDirectory.file("${targetResourcesDirPath}/index.html"),
-    )
+    val indexHtml: RegularFileProperty =
+        objects.fileProperty().convention(
+            project.layout.projectDirectory.file("$TARGET_RESOURCES_DIR_PATH/index.html"),
+        )
 
     @TaskAction
     fun initComposePwa() {
