@@ -2,9 +2,10 @@
 
 [![Publish](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/publish.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/publish.yml)
 [![Tests](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/tests.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/tests.yml)
+[![Lint](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/lint.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/lint.yml)
 <a href="https://jetc.dev/issues/273.html"><img src="https://img.shields.io/badge/As_Seen_In-jetc.dev_Newsletter_Issue_%23273-blue?logo=Jetpack+Compose&amp;logoColor=white" alt="As Seen In - jetc.dev Newsletter Issue #273"></a>
 
-This Gradle plugin provides a Gradle Task, that build your Compose Multiplatform Web App as a PWA.
+This Gradle plugin builds your Compose Multiplatform web app as a progressive web app (PWA).
 
 ## Prerequisites
 
@@ -64,19 +65,19 @@ Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable
 When you run the `wasmJsBrowserDistribution` task, this plugin automatically does the following:
 
 - Creates these files:
-    - `workbox-config-for-wasm.js`
-    - `src/webMain/resources/manifest.json`
-    - `src/webMain/resources/registerServiceWorker.js`
-    - `src/webMain/resources/icons/*`
+  - `workbox-config-for-wasm.js`
+  - `src/webMain/resources/manifest.json`
+  - `src/webMain/resources/registerServiceWorker.js`
+  - `src/webMain/resources/icons/*`
 - Adds the necessary tags to `src/webMain/resources/index.html`.
 
 When you run the `jsBrowserDistribution` task, this plugin automatically does the following:
 
 - Creates these files:
-    - `workbox-config-for-js.js`
-    - `src/webMain/resources/manifest.json`
-    - `src/webMain/resources/registerServiceWorker.js`
-    - `src/webMain/resources/icons/*`
+  - `workbox-config-for-js.js`
+  - `src/webMain/resources/manifest.json`
+  - `src/webMain/resources/registerServiceWorker.js`
+  - `src/webMain/resources/icons/*`
 - Adds the necessary tags to `src/webMain/resources/index.html`.
 
 ## Deploy to GitHub Pages
@@ -87,7 +88,7 @@ You can find a sample GitHub Actions workflow for deploying your PWA to GitHub P
 
 And you can check out a live example here:
 
-https://compose-pwa-example.yuyuyuyuyu.dev
+<https://compose-pwa-example.yuyuyuyuyu.dev>
 
 ## How to customize your PWA
 
@@ -106,6 +107,31 @@ use [ngx-pwa-icons](https://github.com/pverhaert/ngx-pwa-icons) like this.
 npx ngx-pwa-icons
 ```
 
+## Contributing
+
+This plugin exists to make turning a Compose Multiplatform web app into a PWA as
+effortless as possible — I couldn't be bothered to run `workbox-cli` by hand,
+and published it so anyone could skip that chore too.
+
+- **Bug reports and bug-fix PRs are very welcome.**
+- **Thinking about a new feature? Please open an issue first.** I'd love to talk
+  it through before you write any code — partly to check it fits the "make PWAs
+  effortless" goal, and partly because I'm still figuring out what's in scope
+  for this project.
+- **New features should come with tests**, so that if something breaks later, the
+  tests — not my memory — say how it's supposed to behave.
+
+Before opening a pull request, run the auto-fixers and make sure the Lint check
+is green:
+
+```bash
+npm install && npm run fix        # web assets
+./gradlew ktlintFormat            # Kotlin & Gradle scripts
+./gradlew -p plugin ktlintFormat
+```
+
+What runs (and how) is defined in `package.json` and `.github/workflows/`.
+
 ## Dependencies & Acknowledgments
 
 This plugin depends on the following open-source projects.<br />
@@ -119,7 +145,7 @@ Thanks to these projects!
 
 Apache License 2.0
 
-```
+```text
 Copyright 2025 yu
 
 Licensed under the Apache License, Version 2.0 (the "License");

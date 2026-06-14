@@ -6,6 +6,13 @@ plugins {
     `java-gradle-plugin`
     alias(libs.plugins.vanniktechMavenPublish)
     alias(libs.plugins.nodeGradle)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    config.setFrom(file("../detekt.yml"))
 }
 
 kotlin {

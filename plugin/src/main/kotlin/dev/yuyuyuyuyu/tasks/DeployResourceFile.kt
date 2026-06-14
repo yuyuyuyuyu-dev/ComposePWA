@@ -25,8 +25,9 @@ abstract class DeployResourceFile : DefaultTask() {
         val fileName = resourceFileName.get()
         val destFile = destinationFileProperty.get().asFile
 
-        val resourceUrl = this::class.java.classLoader.getResource(fileName)
-            ?: throw GradleException("Error: $fileName is not found.")
+        val resourceUrl =
+            this::class.java.classLoader.getResource(fileName)
+                ?: throw GradleException("Error: $fileName is not found.")
         resourceUrl.openStream().use { inputStream ->
             Files.copy(inputStream, destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }

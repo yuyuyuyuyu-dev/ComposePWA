@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -17,14 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target-name: 'Wasm'
-            gradle-task: 'wasmJsBrowserDistribution'
-            build-dir: 'wasmJs'
-            config-file: 'workbox-config-for-wasm.js'
-          - target-name: 'JS'
-            gradle-task: 'jsBrowserDistribution'
-            build-dir: 'js'
-            config-file: 'workbox-config-for-js.js'
+          - target-name: "Wasm"
+            gradle-task: "wasmJsBrowserDistribution"
+            build-dir: "wasmJs"
+            config-file: "workbox-config-for-wasm.js"
+          - target-name: "JS"
+            gradle-task: "jsBrowserDistribution"
+            build-dir: "js"
+            config-file: "workbox-config-for-js.js"
 
     steps:
       - name: Clone Repository
@@ -33,8 +33,12 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
-          java-version: '21'
-          distribution: 'jetbrains'
+          java-version: "21"
+          distribution: "jetbrains"
+        # The JetBrains distribution resolves its version via the GitHub API;
+        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -48,7 +52,7 @@ jobs:
           test -f composeApp/${{ matrix.config-file }} || { echo '::error::${{ matrix.config-file }} Not Found'; exit 1; }
           test -f composeApp/src/webMain/resources/manifest.json || { echo '::error::manifest.json Not Found'; exit 1; }
           test -f composeApp/src/webMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
-          
+
           test -f composeApp/src/webMain/resources/icons/icon-72x72.png || { echo '::error::icons/icon-72x72.png Not Found'; exit 1; }
           test -f composeApp/src/webMain/resources/icons/icon-96x96.png || { echo '::error::icons/icon-96x96.png Not Found'; exit 1; }
           test -f composeApp/src/webMain/resources/icons/icon-128x128.png || { echo '::error::icons/icon-128x128.png Not Found'; exit 1; }
@@ -57,10 +61,10 @@ jobs:
           test -f composeApp/src/webMain/resources/icons/icon-192x192.png || { echo '::error::icons/icon-192x192.png Not Found'; exit 1; }
           test -f composeApp/src/webMain/resources/icons/icon-384x384.png || { echo '::error::icons/icon-384x384.png Not Found'; exit 1; }
           test -f composeApp/src/webMain/resources/icons/icon-512x512.png || { echo '::error::icons/icon-512x512.png Not Found'; exit 1; }
-          
+
           grep -q 'registerServiceWorker.js' composeApp/src/webMain/resources/index.html || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
           grep -q 'manifest.json' composeApp/src/webMain/resources/index.html || { echo '::error::manifest.json is missing from index.html'; exit 1; }
-          
+
           test ! -e composeApp/src/webMain/resources/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in resources'; exit 1; }
           test ! -e composeApp/src/webMain/resources/icons/.DS_Store || { echo '::error::.DS_Store metadata file should not exist in icons'; exit 1; }
           test ! -e composeApp/build/dist/${{ matrix.build-dir }}/productionExecutable/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in dist'; exit 1; }

@@ -1,0 +1,10 @@
+{
+  "extends": "stylelint-config-standard",
+  "ignoreFiles": [
+    "**/build/**",
+    "**/node_modules/**",
+    ".gradle/**",
+    ".idea/**",
+    ".kotlin/**"
+  ]
+}

@@ -4,7 +4,7 @@ import com.github.gradle.node.npm.task.NpxTask
 import dev.yuyuyuyuyu.tasks.AddNecessaryHtmlTags
 import dev.yuyuyuyuyu.tasks.DeployResourceFile
 import dev.yuyuyuyuyu.tasks.DeployZipResource
-import dev.yuyuyuyuyu.tasks.shared.targetResourcesDirPath
+import dev.yuyuyuyuyu.tasks.shared.TARGET_RESOURCES_DIR_PATH
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -83,7 +83,12 @@ class ComposePwa : Plugin<Project> {
 
             task.resourceFileName.set(fileName)
             task.destinationFileProperty.set(project.layout.projectDirectory.file(fileName))
-            task.onlyIf { !task.destinationFileProperty.get().asFile.exists() }
+            task.onlyIf {
+                !task.destinationFileProperty
+                    .get()
+                    .asFile
+                    .exists()
+            }
         }
     }
 
@@ -93,7 +98,12 @@ class ComposePwa : Plugin<Project> {
 
             task.resourceFileName.set(fileName)
             task.destinationFileProperty.set(project.layout.projectDirectory.file(fileName))
-            task.onlyIf { !task.destinationFileProperty.get().asFile.exists() }
+            task.onlyIf {
+                !task.destinationFileProperty
+                    .get()
+                    .asFile
+                    .exists()
+            }
         }
     }
 
@@ -102,8 +112,17 @@ class ComposePwa : Plugin<Project> {
             val fileName = "registerServiceWorker.js"
 
             task.resourceFileName.set(fileName)
-            task.destinationFileProperty.set(project.layout.projectDirectory.dir(targetResourcesDirPath).file(fileName))
-            task.onlyIf { !task.destinationFileProperty.get().asFile.exists() }
+            task.destinationFileProperty.set(
+                project.layout.projectDirectory
+                    .dir(TARGET_RESOURCES_DIR_PATH)
+                    .file(fileName),
+            )
+            task.onlyIf {
+                !task.destinationFileProperty
+                    .get()
+                    .asFile
+                    .exists()
+            }
         }
     }
 
@@ -112,8 +131,17 @@ class ComposePwa : Plugin<Project> {
             val fileName = "manifest.json"
 
             task.resourceFileName.set(fileName)
-            task.destinationFileProperty.set(project.layout.projectDirectory.dir(targetResourcesDirPath).file(fileName))
-            task.onlyIf { !task.destinationFileProperty.get().asFile.exists() }
+            task.destinationFileProperty.set(
+                project.layout.projectDirectory
+                    .dir(TARGET_RESOURCES_DIR_PATH)
+                    .file(fileName),
+            )
+            task.onlyIf {
+                !task.destinationFileProperty
+                    .get()
+                    .asFile
+                    .exists()
+            }
         }
     }
 
@@ -121,9 +149,15 @@ class ComposePwa : Plugin<Project> {
         project.tasks.register("copyIcons", DeployZipResource::class.java) { task ->
             val dirName = "icons"
 
-            task.resourceFileName.set("${dirName}.zip")
-            task.destinationDirectoryProperty.set(project.layout.projectDirectory.dir(targetResourcesDirPath))
-            task.onlyIf { !task.destinationDirectoryProperty.get().asFile.resolve(dirName).exists() }
+            task.resourceFileName.set("$dirName.zip")
+            task.destinationDirectoryProperty.set(project.layout.projectDirectory.dir(TARGET_RESOURCES_DIR_PATH))
+            task.onlyIf {
+                !task.destinationDirectoryProperty
+                    .get()
+                    .asFile
+                    .resolve(dirName)
+                    .exists()
+            }
         }
     }
 
