@@ -110,14 +110,16 @@ You can customize offline behavior by editing the `workbox-config.js` file:
 
 ```javascript
 module.exports = {
-    globDirectory: "build/dist/wasmJs/productionExecutable/",
-    globPatterns: [],
-    maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
-    runtimeCaching: [{
-        urlPattern: /.+/,
-        handler: "StaleWhileRevalidate",
-    }],
-    swDest: "build/dist/wasmJs/productionExecutable/serviceWorker.js",
+  globDirectory: "build/dist/wasmJs/productionExecutable/",
+  globPatterns: [],
+  maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+  runtimeCaching: [
+    {
+      urlPattern: /.+/,
+      handler: "StaleWhileRevalidate",
+    },
+  ],
+  swDest: "build/dist/wasmJs/productionExecutable/serviceWorker.js",
 };
 ```
 
@@ -125,7 +127,7 @@ module.exports = {
 
 After using `ComposePWA`, your project will look like this:
 
-```
+```text
 composeApp/
 ├── src/
 │   └── wasmJsMain/
