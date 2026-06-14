@@ -1,6 +1,9 @@
 *.iml
 .kotlin
 .gradle
+
+# Node tooling (formatters & linters)
+node_modules/
 **/build/
 xcuserdata
 !src/**/build/

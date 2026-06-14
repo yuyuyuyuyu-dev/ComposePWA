@@ -1,0 +1,12 @@
+exclude = [
+  "**/build/**",
+  "**/node_modules/**",
+  ".gradle/**",
+  ".idea/**",
+  ".kotlin/**",
+  "kotlin-js-store/**",
+]
+
+[formatting]
+# Sort version-catalog entries so they are easy to diff against other projects.
+reorder_keys = true
