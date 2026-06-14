@@ -6,15 +6,11 @@
 .claude/
 node_modules/
 
-# Git-ignored copies the ComposePWA plugin generates into the sample app at
-# build time. They are byte-for-byte copies of plugin/src/main/resources/* (which
-# Prettier already checks) and are verified directly by the "ComposePWA output"
-# job in .github/workflows/lint.yml. index.html is intentionally NOT listed: the
-# plugin no longer rewrites it, so Prettier owns its formatting like any other file.
-composeApp/workbox-config-for-*.js
-composeApp/src/webMain/resources/manifest.json
-composeApp/src/webMain/resources/registerServiceWorker.js
-composeApp/src/webMain/resources/icons/
+# NOTE: the web assets the ComposePWA plugin emits (index.html, manifest.json,
+# registerServiceWorker.js, workbox-config-*.js) are deliberately NOT ignored.
+# In a real consumer project they are committed source that must pass Prettier, so
+# the "ComposePWA output" CI job generates and checks them like any other file.
+# They are .gitignored here only so CI can confirm the plugin regenerates them.
 
 # Lockfiles & Gradle wrapper
 kotlin-js-store/

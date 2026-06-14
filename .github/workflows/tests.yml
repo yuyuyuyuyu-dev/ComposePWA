@@ -8,6 +8,31 @@ on:
   workflow_dispatch:
 
 jobs:
+  plugin:
+    name: Plugin unit tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "jetbrains"
+        # The JetBrains distribution resolves its version via the GitHub API;
+        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run plugin tests
+        run: ./gradlew -p plugin test
+
   test-pwa:
     name: Test ${{ matrix.target-name }} PWA
     runs-on: ubuntu-latest

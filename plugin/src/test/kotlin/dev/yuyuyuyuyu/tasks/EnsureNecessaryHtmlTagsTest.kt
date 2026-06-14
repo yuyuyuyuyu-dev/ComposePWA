@@ -1,7 +1,9 @@
 package dev.yuyuyuyuyu.tasks
 
 import org.junit.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertSame
 
 class EnsureNecessaryHtmlTagsTest {
@@ -111,5 +113,33 @@ class EnsureNecessaryHtmlTagsTest {
         // The second run finds both tags already present, so it is a no-op down to the instance.
         assertEquals(once, twice)
         assertSame(once, twice)
+    }
+
+    @Test
+    fun insertsTagsUsingTheFilesExistingLineEndings() {
+        // A CRLF document, e.g. an index.html checked out on Windows.
+        val crlf =
+            listOf(
+                "<!doctype html>",
+                "<html lang=\"en\">",
+                "  <head>",
+                "    <meta charset=\"UTF-8\" />",
+                "  </head>",
+                "  <body></body>",
+                "</html>",
+            ).joinToString("\r\n")
+
+        val result = ensureNecessaryHtmlTags(crlf)
+
+        // The inserted tags must use CRLF like the rest of the file, never a lone LF — otherwise the
+        // service-worker/manifest lines would have different line endings from everything around them.
+        assertFalse(
+            result.replace("\r\n", "").contains('\n'),
+            "an inserted tag introduced a lone LF into a CRLF document",
+        )
+        val script = """<script type="application/javascript" src="registerServiceWorker.js"></script>"""
+        val link = """<link rel="manifest" href="manifest.json">"""
+        assertContains(result, "\r\n    $script\r\n")
+        assertContains(result, "\r\n    $link\r\n")
     }
 }

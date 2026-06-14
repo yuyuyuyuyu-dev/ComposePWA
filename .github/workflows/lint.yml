@@ -99,19 +99,18 @@ jobs:
         run: git diff --exit-code
 
       # Verify every text file the plugin emits passes the project's formatters and
-      # linters. These outputs are git-ignored, so bypass the ignore files to reach
-      # the freshly generated artifacts.
+      # linters. These outputs are only .gitignored so CI can confirm the plugin
+      # regenerates them; they are not formatter-ignored, so they are checked here as
+      # the committed source they would be in a real consumer project.
       - name: Run formatters & linters on the generated outputs
         run: |
-          outputs=(
-            composeApp/src/webMain/resources/index.html
-            composeApp/src/webMain/resources/manifest.json
-            composeApp/src/webMain/resources/registerServiceWorker.js
-            composeApp/workbox-config-for-wasm.js
+          npx prettier --check \
+            composeApp/src/webMain/resources/index.html \
+            composeApp/src/webMain/resources/manifest.json \
+            composeApp/src/webMain/resources/registerServiceWorker.js \
+            composeApp/workbox-config-for-wasm.js \
             composeApp/workbox-config-for-js.js
-          )
-          npx prettier --check --ignore-path /dev/null "${outputs[@]}"
-          npx eslint --no-ignore \
+          npx eslint \
             composeApp/src/webMain/resources/manifest.json \
             composeApp/src/webMain/resources/registerServiceWorker.js \
             composeApp/workbox-config-for-wasm.js \
