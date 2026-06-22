@@ -18,7 +18,7 @@ kotlin = "2.4.0"
 ktlint = "14.2.0"
 material3 = "1.12.0-alpha02"
 nodeGradle = "7.1.0"
-vanniktechMavenPublish = "0.36.0"
+vanniktechMavenPublish = "0.37.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
