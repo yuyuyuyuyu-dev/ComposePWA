@@ -5,6 +5,8 @@
     "**/node_modules/**",
     ".gradle/**",
     ".idea/**",
-    ".kotlin/**"
+    ".kotlin/**",
+    "example/**",
+    "tmp/**"
   ]
 }

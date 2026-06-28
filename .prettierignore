@@ -6,11 +6,8 @@
 .claude/
 node_modules/
 
-# NOTE: the web assets the ComposePWA plugin emits (index.html, manifest.json,
-# registerServiceWorker.js, workbox-config-*.js) are deliberately NOT ignored.
-# In a real consumer project they are committed source that must pass Prettier, so
-# the "ComposePWA output" CI job generates and checks them like any other file.
-# They are .gitignored here only so CI can confirm the plugin regenerates them.
+# Local scratch workspace (contents are git-ignored).
+tmp/
 
 # Lockfiles & Gradle wrapper
 kotlin-js-store/

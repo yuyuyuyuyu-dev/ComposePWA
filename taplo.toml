@@ -5,6 +5,8 @@ exclude = [
   ".idea/**",
   ".kotlin/**",
   "kotlin-js-store/**",
+  "example/**",
+  "tmp/**",
 ]
 
 [formatting]

@@ -42,7 +42,8 @@ jobs:
           node-version: "24"
 
       - name: Build Web App
-        run: ./gradlew :composeApp:wasmJsBrowserDistribution
+        working-directory: example
+        run: ./gradlew :webApp:wasmJsBrowserDistribution
 
       - name: Setup Pages
         uses: actions/configure-pages@v6
@@ -50,7 +51,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: "composeApp/build/dist/wasmJs/productionExecutable"
+          path: "example/webApp/build/dist/wasmJs/productionExecutable"
 
       - name: Deploy to GitHub Pages
         id: deployment

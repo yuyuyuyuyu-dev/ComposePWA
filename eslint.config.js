@@ -11,12 +11,13 @@ module.exports = [
     ignores: [
       "**/build/**",
       "**/node_modules/**",
-      ".gradle/**",
-      ".idea/**",
-      ".kotlin/**",
+      "**/.gradle/**",
+      "**/.idea/**",
+      "**/.kotlin/**",
       ".claude/**",
-      "kotlin-js-store/**",
+      "**/kotlin-js-store/**",
       "package-lock.json",
+      "tmp/**",
       // NOTE: the JS assets the ComposePWA plugin emits (registerServiceWorker.js,
       // workbox-config-*.js) are intentionally NOT ignored — they are checked by the
       // "ComposePWA output" CI job, which configures them as browser/Node scripts below.

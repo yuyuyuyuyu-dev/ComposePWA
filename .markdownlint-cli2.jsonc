@@ -12,6 +12,8 @@
     "**/build/**",
     ".gradle/**",
     ".idea/**",
-    ".kotlin/**"
+    ".kotlin/**",
+    "example/**",
+    "tmp/**"
   ]
 }
