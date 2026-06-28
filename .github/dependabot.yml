@@ -1,7 +1,5 @@
 version: 2
 updates:
-  # The plugin and the example are separate Gradle builds, each with its own version
-  # catalog, so each needs its own update entry (there is no catalog at the root).
   - package-ecosystem: "gradle"
     directory: "/plugin"
     schedule:
