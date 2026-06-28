@@ -28,3 +28,5 @@ jobs:
 
       - name: Send dependencies to Dependabot
         uses: gradle/actions/dependency-submission@v6
+        with:
+          build-root-directory: plugin
