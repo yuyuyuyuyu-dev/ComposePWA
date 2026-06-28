@@ -30,8 +30,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Lint Kotlin (root project & composeApp)
-        run: ./gradlew ktlintCheck detekt
+      - name: Lint Kotlin (root build scripts)
+        run: ./gradlew ktlintCheck
 
       - name: Lint Kotlin (Gradle plugin build)
         run: ./gradlew -p plugin ktlintCheck detekt

@@ -1,0 +1,5 @@
+# General-purpose temporary working directory.
+# Keep the directory in Git (via .gitkeep) but ignore everything inside it.
+*
+!.gitignore
+!.gitkeep

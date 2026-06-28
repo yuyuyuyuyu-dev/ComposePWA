@@ -9,7 +9,7 @@
     "format:check": "prettier --check . && taplo fmt --check",
     "lint:eslint": "eslint .",
     "lint:css": "stylelint \"**/*.css\"",
-    "lint:html": "htmlhint \"**/*.html\" --ignore \"**/build/**,**/node_modules/**\"",
+    "lint:html": "htmlhint \"**/*.html\" --ignore \"**/build/**,**/node_modules/**,example/**,tmp/**\"",
     "lint:md": "markdownlint-cli2",
     "lint:toml": "taplo lint",
     "lint:actions": "actionlint",

@@ -6,11 +6,15 @@
 .claude/
 node_modules/
 
-# NOTE: the web assets the ComposePWA plugin emits (index.html, manifest.json,
-# registerServiceWorker.js, workbox-config-*.js) are deliberately NOT ignored.
-# In a real consumer project they are committed source that must pass Prettier, so
-# the "ComposePWA output" CI job generates and checks them like any other file.
-# They are .gitignored here only so CI can confirm the plugin regenerates them.
+# The example app is a faithful, drop-in user project, kept out of the repo's general
+# formatting so its wizard-generated files stay byte-for-byte authentic. The web assets
+# the plugin emits/modifies there are verified separately by the "ComposePWA output" CI
+# job (a targeted Prettier run + git diff). The plugin's SOURCE templates under
+# plugin/src/main/resources/ are NOT ignored and must pass Prettier like any other file.
+example/
+
+# Local scratch workspace (its contents are git-ignored); never linted.
+tmp/
 
 # Lockfiles & Gradle wrapper
 kotlin-js-store/
