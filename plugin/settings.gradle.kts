@@ -1,3 +1,5 @@
+rootProject.name = "plugin"
+
 pluginManagement {
     repositories {
         mavenCentral()

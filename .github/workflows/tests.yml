@@ -64,21 +64,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Run the plugin against the sample app so it copies its resources and
+      # Run the plugin against the example app so it copies its resources and
       # ensures the PWA tags in index.html, exactly as a consumer's build would.
       - name: Generate ComposePWA outputs
-        run: ./gradlew :composeApp:initComposePwaForWasm :composeApp:initComposePwaForJs
+        working-directory: example
+        run: ./gradlew :webApp:initComposePwaForWasm :webApp:initComposePwaForJs
 
       # The headline guarantee: running the plugin must not rewrite any committed,
       # formatter-clean file (index.html in particular). A non-empty diff fails here.
       - name: Verify the plugin left tracked files untouched
         run: git diff --exit-code
 
-      # The emitted files are NOT formatter-ignored (see .prettierignore /
-      # eslint.config.js), so the normal lint suite picks them up now that they exist.
-      # No per-file list to maintain as the plugin grows new outputs.
-      - name: Run formatters & linters on the generated outputs
-        run: npm run lint
+      # The example app is excluded from the repo's general lint (it is a faithful,
+      # drop-in user project), so check the files the plugin emits/modifies with a
+      # targeted Prettier run. --ignore-path /dev/null bypasses .prettierignore's example/.
+      - name: Check the plugin's emitted web assets are formatter-clean
+        run: >
+          npx prettier --check --ignore-path /dev/null
+          example/webApp/src/webMain/resources/index.html
+          example/webApp/src/webMain/resources/manifest.json
+          example/webApp/src/webMain/resources/registerServiceWorker.js
+          example/webApp/workbox-config-for-wasm.js
+          example/webApp/workbox-config-for-js.js
 
   test-pwa:
     name: Test ${{ matrix.target-name }} PWA
@@ -116,27 +123,28 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build ${{ matrix.target-name }} as PWA
-        run: ./gradlew :composeApp:${{ matrix.gradle-task }}
+        working-directory: example
+        run: ./gradlew :webApp:${{ matrix.gradle-task }}
 
       - name: Assert ${{ matrix.target-name }} PWA generated files
         run: |
-          test -f composeApp/build/dist/${{ matrix.build-dir }}/productionExecutable/serviceWorker.js || { echo '::error::serviceWorker.js Not Found'; exit 1; }
-          test -f composeApp/${{ matrix.config-file }} || { echo '::error::${{ matrix.config-file }} Not Found'; exit 1; }
-          test -f composeApp/src/webMain/resources/manifest.json || { echo '::error::manifest.json Not Found'; exit 1; }
-          test -f composeApp/src/webMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
+          test -f example/webApp/build/dist/${{ matrix.build-dir }}/productionExecutable/serviceWorker.js || { echo '::error::serviceWorker.js Not Found'; exit 1; }
+          test -f example/webApp/${{ matrix.config-file }} || { echo '::error::${{ matrix.config-file }} Not Found'; exit 1; }
+          test -f example/webApp/src/webMain/resources/manifest.json || { echo '::error::manifest.json Not Found'; exit 1; }
+          test -f example/webApp/src/webMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
 
-          test -f composeApp/src/webMain/resources/icons/icon-72x72.png || { echo '::error::icons/icon-72x72.png Not Found'; exit 1; }
-          test -f composeApp/src/webMain/resources/icons/icon-96x96.png || { echo '::error::icons/icon-96x96.png Not Found'; exit 1; }
-          test -f composeApp/src/webMain/resources/icons/icon-128x128.png || { echo '::error::icons/icon-128x128.png Not Found'; exit 1; }
-          test -f composeApp/src/webMain/resources/icons/icon-144x144.png || { echo '::error::icons/icon-144x144.png Not Found'; exit 1; }
-          test -f composeApp/src/webMain/resources/icons/icon-152x152.png || { echo '::error::icons/icon-152x152.png Not Found'; exit 1; }
-          test -f composeApp/src/webMain/resources/icons/icon-192x192.png || { echo '::error::icons/icon-192x192.png Not Found'; exit 1; }
-          test -f composeApp/src/webMain/resources/icons/icon-384x384.png || { echo '::error::icons/icon-384x384.png Not Found'; exit 1; }
-          test -f composeApp/src/webMain/resources/icons/icon-512x512.png || { echo '::error::icons/icon-512x512.png Not Found'; exit 1; }
+          test -f example/webApp/src/webMain/resources/icons/icon-72x72.png || { echo '::error::icons/icon-72x72.png Not Found'; exit 1; }
+          test -f example/webApp/src/webMain/resources/icons/icon-96x96.png || { echo '::error::icons/icon-96x96.png Not Found'; exit 1; }
+          test -f example/webApp/src/webMain/resources/icons/icon-128x128.png || { echo '::error::icons/icon-128x128.png Not Found'; exit 1; }
+          test -f example/webApp/src/webMain/resources/icons/icon-144x144.png || { echo '::error::icons/icon-144x144.png Not Found'; exit 1; }
+          test -f example/webApp/src/webMain/resources/icons/icon-152x152.png || { echo '::error::icons/icon-152x152.png Not Found'; exit 1; }
+          test -f example/webApp/src/webMain/resources/icons/icon-192x192.png || { echo '::error::icons/icon-192x192.png Not Found'; exit 1; }
+          test -f example/webApp/src/webMain/resources/icons/icon-384x384.png || { echo '::error::icons/icon-384x384.png Not Found'; exit 1; }
+          test -f example/webApp/src/webMain/resources/icons/icon-512x512.png || { echo '::error::icons/icon-512x512.png Not Found'; exit 1; }
 
-          grep -q 'registerServiceWorker.js' composeApp/src/webMain/resources/index.html || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
-          grep -q 'manifest.json' composeApp/src/webMain/resources/index.html || { echo '::error::manifest.json is missing from index.html'; exit 1; }
+          grep -q 'registerServiceWorker.js' example/webApp/src/webMain/resources/index.html || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
+          grep -q 'manifest.json' example/webApp/src/webMain/resources/index.html || { echo '::error::manifest.json is missing from index.html'; exit 1; }
 
-          test ! -e composeApp/src/webMain/resources/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in resources'; exit 1; }
-          test ! -e composeApp/src/webMain/resources/icons/.DS_Store || { echo '::error::.DS_Store metadata file should not exist in icons'; exit 1; }
-          test ! -e composeApp/build/dist/${{ matrix.build-dir }}/productionExecutable/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in dist'; exit 1; }
+          test ! -e example/webApp/src/webMain/resources/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in resources'; exit 1; }
+          test ! -e example/webApp/src/webMain/resources/icons/.DS_Store || { echo '::error::.DS_Store metadata file should not exist in icons'; exit 1; }
+          test ! -e example/webApp/build/dist/${{ matrix.build-dir }}/productionExecutable/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in dist'; exit 1; }
