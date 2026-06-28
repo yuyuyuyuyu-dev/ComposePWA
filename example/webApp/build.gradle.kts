@@ -5,9 +5,9 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 
-    // Builds this web app as a PWA. Resolved from the local includeBuild (see
-    // settings.gradle.kts), so the catalog version is overridden by the local source.
-    alias(libs.plugins.composePwa)
+    // Builds this web app as a PWA. Resolved from source via includeBuild("../plugin")
+    // in settings.gradle.kts, so there is no version and no Gradle Plugin Portal lookup.
+    id("dev.yuyuyuyuyu.composepwa")
 }
 
 kotlin {

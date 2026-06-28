@@ -1,7 +1,6 @@
 [versions]
 androidx-lifecycle = "2.11.0-beta01"
 composeMultiplatform = "1.11.1"
-composePwa = "0.7.0-alpha01"
 junit = "4.13.2"
 kotlin = "2.4.0"
 kotlin-wrappers = "2026.6.1"
@@ -23,6 +22,5 @@ wrappers-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", ve
 
 [plugins]
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
-composePwa = { id = "dev.yuyuyuyuyu.composepwa", version.ref = "composePwa" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
