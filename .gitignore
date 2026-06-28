@@ -22,11 +22,9 @@ captures
 
 /article.html
 
-# Web assets the ComposePWA plugin generates inside the example app. These are
-# git-ignored from the root (not from example/.gitignore) so that replacing the
-# example with a freshly generated project never drops these rules. They are kept out
-# of Git on purpose so CI can verify the plugin actually regenerates them; a real
-# consumer app would commit them.
+# Web assets the ComposePWA plugin generates in the example. Git-ignored only so CI can
+# check the plugin regenerates them; real apps commit these. (Kept in the root .gitignore,
+# not example/.gitignore, so regenerating the example never drops these rules.)
 /example/webApp/workbox-config-for-wasm.js
 /example/webApp/workbox-config-for-js.js
 /example/webApp/src/webMain/resources/manifest.json

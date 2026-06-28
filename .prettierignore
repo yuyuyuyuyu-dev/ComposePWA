@@ -6,14 +6,7 @@
 .claude/
 node_modules/
 
-# The example app is a faithful, drop-in user project, kept out of the repo's general
-# formatting so its wizard-generated files stay byte-for-byte authentic. The web assets
-# the plugin emits/modifies there are verified separately by the "ComposePWA output" CI
-# job (a targeted Prettier run + git diff). The plugin's SOURCE templates under
-# plugin/src/main/resources/ are NOT ignored and must pass Prettier like any other file.
-example/
-
-# Local scratch workspace (its contents are git-ignored); never linted.
+# Local scratch workspace (contents are git-ignored).
 tmp/
 
 # Lockfiles & Gradle wrapper

@@ -11,15 +11,12 @@ module.exports = [
     ignores: [
       "**/build/**",
       "**/node_modules/**",
-      ".gradle/**",
-      ".idea/**",
-      ".kotlin/**",
+      "**/.gradle/**",
+      "**/.idea/**",
+      "**/.kotlin/**",
       ".claude/**",
-      "kotlin-js-store/**",
+      "**/kotlin-js-store/**",
       "package-lock.json",
-      // The example app is a faithful, drop-in user project; its plugin OUTPUTS are
-      // verified separately (ComposePWA output CI job). "tmp/" is a local scratch dir.
-      "example/**",
       "tmp/**",
       // NOTE: the JS assets the ComposePWA plugin emits (registerServiceWorker.js,
       // workbox-config-*.js) are intentionally NOT ignored — they are checked by the
