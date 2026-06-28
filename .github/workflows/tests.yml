@@ -31,8 +31,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Run plugin tests
-        working-directory: plugin
-        run: ./gradlew test
+        run: ./gradlew :plugin:test
 
   plugin-output:
     name: ComposePWA output (web assets the plugin emits)

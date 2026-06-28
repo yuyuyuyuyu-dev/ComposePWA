@@ -1,4 +1,4 @@
-rootProject.name = "plugin"
+rootProject.name = "ComposePWA"
 
 pluginManagement {
     repositories {
@@ -13,3 +13,5 @@ dependencyResolutionManagement {
         gradlePluginPortal()
     }
 }
+
+include(":plugin")

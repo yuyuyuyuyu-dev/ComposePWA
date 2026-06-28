@@ -5,7 +5,7 @@ pluginManagement {
     // Use the ComposePWA plugin from this repository's source (the build under test)
     // instead of a published version. This is the only change from a real consumer
     // project, which would resolve the plugin from the Gradle Plugin Portal.
-    includeBuild("../plugin")
+    includeBuild("..")
 
     repositories {
         google {
