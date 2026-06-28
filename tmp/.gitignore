@@ -1,5 +1,4 @@
-# General-purpose temporary working directory.
-# Keep the directory in Git (via .gitkeep) but ignore everything inside it.
+# General-purpose temporary working directory. This tracked .gitignore is what keeps the
+# otherwise-empty directory in Git; everything else inside it is ignored.
 *
 !.gitignore
-!.gitkeep
