@@ -34,7 +34,7 @@ jobs:
         run: ./gradlew :plugin:test
 
   plugin-output:
-    name: ComposePWA output (web assets the plugin emits)
+    name: Plugin output stays formatter-clean
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -79,7 +79,7 @@ jobs:
         run: npm run lint
 
   test-pwa:
-    name: Test ${{ matrix.target-name }} PWA
+    name: "E2E: build ${{ matrix.target-name }} PWA"
     runs-on: ubuntu-latest
     permissions:
       contents: read
