@@ -9,6 +9,9 @@ node_modules/
 # Local scratch workspace (contents are git-ignored).
 tmp/
 
+# Runtime state of the layout test app (files CI copies/generates; not committed).
+test-projects/web-app/src/*/resources/
+
 # Lockfiles & Gradle wrapper
 kotlin-js-store/
 gradlew
