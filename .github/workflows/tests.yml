@@ -285,9 +285,12 @@ jobs:
             exit 1
           fi
           grep -q "ComposePWA needs your web app's index.html" build-output.log || { echo '::error::the failure message is missing'; tail -50 build-output.log; exit 1; }
-          for sourceSet in webMain wasmJsMain jsMain commonMain; do
+          for sourceSet in webMain wasmJsMain commonMain; do
             grep -q "src/$sourceSet/resources/index.html" build-output.log || { echo "::error::searched location src/$sourceSet/resources/index.html is not listed"; exit 1; }
           done
+          if grep -q 'src/jsMain/resources/index.html' build-output.log; then
+            echo '::error::a wasm build must not search the js target source set'; exit 1
+          fi
 
   test-own-manifest:
     name: "Respects the project's own manifest.json"
