@@ -204,6 +204,56 @@ jobs:
             fi
           done
 
+  test-per-target:
+    name: "E2E: build PWA (index.html in wasmJsMain and jsMain)"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "jetbrains"
+        # The JetBrains distribution resolves its version via the GitHub API;
+        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Copy index.html into both per-target resources
+        run: |
+          for sourceSet in wasmJsMain jsMain; do
+            mkdir -p "test-projects/web-app/src/$sourceSet/resources"
+            cp test-projects/web-app/index.html "test-projects/web-app/src/$sourceSet/resources/index.html"
+          done
+
+      - name: Build both targets as PWAs
+        working-directory: test-projects/web-app
+        run: ../../gradlew wasmJsBrowserDistribution jsBrowserDistribution
+
+      - name: Assert each page got its own web assets
+        run: |
+          for buildDir in wasmJs js; do
+            test -f "test-projects/web-app/build/dist/$buildDir/productionExecutable/serviceWorker.js" || { echo "::error::serviceWorker.js Not Found for $buildDir"; exit 1; }
+          done
+          for sourceSet in wasmJsMain jsMain; do
+            resources=test-projects/web-app/src/$sourceSet/resources
+            test -f "$resources/manifest.json" || { echo "::error::manifest.json Not Found in $sourceSet"; exit 1; }
+            test -f "$resources/registerServiceWorker.js" || { echo "::error::registerServiceWorker.js Not Found in $sourceSet"; exit 1; }
+            test -f "$resources/icons/icon-192x192.png" || { echo "::error::icons Not Found in $sourceSet"; exit 1; }
+            grep -q 'registerServiceWorker.js' "$resources/index.html" || { echo "::error::script tag missing from $sourceSet index.html"; exit 1; }
+            grep -q 'manifest.json' "$resources/index.html" || { echo "::error::manifest link missing from $sourceSet index.html"; exit 1; }
+          done
+          for other in webMain commonMain; do
+            test ! -e "test-projects/web-app/src/$other/resources" || { echo "::error::files were generated into $other"; exit 1; }
+          done
+
   test-missing-index-html:
     name: "E2E: missing index.html fails with a helpful error"
     runs-on: ubuntu-latest
