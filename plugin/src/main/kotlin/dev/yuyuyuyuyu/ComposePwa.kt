@@ -4,9 +4,13 @@ import com.github.gradle.node.npm.task.NpxTask
 import dev.yuyuyuyuyu.tasks.AddNecessaryHtmlTags
 import dev.yuyuyuyuyu.tasks.DeployResourceFile
 import dev.yuyuyuyuyu.tasks.DeployZipResource
-import dev.yuyuyuyuyu.tasks.shared.TARGET_RESOURCES_DIR_PATH
+import dev.yuyuyuyuyu.tasks.shared.candidateTargetResourcesDirPaths
+import dev.yuyuyuyuyu.tasks.shared.findTargetResourcesDirPath
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
+import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 @Suppress("unused")
@@ -14,12 +18,14 @@ class ComposePwa : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply("com.github.node-gradle.node")
 
+        val targetResourcesDir = targetResourcesDir(project)
+
         registerCopyWorkboxConfigForWasm(project)
         registerCopyWorkboxConfigForJs(project)
-        registerCopyResisterServiceWorkerJs(project)
-        registerCopyManifestJson(project)
-        registerCopyIcons(project)
-        registerAddNecessaryHtmlTags(project)
+        registerCopyResisterServiceWorkerJs(project, targetResourcesDir)
+        registerCopyManifestJson(project, targetResourcesDir)
+        registerCopyIcons(project, targetResourcesDir)
+        registerAddNecessaryHtmlTags(project, targetResourcesDir)
 
         project.tasks.register("initComposePwaForWasm") { task ->
             task.dependsOn(
@@ -107,16 +113,15 @@ class ComposePwa : Plugin<Project> {
         }
     }
 
-    private fun registerCopyResisterServiceWorkerJs(project: Project) {
+    private fun registerCopyResisterServiceWorkerJs(
+        project: Project,
+        targetResourcesDir: Provider<Directory>,
+    ) {
         project.tasks.register("copyResisterServiceWorkerJs", DeployResourceFile::class.java) { task ->
             val fileName = "registerServiceWorker.js"
 
             task.resourceFileName.set(fileName)
-            task.destinationFileProperty.set(
-                project.layout.projectDirectory
-                    .dir(TARGET_RESOURCES_DIR_PATH)
-                    .file(fileName),
-            )
+            task.destinationFileProperty.set(targetResourcesDir.map { it.file(fileName) })
             task.onlyIf {
                 !task.destinationFileProperty
                     .get()
@@ -126,16 +131,15 @@ class ComposePwa : Plugin<Project> {
         }
     }
 
-    private fun registerCopyManifestJson(project: Project) {
+    private fun registerCopyManifestJson(
+        project: Project,
+        targetResourcesDir: Provider<Directory>,
+    ) {
         project.tasks.register("copyManifestJson", DeployResourceFile::class.java) { task ->
             val fileName = "manifest.json"
 
             task.resourceFileName.set(fileName)
-            task.destinationFileProperty.set(
-                project.layout.projectDirectory
-                    .dir(TARGET_RESOURCES_DIR_PATH)
-                    .file(fileName),
-            )
+            task.destinationFileProperty.set(targetResourcesDir.map { it.file(fileName) })
             task.onlyIf {
                 !task.destinationFileProperty
                     .get()
@@ -145,12 +149,15 @@ class ComposePwa : Plugin<Project> {
         }
     }
 
-    private fun registerCopyIcons(project: Project) {
+    private fun registerCopyIcons(
+        project: Project,
+        targetResourcesDir: Provider<Directory>,
+    ) {
         project.tasks.register("copyIcons", DeployZipResource::class.java) { task ->
             val dirName = "icons"
 
             task.resourceFileName.set("$dirName.zip")
-            task.destinationDirectoryProperty.set(project.layout.projectDirectory.dir(TARGET_RESOURCES_DIR_PATH))
+            task.destinationDirectoryProperty.set(targetResourcesDir)
             task.onlyIf {
                 !task.destinationDirectoryProperty
                     .get()
@@ -161,8 +168,12 @@ class ComposePwa : Plugin<Project> {
         }
     }
 
-    private fun registerAddNecessaryHtmlTags(project: Project) {
+    private fun registerAddNecessaryHtmlTags(
+        project: Project,
+        targetResourcesDir: Provider<Directory>,
+    ) {
         project.tasks.register("addNecessaryHtmlTags", AddNecessaryHtmlTags::class.java) { task ->
+            task.indexHtml.convention(targetResourcesDir.map { it.file("index.html") })
             task.mustRunAfter(
                 "copyWorkboxConfigForWasm",
                 "copyWorkboxConfigForJs",
@@ -170,6 +181,26 @@ class ComposePwa : Plugin<Project> {
                 "copyManifestJson",
                 "copyIcons",
             )
+        }
+    }
+
+    /**
+     * The resources directory the plugin reads index.html from and writes its generated
+     * files into: the first candidate source set whose resources contain index.html.
+     *
+     * Resolved lazily (and only for tasks that are actually scheduled) so that projects
+     * are configurable even before an index.html exists.
+     */
+    private fun targetResourcesDir(project: Project): Provider<Directory> {
+        val projectDir = project.layout.projectDirectory
+        return project.provider {
+            val path =
+                findTargetResourcesDirPath(projectDir.asFile)
+                    ?: throw GradleException(
+                        "ComposePWA could not find your web app's index.html. Searched:\n" +
+                            candidateTargetResourcesDirPaths.joinToString("\n") { "  - $it/index.html" },
+                    )
+            projectDir.dir(path)
         }
     }
 

@@ -62,23 +62,31 @@ Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable
 
 ## What this plugin does
 
+The plugin first locates your web app's `index.html`. It searches these resources
+directories and uses the first one that contains the file:
+
+1. `src/webMain/resources`
+2. `src/wasmJsMain/resources`
+3. `src/jsMain/resources`
+4. `src/commonMain/resources`
+
 When you run the `wasmJsBrowserDistribution` task, this plugin automatically does the following:
 
-- Creates these files:
-  - `workbox-config-for-wasm.js`
-  - `src/webMain/resources/manifest.json`
-  - `src/webMain/resources/registerServiceWorker.js`
-  - `src/webMain/resources/icons/*`
-- Adds the necessary tags to `src/webMain/resources/index.html`.
+- Creates `workbox-config-for-wasm.js` in the project directory.
+- Creates these files next to your `index.html`:
+  - `manifest.json`
+  - `registerServiceWorker.js`
+  - `icons/*`
+- Adds the necessary tags to your `index.html`.
 
 When you run the `jsBrowserDistribution` task, this plugin automatically does the following:
 
-- Creates these files:
-  - `workbox-config-for-js.js`
-  - `src/webMain/resources/manifest.json`
-  - `src/webMain/resources/registerServiceWorker.js`
-  - `src/webMain/resources/icons/*`
-- Adds the necessary tags to `src/webMain/resources/index.html`.
+- Creates `workbox-config-for-js.js` in the project directory.
+- Creates these files next to your `index.html`:
+  - `manifest.json`
+  - `registerServiceWorker.js`
+  - `icons/*`
+- Adds the necessary tags to your `index.html`.
 
 ## Deploy to GitHub Pages
 
@@ -94,9 +102,9 @@ And you can check out a live example here:
 
 You can edit the following files to customize your PWA:
 
-- `workbox-config.js`
-- `src/webMain/resources/manifest.json`
-- `src/webMain/resources/icons/*`
+- `workbox-config-for-wasm.js` / `workbox-config-for-js.js`
+- `manifest.json` (next to your `index.html`)
+- `icons/*` (next to your `index.html`)
 
 ## Custom icon
 
