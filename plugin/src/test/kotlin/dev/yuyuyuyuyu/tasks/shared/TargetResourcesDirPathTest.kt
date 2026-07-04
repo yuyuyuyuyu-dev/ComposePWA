@@ -8,7 +8,7 @@ import java.io.File
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class TargetResourcesDirPathTest {
     @get:Rule
@@ -25,7 +25,7 @@ class TargetResourcesDirPathTest {
         createIndexHtml("webMain")
 
         // Act & Assert
-        assertEquals("src/webMain/resources", findTargetResourcesDirPath(projectDir.root))
+        assertEquals(listOf("src/webMain/resources"), findTargetResourcesDirPaths(projectDir.root))
     }
 
     @Test
@@ -34,7 +34,7 @@ class TargetResourcesDirPathTest {
         createIndexHtml("wasmJsMain")
 
         // Act & Assert
-        assertEquals("src/wasmJsMain/resources", findTargetResourcesDirPath(projectDir.root))
+        assertEquals(listOf("src/wasmJsMain/resources"), findTargetResourcesDirPaths(projectDir.root))
     }
 
     @Test
@@ -43,7 +43,7 @@ class TargetResourcesDirPathTest {
         createIndexHtml("jsMain")
 
         // Act & Assert
-        assertEquals("src/jsMain/resources", findTargetResourcesDirPath(projectDir.root))
+        assertEquals(listOf("src/jsMain/resources"), findTargetResourcesDirPaths(projectDir.root))
     }
 
     @Test
@@ -52,26 +52,29 @@ class TargetResourcesDirPathTest {
         createIndexHtml("commonMain")
 
         // Act & Assert
-        assertEquals("src/commonMain/resources", findTargetResourcesDirPath(projectDir.root))
+        assertEquals(listOf("src/commonMain/resources"), findTargetResourcesDirPaths(projectDir.root))
     }
 
     @Test
-    fun `prefers webMain when several source sets contain index html`() {
+    fun `finds every index html when a project has one page per target`() {
         // Arrange
-        createIndexHtml("commonMain")
-        createIndexHtml("webMain")
+        createIndexHtml("wasmJsMain")
+        createIndexHtml("jsMain")
 
         // Act & Assert
-        assertEquals("src/webMain/resources", findTargetResourcesDirPath(projectDir.root))
+        assertEquals(
+            listOf("src/wasmJsMain/resources", "src/jsMain/resources"),
+            findTargetResourcesDirPaths(projectDir.root),
+        )
     }
 
     @Test
-    fun `returns null when no index html exists`() {
+    fun `returns nothing when no index html exists`() {
         // Arrange: a resources directory exists but holds no index.html.
         projectDir.newFolder("src", "webMain", "resources")
 
         // Act & Assert
-        assertNull(findTargetResourcesDirPath(projectDir.root))
+        assertTrue(findTargetResourcesDirPaths(projectDir.root).isEmpty())
     }
 
     @Test
@@ -80,7 +83,7 @@ class TargetResourcesDirPathTest {
         projectDir.newFolder("src", "webMain", "resources", "index.html")
 
         // Act & Assert
-        assertNull(findTargetResourcesDirPath(projectDir.root))
+        assertTrue(findTargetResourcesDirPaths(projectDir.root).isEmpty())
     }
 
     @Test
@@ -90,7 +93,7 @@ class TargetResourcesDirPathTest {
         // Act
         val exception =
             assertFailsWith<GradleException> {
-                resolveTargetResourcesDirPath(projectDir.root)
+                resolveTargetResourcesDirPaths(projectDir.root)
             }
 
         // Assert
