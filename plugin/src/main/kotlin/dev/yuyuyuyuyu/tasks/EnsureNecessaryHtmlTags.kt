@@ -1,34 +1,6 @@
 package dev.yuyuyuyuyu.tasks
 
-import org.gradle.api.DefaultTask
-import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.TaskAction
-import org.gradle.work.DisableCachingByDefault
 import org.jsoup.Jsoup
-
-@DisableCachingByDefault(because = "Not worth caching")
-abstract class AddNecessaryHtmlTags : DefaultTask() {
-    @get:PathSensitive(PathSensitivity.NONE)
-    @get:InputFiles
-    abstract val indexHtmlFiles: ConfigurableFileCollection
-
-    @TaskAction
-    fun initComposePwa() {
-        indexHtmlFiles.forEach { indexHtmlFile ->
-            val original = indexHtmlFile.readText(Charsets.UTF_8)
-            val updated = ensureNecessaryHtmlTags(original)
-
-            // Only write when a tag was actually added; an already-complete file is left
-            // byte-for-byte untouched so repeated builds don't fight the user's formatter.
-            if (updated != original) {
-                indexHtmlFile.writeText(updated, Charsets.UTF_8)
-            }
-        }
-    }
-}
 
 /**
  * Ensures the service-worker `<script>` and manifest `<link>` exist in the `<head>` of [html],

@@ -62,17 +62,17 @@ Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable
 
 ## What this plugin does
 
-The plugin first locates your web app's `index.html`. It searches these resources
-directories and uses every one that contains the file:
+The plugin first locates your web app's `index.html`. Each build searches only the
+resources directories that feed its target, and uses the first one that contains the
+file:
 
-- `src/webMain/resources`
-- `src/wasmJsMain/resources`
-- `src/jsMain/resources`
-- `src/commonMain/resources`
+- `wasmJsBrowserDistribution`: `src/webMain/resources` → `src/wasmJsMain/resources` →
+  `src/commonMain/resources`
+- `jsBrowserDistribution`: `src/webMain/resources` → `src/jsMain/resources` →
+  `src/commonMain/resources`
 
-A project normally has just one `index.html`. If yours has one page per target (one
-`index.html` in `wasmJsMain` and another in `jsMain`), each page gets its own copies of
-the files below.
+With one page per target (one `index.html` in `wasmJsMain` and another in `jsMain`),
+each build finds its own page and puts that page's files next to it.
 
 Files that already exist are left untouched. If you already have a `manifest.json`, the
 bundled `icons/` are not copied either — they only exist to back the bundled manifest.
