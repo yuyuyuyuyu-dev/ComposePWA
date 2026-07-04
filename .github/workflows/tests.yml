@@ -140,8 +140,72 @@ jobs:
           test ! -e example/webApp/src/webMain/resources/icons/.DS_Store || { echo '::error::.DS_Store metadata file should not exist in icons'; exit 1; }
           test ! -e example/webApp/build/dist/${{ matrix.build-dir }}/productionExecutable/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in dist'; exit 1; }
 
-  test-pwa-commonmain:
-    name: "E2E: build Wasm PWA (index.html in commonMain)"
+  test-layouts:
+    name: "E2E: build PWA (index.html in ${{ matrix.source-set }})"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - source-set: "webMain"
+            gradle-task: "wasmJsBrowserDistribution"
+            build-dir: "wasmJs"
+          - source-set: "wasmJsMain"
+            gradle-task: "wasmJsBrowserDistribution"
+            build-dir: "wasmJs"
+          - source-set: "jsMain"
+            gradle-task: "jsBrowserDistribution"
+            build-dir: "js"
+          - source-set: "commonMain"
+            gradle-task: "wasmJsBrowserDistribution"
+            build-dir: "wasmJs"
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "jetbrains"
+        # The JetBrains distribution resolves its version via the GitHub API;
+        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Copy index.html into ${{ matrix.source-set }} resources
+        run: |
+          mkdir -p test-projects/web-app/src/${{ matrix.source-set }}/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/${{ matrix.source-set }}/resources/index.html
+
+      - name: Build as PWA
+        working-directory: test-projects/web-app
+        run: ../../gradlew ${{ matrix.gradle-task }}
+
+      - name: Assert the generated files landed next to index.html
+        run: |
+          resources=test-projects/web-app/src/${{ matrix.source-set }}/resources
+          test -f test-projects/web-app/build/dist/${{ matrix.build-dir }}/productionExecutable/serviceWorker.js || { echo '::error::serviceWorker.js Not Found'; exit 1; }
+          test -f "$resources/manifest.json" || { echo '::error::manifest.json Not Found'; exit 1; }
+          test -f "$resources/registerServiceWorker.js" || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
+          test -f "$resources/icons/icon-192x192.png" || { echo '::error::icons Not Found'; exit 1; }
+          grep -q 'registerServiceWorker.js' "$resources/index.html" || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
+          grep -q 'manifest.json' "$resources/index.html" || { echo '::error::manifest.json is missing from index.html'; exit 1; }
+
+          for other in webMain wasmJsMain jsMain commonMain; do
+            if [ "$other" != "${{ matrix.source-set }}" ]; then
+              test ! -e "test-projects/web-app/src/$other/resources" || { echo "::error::files were generated into $other"; exit 1; }
+            fi
+          done
+
+  test-missing-index-html:
+    name: "E2E: missing index.html fails with a helpful error"
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -162,29 +226,53 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      # Recreate the Compose-Multiplatform-Wizard layout from issue #27,
-      # where index.html lives in commonMain instead of webMain.
-      - name: Move index.html to commonMain resources
+      # The committed test app deliberately has no index.html in any source set.
+      - name: Build without an index.html anywhere
+        working-directory: test-projects/web-app
         run: |
-          mkdir -p example/webApp/src/commonMain/resources
-          mv example/webApp/src/webMain/resources/index.html example/webApp/src/commonMain/resources/index.html
+          if ../../gradlew wasmJsBrowserDistribution > build-output.log 2>&1; then
+            echo '::error::the build unexpectedly succeeded without an index.html'
+            exit 1
+          fi
+          grep -q "ComposePWA needs your web app's index.html" build-output.log || { echo '::error::the failure message is missing'; tail -50 build-output.log; exit 1; }
+          for sourceSet in webMain wasmJsMain jsMain commonMain; do
+            grep -q "src/$sourceSet/resources/index.html" build-output.log || { echo "::error::searched location src/$sourceSet/resources/index.html is not listed"; exit 1; }
+          done
 
-      - name: Build Wasm as PWA
-        working-directory: example
-        run: ./gradlew :webApp:wasmJsBrowserDistribution
+  test-own-manifest:
+    name: "Respects the project's own manifest.json"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
 
-      - name: Assert the generated files landed next to index.html
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "jetbrains"
+        # The JetBrains distribution resolves its version via the GitHub API;
+        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Seed index.html and the project's own manifest.json
         run: |
-          test -f example/webApp/build/dist/wasmJs/productionExecutable/serviceWorker.js || { echo '::error::serviceWorker.js Not Found'; exit 1; }
-          test -f example/webApp/workbox-config-for-wasm.js || { echo '::error::workbox-config-for-wasm.js Not Found'; exit 1; }
+          mkdir -p test-projects/web-app/src/webMain/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
+          echo '{ "name": "own manifest" }' > test-projects/web-app/src/webMain/resources/manifest.json
 
-          test -f example/webApp/src/commonMain/resources/manifest.json || { echo '::error::manifest.json Not Found in commonMain'; exit 1; }
-          test -f example/webApp/src/commonMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js Not Found in commonMain'; exit 1; }
-          test -f example/webApp/src/commonMain/resources/icons/icon-192x192.png || { echo '::error::icons Not Found in commonMain'; exit 1; }
+      - name: Run the plugin's init tasks
+        working-directory: test-projects/web-app
+        run: ../../gradlew initComposePwaForWasm
 
-          grep -q 'registerServiceWorker.js' example/webApp/src/commonMain/resources/index.html || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
-          grep -q 'manifest.json' example/webApp/src/commonMain/resources/index.html || { echo '::error::manifest.json is missing from index.html'; exit 1; }
-
-          test ! -e example/webApp/src/webMain/resources/manifest.json || { echo '::error::manifest.json was generated into webMain'; exit 1; }
-          test ! -e example/webApp/src/webMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js was generated into webMain'; exit 1; }
-          test ! -e example/webApp/src/webMain/resources/icons || { echo '::error::icons were generated into webMain'; exit 1; }
+      - name: Assert the manifest survived and no bundled icons were copied
+        run: |
+          grep -q 'own manifest' test-projects/web-app/src/webMain/resources/manifest.json || { echo '::error::manifest.json was overwritten'; exit 1; }
+          test ! -e test-projects/web-app/src/webMain/resources/icons || { echo '::error::bundled icons were copied despite an existing manifest.json'; exit 1; }
+          test -f test-projects/web-app/src/webMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
