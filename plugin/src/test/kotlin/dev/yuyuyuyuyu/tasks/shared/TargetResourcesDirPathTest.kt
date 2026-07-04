@@ -21,7 +21,7 @@ class TargetResourcesDirPathTest {
 
     @Test
     fun `finds index html in webMain`() {
-        // Arrange: the official IDE templates put index.html in webMain.
+        // Arrange
         createIndexHtml("webMain")
 
         // Act & Assert
@@ -30,7 +30,7 @@ class TargetResourcesDirPathTest {
 
     @Test
     fun `finds index html in wasmJsMain`() {
-        // Arrange: wasmJs-only projects put index.html in wasmJsMain.
+        // Arrange
         createIndexHtml("wasmJsMain")
 
         // Act & Assert
@@ -39,7 +39,7 @@ class TargetResourcesDirPathTest {
 
     @Test
     fun `finds index html in jsMain`() {
-        // Arrange: js-only projects put index.html in jsMain.
+        // Arrange
         createIndexHtml("jsMain")
 
         // Act & Assert
@@ -48,7 +48,7 @@ class TargetResourcesDirPathTest {
 
     @Test
     fun `finds index html in commonMain`() {
-        // Arrange: Compose-Multiplatform-Wizard projects put index.html in commonMain (issue #27).
+        // Arrange: the layout reported in issue #27.
         createIndexHtml("commonMain")
 
         // Act & Assert
@@ -95,6 +95,7 @@ class TargetResourcesDirPathTest {
 
         // Assert
         val message = exception.message.orEmpty()
+        assertContains(message, "needs your web app's index.html")
         assertContains(message, "src/webMain/resources/index.html")
         assertContains(message, "src/wasmJsMain/resources/index.html")
         assertContains(message, "src/jsMain/resources/index.html")

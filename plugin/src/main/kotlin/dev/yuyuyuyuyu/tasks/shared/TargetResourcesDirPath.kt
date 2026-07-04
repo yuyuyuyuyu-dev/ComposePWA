@@ -6,11 +6,11 @@ import java.io.File
 /**
  * Resources directories searched for the web app's index.html, in priority order.
  *
- * Projects disagree on where index.html lives: the official IDE templates use `webMain`,
- * single-web-target projects use `wasmJsMain` or `jsMain`, and Compose-Multiplatform-Wizard
- * projects use `commonMain`. The plugin reads index.html from — and places its web assets
- * next to — whichever directory actually contains the file, so that everything ends up in
- * the same resource bundle.
+ * A Compose Multiplatform web app can keep index.html in any of these source sets'
+ * resources — the build merges each of them into the final bundle — so projects differ
+ * in where they put it. The plugin reads index.html from, and places its web assets
+ * next to, whichever directory actually contains the file, keeping everything in the
+ * same resource bundle.
  */
 internal val candidateTargetResourcesDirPaths: List<String> =
     listOf("webMain", "wasmJsMain", "jsMain", "commonMain").map { "src/$it/resources" }
@@ -23,6 +23,6 @@ internal fun findTargetResourcesDirPath(projectDir: File): String? =
 internal fun resolveTargetResourcesDirPath(projectDir: File): String =
     findTargetResourcesDirPath(projectDir)
         ?: throw GradleException(
-            "ComposePWA could not find your web app's index.html. Searched:\n" +
+            "ComposePWA needs your web app's index.html, but could not find it. Searched:\n" +
                 candidateTargetResourcesDirPaths.joinToString("\n") { "  - $it/index.html" },
         )
