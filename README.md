@@ -70,6 +70,9 @@ directories and uses the first one that contains the file:
 3. `src/jsMain/resources`
 4. `src/commonMain/resources`
 
+Files that already exist are left untouched. If you already have a `manifest.json`, the
+bundled `icons/` are not copied either — they only exist to back the bundled manifest.
+
 When you run the `wasmJsBrowserDistribution` task, this plugin automatically does the following:
 
 - Creates `workbox-config-for-wasm.js` in the project directory.

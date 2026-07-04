@@ -138,6 +138,9 @@ class ComposePwa : Plugin<Project> {
 
             task.resourceFileName.set(fileName)
             task.destinationFileProperty.set(targetResourcesDir.map { it.file(fileName) })
+            // After copyIcons, so copyIcons' manifest.json check observes the state from
+            // before this task creates the bundled manifest.
+            task.mustRunAfter("copyIcons")
             task.onlyIf {
                 !task.destinationFileProperty
                     .get()
@@ -156,12 +159,16 @@ class ComposePwa : Plugin<Project> {
 
             task.resourceFileName.set("$dirName.zip")
             task.destinationDirectoryProperty.set(targetResourcesDir)
+            // The bundled icons exist only to back the bundled manifest.json, which
+            // references them: when the project brings its own manifest they would just be
+            // dead files. An existing icons directory is never overwritten either way.
             task.onlyIf {
-                !task.destinationDirectoryProperty
-                    .get()
-                    .asFile
-                    .resolve(dirName)
-                    .exists()
+                val destinationDir =
+                    task.destinationDirectoryProperty
+                        .get()
+                        .asFile
+                !destinationDir.resolve(dirName).exists() &&
+                    !destinationDir.resolve("manifest.json").exists()
             }
         }
     }
