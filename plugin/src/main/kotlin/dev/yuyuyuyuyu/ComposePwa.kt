@@ -21,6 +21,13 @@ class ComposePwa : Plugin<Project> {
             }
         }
 
+        // With index.html in webMain or commonMain, both init tasks stage the same
+        // directory; Gradle may run them in parallel under the configuration cache, so
+        // serialize them instead of coordinating concurrent writes (they are cheap).
+        project.tasks.named(WebTarget.Js.initTaskName).configure { task ->
+            task.mustRunAfter(WebTarget.Wasm.initTaskName)
+        }
+
         registerInitTasksAsResources(project)
     }
 
@@ -64,6 +71,6 @@ class ComposePwa : Plugin<Project> {
     }
 
     private companion object {
-        const val TASK_GROUP = "compose pwa"
+        const val TASK_GROUP = "ComposePWA"
     }
 }
