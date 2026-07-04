@@ -4,9 +4,7 @@ import com.github.gradle.node.npm.task.NpxTask
 import dev.yuyuyuyuyu.tasks.AddNecessaryHtmlTags
 import dev.yuyuyuyuyu.tasks.DeployResourceFile
 import dev.yuyuyuyuyu.tasks.DeployZipResource
-import dev.yuyuyuyuyu.tasks.shared.candidateTargetResourcesDirPaths
-import dev.yuyuyuyuyu.tasks.shared.findTargetResourcesDirPath
-import org.gradle.api.GradleException
+import dev.yuyuyuyuyu.tasks.shared.resolveTargetResourcesDirPath
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
@@ -194,13 +192,7 @@ class ComposePwa : Plugin<Project> {
     private fun targetResourcesDir(project: Project): Provider<Directory> {
         val projectDir = project.layout.projectDirectory
         return project.provider {
-            val path =
-                findTargetResourcesDirPath(projectDir.asFile)
-                    ?: throw GradleException(
-                        "ComposePWA could not find your web app's index.html. Searched:\n" +
-                            candidateTargetResourcesDirPaths.joinToString("\n") { "  - $it/index.html" },
-                    )
-            projectDir.dir(path)
+            projectDir.dir(resolveTargetResourcesDirPath(projectDir.asFile))
         }
     }
 

@@ -1,10 +1,13 @@
 package dev.yuyuyuyuyu.tasks.shared
 
+import org.gradle.api.GradleException
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.File
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 class TargetResourcesDirPathTest {
@@ -17,7 +20,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun findsIndexHtmlInWebMain() {
+    fun `finds index html in webMain`() {
         // Arrange: the official IDE templates put index.html in webMain.
         createIndexHtml("webMain")
 
@@ -26,7 +29,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun findsIndexHtmlInWasmJsMain() {
+    fun `finds index html in wasmJsMain`() {
         // Arrange: wasmJs-only projects put index.html in wasmJsMain.
         createIndexHtml("wasmJsMain")
 
@@ -35,7 +38,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun findsIndexHtmlInJsMain() {
+    fun `finds index html in jsMain`() {
         // Arrange: js-only projects put index.html in jsMain.
         createIndexHtml("jsMain")
 
@@ -44,7 +47,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun findsIndexHtmlInCommonMain() {
+    fun `finds index html in commonMain`() {
         // Arrange: Compose-Multiplatform-Wizard projects put index.html in commonMain (issue #27).
         createIndexHtml("commonMain")
 
@@ -53,7 +56,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun prefersWebMainWhenSeveralSourceSetsContainIndexHtml() {
+    fun `prefers webMain when several source sets contain index html`() {
         // Arrange
         createIndexHtml("commonMain")
         createIndexHtml("webMain")
@@ -63,8 +66,8 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun returnsNullWhenNoIndexHtmlExists() {
-        // Arrange: resources directory exists but holds no index.html.
+    fun `returns null when no index html exists`() {
+        // Arrange: a resources directory exists but holds no index.html.
         projectDir.newFolder("src", "webMain", "resources")
 
         // Act & Assert
@@ -72,11 +75,29 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun ignoresDirectoriesNamedIndexHtml() {
+    fun `ignores a directory named index html`() {
         // Arrange: only a directory named index.html, not a file.
         projectDir.newFolder("src", "webMain", "resources", "index.html")
 
         // Act & Assert
         assertNull(findTargetResourcesDirPath(projectDir.root))
+    }
+
+    @Test
+    fun `failure message lists every searched location`() {
+        // Arrange: no index.html anywhere.
+
+        // Act
+        val exception =
+            assertFailsWith<GradleException> {
+                resolveTargetResourcesDirPath(projectDir.root)
+            }
+
+        // Assert
+        val message = exception.message.orEmpty()
+        assertContains(message, "src/webMain/resources/index.html")
+        assertContains(message, "src/wasmJsMain/resources/index.html")
+        assertContains(message, "src/jsMain/resources/index.html")
+        assertContains(message, "src/commonMain/resources/index.html")
     }
 }
