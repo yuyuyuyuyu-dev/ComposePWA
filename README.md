@@ -70,9 +70,6 @@ resources directories that feed its target, and uses the one that contains the f
 - `jsBrowserDistribution`: `src/webMain/resources`, `src/jsMain/resources`,
   `src/commonMain/resources`
 
-With one page per target (one `index.html` in `wasmJsMain` and another in `jsMain`),
-each build finds its own page and puts that page's files next to it.
-
 Files that already exist are left untouched. If you already have a `manifest.json`, the
 bundled `icons/` are not copied either — they only exist to back the bundled manifest.
 
