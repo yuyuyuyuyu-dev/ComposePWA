@@ -8,78 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  plugin:
-    name: Plugin unit tests
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v7
-
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
-
-      - name: Run plugin tests
-        run: ./gradlew :plugin:test
-
-  plugin-output:
-    name: Plugin output stays formatter-clean
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v7
-
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      # Run the plugin against the example app so it copies its resources and
-      # ensures the PWA tags in index.html, exactly as a consumer's build would.
-      - name: Generate ComposePWA outputs
-        working-directory: example
-        run: ./gradlew :webApp:initComposePwaForWasm :webApp:initComposePwaForJs
-
-      # The headline guarantee: running the plugin must not rewrite any committed,
-      # formatter-clean file (index.html in particular). A non-empty diff fails here.
-      - name: Verify the plugin left tracked files untouched
-        run: git diff --exit-code
-
-      - name: Run formatters & linters on the generated outputs
-        run: npm run lint
-
   test-pwa:
-    name: "E2E: build ${{ matrix.target-name }} PWA"
+    name: should build ${{ matrix.target-name }} as a PWA
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -100,18 +30,8 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+      - name: Setup build
+        uses: ./.github/actions/setup-build
 
       - name: Build ${{ matrix.target-name }} as PWA
         working-directory: example
@@ -139,3 +59,225 @@ jobs:
           test ! -e example/webApp/src/webMain/resources/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in resources'; exit 1; }
           test ! -e example/webApp/src/webMain/resources/icons/.DS_Store || { echo '::error::.DS_Store metadata file should not exist in icons'; exit 1; }
           test ! -e example/webApp/build/dist/${{ matrix.build-dir }}/productionExecutable/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in dist'; exit 1; }
+
+  test-layouts:
+    name: should put the PWA files next to index.html in ${{ matrix.source-set }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - source-set: "webMain"
+            gradle-task: "wasmJsBrowserDistribution"
+            build-dir: "wasmJs"
+          - source-set: "wasmJsMain"
+            gradle-task: "wasmJsBrowserDistribution"
+            build-dir: "wasmJs"
+          - source-set: "jsMain"
+            gradle-task: "jsBrowserDistribution"
+            build-dir: "js"
+          - source-set: "commonMain"
+            gradle-task: "wasmJsBrowserDistribution"
+            build-dir: "wasmJs"
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
+
+      - name: Copy index.html into ${{ matrix.source-set }} resources
+        run: |
+          mkdir -p test-projects/web-app/src/${{ matrix.source-set }}/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/${{ matrix.source-set }}/resources/index.html
+
+      - name: Build as PWA
+        working-directory: test-projects/web-app
+        run: ../../gradlew ${{ matrix.gradle-task }}
+
+      - name: Assert the generated files landed next to index.html
+        run: |
+          resources=test-projects/web-app/src/${{ matrix.source-set }}/resources
+          test -f test-projects/web-app/build/dist/${{ matrix.build-dir }}/productionExecutable/serviceWorker.js || { echo '::error::serviceWorker.js Not Found'; exit 1; }
+          test -f "$resources/manifest.json" || { echo '::error::manifest.json Not Found'; exit 1; }
+          test -f "$resources/registerServiceWorker.js" || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
+          test -f "$resources/icons/icon-192x192.png" || { echo '::error::icons Not Found'; exit 1; }
+          grep -q 'registerServiceWorker.js' "$resources/index.html" || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
+          grep -q 'manifest.json' "$resources/index.html" || { echo '::error::manifest.json is missing from index.html'; exit 1; }
+
+          for other in webMain wasmJsMain jsMain commonMain; do
+            if [ "$other" != "${{ matrix.source-set }}" ]; then
+              test ! -e "test-projects/web-app/src/$other/resources" || { echo "::error::files were generated into $other"; exit 1; }
+            fi
+          done
+
+  test-per-target:
+    name: should build each per-target page as a PWA
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
+
+      - name: Copy index.html into both per-target resources
+        run: |
+          for sourceSet in wasmJsMain jsMain; do
+            mkdir -p "test-projects/web-app/src/$sourceSet/resources"
+            cp test-projects/web-app/index.html "test-projects/web-app/src/$sourceSet/resources/index.html"
+          done
+
+      - name: Build both targets as PWAs
+        working-directory: test-projects/web-app
+        run: ../../gradlew wasmJsBrowserDistribution jsBrowserDistribution
+
+      - name: Assert each page got its own web assets
+        run: |
+          for buildDir in wasmJs js; do
+            test -f "test-projects/web-app/build/dist/$buildDir/productionExecutable/serviceWorker.js" || { echo "::error::serviceWorker.js Not Found for $buildDir"; exit 1; }
+          done
+          for sourceSet in wasmJsMain jsMain; do
+            resources=test-projects/web-app/src/$sourceSet/resources
+            test -f "$resources/manifest.json" || { echo "::error::manifest.json Not Found in $sourceSet"; exit 1; }
+            test -f "$resources/registerServiceWorker.js" || { echo "::error::registerServiceWorker.js Not Found in $sourceSet"; exit 1; }
+            test -f "$resources/icons/icon-192x192.png" || { echo "::error::icons Not Found in $sourceSet"; exit 1; }
+            grep -q 'registerServiceWorker.js' "$resources/index.html" || { echo "::error::script tag missing from $sourceSet index.html"; exit 1; }
+            grep -q 'manifest.json' "$resources/index.html" || { echo "::error::manifest link missing from $sourceSet index.html"; exit 1; }
+          done
+          for other in webMain commonMain; do
+            test ! -e "test-projects/web-app/src/$other/resources" || { echo "::error::files were generated into $other"; exit 1; }
+          done
+
+  formatter:
+    name: should not fight the formatter
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Run the plugin against the example app so it copies its resources and
+      # ensures the PWA tags in index.html, exactly as a consumer's build would.
+      - name: Generate ComposePWA outputs
+        working-directory: example
+        run: ./gradlew :webApp:initComposePwaForWasm :webApp:initComposePwaForJs
+
+      # One side of the fight: the plugin must not rewrite any committed,
+      # formatter-clean file (index.html in particular). A non-empty diff fails here.
+      - name: Verify the plugin left tracked files untouched
+        run: git diff --exit-code
+
+      # The other side: the formatters must find nothing to change in what the
+      # plugin just generated.
+      - name: Run formatters & linters on the generated outputs
+        run: npm run lint
+
+  test-own-assets:
+    name: should keep the project's own web assets untouched
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
+
+      - name: Seed index.html and the project's own web assets
+        run: |
+          resources=test-projects/web-app/src/webMain/resources
+          mkdir -p "$resources/icons"
+          cp test-projects/web-app/index.html "$resources/index.html"
+          echo '{ "name": "own manifest" }' > "$resources/manifest.json"
+          echo '// own service worker registration' > "$resources/registerServiceWorker.js"
+          echo 'own icon' > "$resources/icons/own-icon.png"
+
+      - name: Run the plugin's init tasks
+        working-directory: test-projects/web-app
+        run: ../../gradlew initComposePwaForWasm
+
+      - name: Assert every pre-existing web asset survived untouched
+        run: |
+          resources=test-projects/web-app/src/webMain/resources
+          grep -q 'own manifest' "$resources/manifest.json" || { echo '::error::manifest.json was overwritten'; exit 1; }
+          grep -q 'own service worker registration' "$resources/registerServiceWorker.js" || { echo '::error::registerServiceWorker.js was overwritten'; exit 1; }
+          test -f "$resources/icons/own-icon.png" || { echo "::error::the project's own icon was removed"; exit 1; }
+          test ! -e "$resources/icons/icon-192x192.png" || { echo '::error::bundled icons were copied despite an existing manifest.json'; exit 1; }
+
+  test-missing-index-html:
+    name: should fail helpfully when index.html is missing
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
+
+      # The committed test app deliberately has no index.html in any source set.
+      - name: Build Wasm without an index.html anywhere
+        working-directory: test-projects/web-app
+        run: |
+          if ../../gradlew wasmJsBrowserDistribution > build-output.log 2>&1; then
+            echo '::error::the build unexpectedly succeeded without an index.html'
+            exit 1
+          fi
+          grep -q "ComposePWA needs your web app's index.html" build-output.log || { echo '::error::the failure message is missing'; tail -50 build-output.log; exit 1; }
+          for sourceSet in webMain wasmJsMain commonMain; do
+            grep -q "src/$sourceSet/resources/index.html" build-output.log || { echo "::error::searched location src/$sourceSet/resources/index.html is not listed"; exit 1; }
+          done
+          if grep -q 'src/jsMain/resources/index.html' build-output.log; then
+            echo '::error::a wasm build must not search the js target source set'; exit 1
+          fi
+
+      - name: Build JS without an index.html anywhere
+        working-directory: test-projects/web-app
+        run: |
+          if ../../gradlew jsBrowserDistribution > build-output-js.log 2>&1; then
+            echo '::error::the build unexpectedly succeeded without an index.html'
+            exit 1
+          fi
+          grep -q "ComposePWA needs your web app's index.html" build-output-js.log || { echo '::error::the failure message is missing'; tail -50 build-output-js.log; exit 1; }
+          for sourceSet in webMain jsMain commonMain; do
+            grep -q "src/$sourceSet/resources/index.html" build-output-js.log || { echo "::error::searched location src/$sourceSet/resources/index.html is not listed"; exit 1; }
+          done
+          if grep -q 'src/wasmJsMain/resources/index.html' build-output-js.log; then
+            echo '::error::a js build must not search the wasm target source set'; exit 1
+          fi
+
+  unit-tests:
+    name: Plugin unit tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
+
+      - name: Run plugin tests
+        run: ./gradlew :plugin:test

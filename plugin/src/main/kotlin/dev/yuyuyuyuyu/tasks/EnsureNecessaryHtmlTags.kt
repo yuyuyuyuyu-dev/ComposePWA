@@ -1,43 +1,6 @@
 package dev.yuyuyuyuyu.tasks
 
-import dev.yuyuyuyuyu.tasks.shared.TARGET_RESOURCES_DIR_PATH
-import org.gradle.api.DefaultTask
-import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.TaskAction
-import org.gradle.work.DisableCachingByDefault
 import org.jsoup.Jsoup
-import javax.inject.Inject
-
-@DisableCachingByDefault(because = "Not worth caching")
-abstract class AddNecessaryHtmlTags : DefaultTask() {
-    @get:Inject
-    abstract val objects: ObjectFactory
-
-    @get:PathSensitive(PathSensitivity.NONE)
-    @get:InputFile
-    val indexHtml: RegularFileProperty =
-        objects.fileProperty().convention(
-            project.layout.projectDirectory.file("$TARGET_RESOURCES_DIR_PATH/index.html"),
-        )
-
-    @TaskAction
-    fun initComposePwa() {
-        val indexHtmlFile = indexHtml.asFile.get()
-
-        val original = indexHtmlFile.readText(Charsets.UTF_8)
-        val updated = ensureNecessaryHtmlTags(original)
-
-        // Only write when a tag was actually added; an already-complete file is left byte-for-byte
-        // untouched so repeated builds don't fight the user's formatter.
-        if (updated != original) {
-            indexHtmlFile.writeText(updated, Charsets.UTF_8)
-        }
-    }
-}
 
 /**
  * Ensures the service-worker `<script>` and manifest `<link>` exist in the `<head>` of [html],
