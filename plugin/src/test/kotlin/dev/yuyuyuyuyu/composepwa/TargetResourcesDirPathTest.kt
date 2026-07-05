@@ -1,6 +1,5 @@
-package dev.yuyuyuyuyu.tasks.shared
+package dev.yuyuyuyuyu.composepwa
 
-import dev.yuyuyuyuyu.WebTarget
 import org.gradle.api.GradleException
 import org.junit.Rule
 import org.junit.Test

@@ -1,4 +1,4 @@
-package dev.yuyuyuyuyu.tasks.shared
+package dev.yuyuyuyuyu.composepwa
 
 import org.gradle.api.GradleException
 import java.io.File

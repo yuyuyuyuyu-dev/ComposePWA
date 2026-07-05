@@ -1,4 +1,4 @@
-package dev.yuyuyuyuyu.tasks
+package dev.yuyuyuyuyu.composepwa
 
 import org.junit.Test
 import kotlin.test.assertContains
