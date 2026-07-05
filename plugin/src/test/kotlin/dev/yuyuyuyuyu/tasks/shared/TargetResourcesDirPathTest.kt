@@ -22,22 +22,6 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun `a wasm build searches webMain then wasmJsMain then commonMain`() {
-        assertEquals(
-            listOf("src/webMain/resources", "src/wasmJsMain/resources", "src/commonMain/resources"),
-            WebTarget.Wasm.candidateResourcesDirPaths,
-        )
-    }
-
-    @Test
-    fun `a js build searches webMain then jsMain then commonMain`() {
-        assertEquals(
-            listOf("src/webMain/resources", "src/jsMain/resources", "src/commonMain/resources"),
-            WebTarget.Js.candidateResourcesDirPaths,
-        )
-    }
-
-    @Test
     fun `finds index html in webMain`() {
         // Arrange
         createIndexHtml("webMain")
@@ -92,6 +76,28 @@ class TargetResourcesDirPathTest {
 
         // Act & Assert
         assertNull(findTargetResourcesDirPath(projectDir.root, WebTarget.Wasm.candidateResourcesDirPaths))
+    }
+
+    @Test
+    fun `a js build does not see an index html in wasmJsMain`() {
+        // Arrange
+        createIndexHtml("wasmJsMain")
+
+        // Act & Assert
+        assertNull(findTargetResourcesDirPath(projectDir.root, WebTarget.Js.candidateResourcesDirPaths))
+    }
+
+    @Test
+    fun `uses the first candidate directory that contains an index html`() {
+        // Arrange
+        createIndexHtml("wasmJsMain")
+        createIndexHtml("commonMain")
+
+        // Act & Assert
+        assertEquals(
+            "src/wasmJsMain/resources",
+            findTargetResourcesDirPath(projectDir.root, WebTarget.Wasm.candidateResourcesDirPaths),
+        )
     }
 
     @Test

@@ -63,12 +63,11 @@ Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable
 ## What this plugin does
 
 The plugin first locates your web app's `index.html`. Each build searches only the
-resources directories that feed its target, and uses the first one that contains the
-file:
+resources directories that feed its target, and uses the one that contains the file:
 
-- `wasmJsBrowserDistribution`: `src/webMain/resources` → `src/wasmJsMain/resources` →
+- `wasmJsBrowserDistribution`: `src/webMain/resources`, `src/wasmJsMain/resources`,
   `src/commonMain/resources`
-- `jsBrowserDistribution`: `src/webMain/resources` → `src/jsMain/resources` →
+- `jsBrowserDistribution`: `src/webMain/resources`, `src/jsMain/resources`,
   `src/commonMain/resources`
 
 With one page per target (one `index.html` in `wasmJsMain` and another in `jsMain`),
