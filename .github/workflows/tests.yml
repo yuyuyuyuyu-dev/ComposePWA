@@ -154,8 +154,8 @@ jobs:
             test ! -e "test-projects/web-app/src/$other/resources" || { echo "::error::files were generated into $other"; exit 1; }
           done
 
-  plugin-output:
-    name: should generate formatter-clean files and leave committed files untouched
+  formatter:
+    name: should not fight the formatter
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -181,11 +181,13 @@ jobs:
         working-directory: example
         run: ./gradlew :webApp:initComposePwaForWasm :webApp:initComposePwaForJs
 
-      # The headline guarantee: running the plugin must not rewrite any committed,
+      # One side of the fight: the plugin must not rewrite any committed,
       # formatter-clean file (index.html in particular). A non-empty diff fails here.
       - name: Verify the plugin left tracked files untouched
         run: git diff --exit-code
 
+      # The other side: the formatters must find nothing to change in what the
+      # plugin just generated.
       - name: Run formatters & linters on the generated outputs
         run: npm run lint
 
@@ -265,7 +267,7 @@ jobs:
             echo '::error::a js build must not search the wasm target source set'; exit 1
           fi
 
-  plugin:
+  unit-tests:
     name: Plugin unit tests
     runs-on: ubuntu-latest
     permissions:
