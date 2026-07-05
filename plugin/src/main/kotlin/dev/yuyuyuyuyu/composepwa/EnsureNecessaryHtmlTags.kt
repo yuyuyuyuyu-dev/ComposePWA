@@ -1,4 +1,4 @@
-package dev.yuyuyuyuyu.tasks
+package dev.yuyuyuyuyu.composepwa
 
 import org.jsoup.Jsoup
 

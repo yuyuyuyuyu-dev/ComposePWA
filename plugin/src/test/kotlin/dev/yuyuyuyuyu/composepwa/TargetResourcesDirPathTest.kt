@@ -1,6 +1,5 @@
-package dev.yuyuyuyuyu.tasks.shared
+package dev.yuyuyuyuyu.composepwa
 
-import dev.yuyuyuyuyu.WebTarget
 import org.gradle.api.GradleException
 import org.junit.Rule
 import org.junit.Test
@@ -12,6 +11,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 
+/** The index.html lookup's contract; the plugin-level spec lives in tests.yml. */
 class TargetResourcesDirPathTest {
     @get:Rule
     val projectDir = TemporaryFolder()

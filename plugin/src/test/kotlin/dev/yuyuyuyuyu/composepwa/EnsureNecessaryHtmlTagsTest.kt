@@ -1,4 +1,4 @@
-package dev.yuyuyuyuyu.tasks
+package dev.yuyuyuyuyu.composepwa
 
 import org.junit.Test
 import kotlin.test.assertContains
@@ -6,9 +6,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertSame
 
+/** The [ensureNecessaryHtmlTags] function's contract; the plugin-level spec lives in tests.yml. */
 class EnsureNecessaryHtmlTagsTest {
     @Test
-    fun returnsSameInstanceWhenBothTagsArePresent() {
+    fun `should return the same instance when both tags are already present`() {
         // Arrange
         val html =
             """
@@ -34,7 +35,36 @@ class EnsureNecessaryHtmlTagsTest {
     }
 
     @Test
-    fun insertsBothMissingTagsAndPreservesExistingFormatting() {
+    fun `should recognize tags reformatted by a formatter`() {
+        // Arrange
+        // Prettier splits long tags across lines; failing to recognize this shape is what
+        // once made the plugin and the formatter rewrite index.html back and forth forever.
+        val html =
+            """
+            <!doctype html>
+            <html lang="en">
+              <head>
+                <meta charset="UTF-8" />
+                <title>composeApp</title>
+                <script
+                  type="application/javascript"
+                  src="registerServiceWorker.js"
+                ></script>
+                <link rel="manifest" href="manifest.json" />
+              </head>
+              <body></body>
+            </html>
+            """.trimIndent()
+
+        // Act
+        val result = ensureNecessaryHtmlTags(html)
+
+        // Assert
+        assertSame(html, result)
+    }
+
+    @Test
+    fun `should insert both missing tags without reformatting the rest`() {
         // Arrange
         val html =
             """
@@ -73,7 +103,7 @@ class EnsureNecessaryHtmlTagsTest {
     }
 
     @Test
-    fun insertsOnlyTheMissingTag() {
+    fun `should insert only the missing tag`() {
         // Arrange
         val html =
             """
@@ -107,7 +137,7 @@ class EnsureNecessaryHtmlTagsTest {
     }
 
     @Test
-    fun isIdempotent() {
+    fun `should change nothing on a second run`() {
         // Arrange
         val html =
             """
@@ -132,7 +162,7 @@ class EnsureNecessaryHtmlTagsTest {
     }
 
     @Test
-    fun insertsTagsUsingTheFilesExistingLineEndings() {
+    fun `should insert tags using the file's existing line endings`() {
         // Arrange
         // A CRLF document, e.g. an index.html checked out on Windows.
         val crlf =

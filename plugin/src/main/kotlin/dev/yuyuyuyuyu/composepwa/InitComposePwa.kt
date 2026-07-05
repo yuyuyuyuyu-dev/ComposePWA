@@ -1,6 +1,5 @@
-package dev.yuyuyuyuyu.tasks
+package dev.yuyuyuyuyu.composepwa
 
-import dev.yuyuyuyuyu.tasks.shared.resolveTargetResourcesDirPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty

@@ -1,4 +1,4 @@
-package dev.yuyuyuyuyu
+package dev.yuyuyuyuyu.composepwa
 
 /**
  * The two web targets the plugin supports, and everything that differs between them.
