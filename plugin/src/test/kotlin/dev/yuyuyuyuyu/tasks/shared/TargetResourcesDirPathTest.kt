@@ -22,7 +22,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun `finds index html in webMain`() {
+    fun `should find index html in webMain`() {
         // Arrange
         createIndexHtml("webMain")
 
@@ -34,7 +34,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun `finds index html in wasmJsMain`() {
+    fun `should find index html in wasmJsMain`() {
         // Arrange
         createIndexHtml("wasmJsMain")
 
@@ -46,7 +46,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun `finds index html in jsMain`() {
+    fun `should find index html in jsMain`() {
         // Arrange
         createIndexHtml("jsMain")
 
@@ -58,7 +58,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun `finds index html in commonMain`() {
+    fun `should find index html in commonMain`() {
         // Arrange: the layout reported in issue #27.
         createIndexHtml("commonMain")
 
@@ -70,7 +70,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun `a wasm build does not see an index html in jsMain`() {
+    fun `should not search jsMain for a wasm build`() {
         // Arrange
         createIndexHtml("jsMain")
 
@@ -79,7 +79,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun `a js build does not see an index html in wasmJsMain`() {
+    fun `should not search wasmJsMain for a js build`() {
         // Arrange
         createIndexHtml("wasmJsMain")
 
@@ -88,7 +88,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun `uses the first candidate directory that contains an index html`() {
+    fun `should use the first candidate directory that contains an index html`() {
         // Arrange
         createIndexHtml("wasmJsMain")
         createIndexHtml("commonMain")
@@ -101,7 +101,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun `ignores a directory named index html`() {
+    fun `should ignore a directory named index html`() {
         // Arrange: only a directory named index.html, not a file.
         projectDir.newFolder("src", "webMain", "resources", "index.html")
 
@@ -110,7 +110,7 @@ class TargetResourcesDirPathTest {
     }
 
     @Test
-    fun `failure message lists exactly the searched locations`() {
+    fun `should fail listing exactly the searched locations`() {
         // Arrange: no index.html anywhere.
 
         // Act
