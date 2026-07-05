@@ -20,11 +20,17 @@ class ComposePwa : Plugin<Project> {
             }
         }
 
-        // With index.html in webMain or commonMain, both init tasks stage the same
-        // directory; Gradle may run them in parallel under the configuration cache, so
-        // serialize them instead of coordinating concurrent writes (they are cheap).
+        // Gradle may run the two targets' tasks in parallel under the configuration
+        // cache, but they share state Gradle cannot see: both init tasks can stage the
+        // same resources directory (webMain/commonMain layouts), and both workbox tasks
+        // install workbox-cli into the same npx cache entry, corrupting it
+        // (TAR_ENTRY_ERROR). Everything here is cheap, so serialize the js pipeline
+        // after the wasm one instead of coordinating concurrent writes.
         project.tasks.named(WebTarget.Js.initTaskName).configure { task ->
             task.mustRunAfter(WebTarget.Wasm.initTaskName)
+        }
+        project.tasks.named(WebTarget.Js.buildAsPwaTaskName).configure { task ->
+            task.mustRunAfter(WebTarget.Wasm.buildAsPwaTaskName)
         }
 
         registerInitTasksAsResources(project)
