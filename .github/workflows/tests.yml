@@ -8,78 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  plugin:
-    name: Plugin unit tests
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v7
-
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
-
-      - name: Run plugin tests
-        run: ./gradlew :plugin:test
-
-  plugin-output:
-    name: Plugin output stays formatter-clean
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v7
-
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      # Run the plugin against the example app so it copies its resources and
-      # ensures the PWA tags in index.html, exactly as a consumer's build would.
-      - name: Generate ComposePWA outputs
-        working-directory: example
-        run: ./gradlew :webApp:initComposePwaForWasm :webApp:initComposePwaForJs
-
-      # The headline guarantee: running the plugin must not rewrite any committed,
-      # formatter-clean file (index.html in particular). A non-empty diff fails here.
-      - name: Verify the plugin left tracked files untouched
-        run: git diff --exit-code
-
-      - name: Run formatters & linters on the generated outputs
-        run: npm run lint
-
   test-pwa:
-    name: "E2E: build ${{ matrix.target-name }} PWA"
+    name: should build ${{ matrix.target-name }} as a PWA
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -100,18 +30,8 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+      - name: Setup build
+        uses: ./.github/actions/setup-build
 
       - name: Build ${{ matrix.target-name }} as PWA
         working-directory: example
@@ -141,7 +61,7 @@ jobs:
           test ! -e example/webApp/build/dist/${{ matrix.build-dir }}/productionExecutable/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in dist'; exit 1; }
 
   test-layouts:
-    name: "E2E: build PWA (index.html in ${{ matrix.source-set }})"
+    name: should put the PWA files next to index.html in ${{ matrix.source-set }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -166,18 +86,8 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+      - name: Setup build
+        uses: ./.github/actions/setup-build
 
       - name: Copy index.html into ${{ matrix.source-set }} resources
         run: |
@@ -205,7 +115,7 @@ jobs:
           done
 
   test-per-target:
-    name: "E2E: build PWA (index.html in wasmJsMain and jsMain)"
+    name: should build each per-target page as a PWA
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -213,18 +123,8 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+      - name: Setup build
+        uses: ./.github/actions/setup-build
 
       - name: Copy index.html into both per-target resources
         run: |
@@ -254,8 +154,8 @@ jobs:
             test ! -e "test-projects/web-app/src/$other/resources" || { echo "::error::files were generated into $other"; exit 1; }
           done
 
-  test-missing-index-html:
-    name: "E2E: missing index.html fails with a helpful error"
+  plugin-output:
+    name: should generate formatter-clean files and leave committed files untouched
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -263,21 +163,79 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Setup build
+        uses: ./.github/actions/setup-build
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Run the plugin against the example app so it copies its resources and
+      # ensures the PWA tags in index.html, exactly as a consumer's build would.
+      - name: Generate ComposePWA outputs
+        working-directory: example
+        run: ./gradlew :webApp:initComposePwaForWasm :webApp:initComposePwaForJs
+
+      # The headline guarantee: running the plugin must not rewrite any committed,
+      # formatter-clean file (index.html in particular). A non-empty diff fails here.
+      - name: Verify the plugin left tracked files untouched
+        run: git diff --exit-code
+
+      - name: Run formatters & linters on the generated outputs
+        run: npm run lint
+
+  test-own-assets:
+    name: should keep the project's own web assets untouched
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
+
+      - name: Seed index.html and the project's own web assets
+        run: |
+          resources=test-projects/web-app/src/webMain/resources
+          mkdir -p "$resources/icons"
+          cp test-projects/web-app/index.html "$resources/index.html"
+          echo '{ "name": "own manifest" }' > "$resources/manifest.json"
+          echo '// own service worker registration' > "$resources/registerServiceWorker.js"
+          echo 'own icon' > "$resources/icons/own-icon.png"
+
+      - name: Run the plugin's init tasks
+        working-directory: test-projects/web-app
+        run: ../../gradlew initComposePwaForWasm
+
+      - name: Assert every pre-existing web asset survived untouched
+        run: |
+          resources=test-projects/web-app/src/webMain/resources
+          grep -q 'own manifest' "$resources/manifest.json" || { echo '::error::manifest.json was overwritten'; exit 1; }
+          grep -q 'own service worker registration' "$resources/registerServiceWorker.js" || { echo '::error::registerServiceWorker.js was overwritten'; exit 1; }
+          test -f "$resources/icons/own-icon.png" || { echo "::error::the project's own icon was removed"; exit 1; }
+          test ! -e "$resources/icons/icon-192x192.png" || { echo '::error::bundled icons were copied despite an existing manifest.json'; exit 1; }
+
+  test-missing-index-html:
+    name: should fail helpfully when index.html is missing
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
 
       # The committed test app deliberately has no index.html in any source set.
-      - name: Build without an index.html anywhere
+      - name: Build Wasm without an index.html anywhere
         working-directory: test-projects/web-app
         run: |
           if ../../gradlew wasmJsBrowserDistribution > build-output.log 2>&1; then
@@ -292,8 +250,23 @@ jobs:
             echo '::error::a wasm build must not search the js target source set'; exit 1
           fi
 
-  test-own-manifest:
-    name: "Respects the project's own manifest.json"
+      - name: Build JS without an index.html anywhere
+        working-directory: test-projects/web-app
+        run: |
+          if ../../gradlew jsBrowserDistribution > build-output-js.log 2>&1; then
+            echo '::error::the build unexpectedly succeeded without an index.html'
+            exit 1
+          fi
+          grep -q "ComposePWA needs your web app's index.html" build-output-js.log || { echo '::error::the failure message is missing'; tail -50 build-output-js.log; exit 1; }
+          for sourceSet in webMain jsMain commonMain; do
+            grep -q "src/$sourceSet/resources/index.html" build-output-js.log || { echo "::error::searched location src/$sourceSet/resources/index.html is not listed"; exit 1; }
+          done
+          if grep -q 'src/wasmJsMain/resources/index.html' build-output-js.log; then
+            echo '::error::a js build must not search the wasm target source set'; exit 1
+          fi
+
+  plugin:
+    name: Plugin unit tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -301,31 +274,8 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Setup build
+        uses: ./.github/actions/setup-build
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
-
-      - name: Seed index.html and the project's own manifest.json
-        run: |
-          mkdir -p test-projects/web-app/src/webMain/resources
-          cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
-          echo '{ "name": "own manifest" }' > test-projects/web-app/src/webMain/resources/manifest.json
-
-      - name: Run the plugin's init tasks
-        working-directory: test-projects/web-app
-        run: ../../gradlew initComposePwaForWasm
-
-      - name: Assert the manifest survived and no bundled icons were copied
-        run: |
-          grep -q 'own manifest' test-projects/web-app/src/webMain/resources/manifest.json || { echo '::error::manifest.json was overwritten'; exit 1; }
-          test ! -e test-projects/web-app/src/webMain/resources/icons || { echo '::error::bundled icons were copied despite an existing manifest.json'; exit 1; }
-          test -f test-projects/web-app/src/webMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
+      - name: Run plugin tests
+        run: ./gradlew :plugin:test

@@ -1,0 +1,18 @@
+name: Setup build
+description: JDK and Gradle, needed by every job that builds this repository.
+
+runs:
+  using: composite
+  steps:
+    - name: Setup JDK
+      uses: actions/setup-java@v5
+      with:
+        java-version: "21"
+        distribution: "jetbrains"
+      # The JetBrains distribution resolves its version via the GitHub API;
+      # authenticate so it isn't throttled by the 60 req/hour/IP limit.
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v6
