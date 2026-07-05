@@ -11,6 +11,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 
+/** The index.html lookup's contract; the plugin-level spec lives in tests.yml. */
 class TargetResourcesDirPathTest {
     @get:Rule
     val projectDir = TemporaryFolder()
