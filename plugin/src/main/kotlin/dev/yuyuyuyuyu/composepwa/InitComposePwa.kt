@@ -18,44 +18,106 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 /**
- * Stages every file one web target's PWA needs: the workbox config in the project
- * directory, and registerServiceWorker.js, manifest.json, icons/, plus the required
- * tags next to that target's index.html.
+ * Deploys every file one web target's PWA needs: the workbox config in the project
+ * directory, and registerServiceWorker.js, manifest.json, and icons/ into the target's
+ * resources directories, following four rules:
+ *
+ * 1. A file already present in two searched directories fails the build with a report
+ *    naming every copy — Gradle merges those directories into one page and cannot pick one.
+ * 2. A file the project already has is used as is, wherever it lives.
+ * 3. A file the sibling target keeps in its own resources directory is mirrored into this
+ *    target's own resources directory — copying it into a directory both targets merge
+ *    would recreate the very duplicate rule 1 rejects.
+ * 4. A file the project has nowhere is created next to index.html, the one location the
+ *    project itself has chosen for its page.
  *
  * All steps run sequentially in this one action — instead of one task per file — so
- * ordering constraints (the icons decision must observe the manifest state from before
- * the bundled manifest is installed) are plain statement order, not inter-task rules.
+ * ordering constraints (the conflict scan must precede every copy; the icons decision
+ * must observe the manifest decision) are plain statement order, not inter-task rules.
  */
 @DisableCachingByDefault(because = "Not worth caching")
 abstract class InitComposePwa : DefaultTask() {
     @get:Internal
     abstract val projectDirectory: DirectoryProperty
 
-    /** Resources directories searched for index.html, in order. */
+    /** Resources directories searched for index.html and existing PWA assets, in order. */
     @get:Input
     abstract val candidateResourcesDirPaths: ListProperty<String>
+
+    /** This target's own source-set resources directory; where sibling-mirrored files go. */
+    @get:Input
+    abstract val ownResourcesDirPath: Property<String>
+
+    /** The sibling target's own resources directory; a copy there signals a per-target convention. */
+    @get:Input
+    abstract val siblingResourcesDirPath: Property<String>
 
     @get:Input
     abstract val workboxConfigFileName: Property<String>
 
     @TaskAction
-    fun stagePwaFiles() {
+    fun deployPwaFiles() {
         val projectDir = projectDirectory.get().asFile
-        val resourcesDir =
-            File(projectDir, resolveTargetResourcesDirPath(projectDir, candidateResourcesDirPaths.get()))
+        val candidateDirPaths = candidateResourcesDirPaths.get()
+        val indexHtmlDir = File(projectDir, resolveTargetResourcesDirPath(projectDir, candidateDirPaths))
 
         copyBundledFileIfMissing(workboxConfigFileName.get(), projectDir)
-        copyBundledFileIfMissing("registerServiceWorker.js", resourcesDir)
 
-        // The bundled icons exist solely to back the bundled manifest.json, which
-        // references them: when a manifest.json is already there (its contents are never
-        // inspected), the bundled manifest is not installed, so the icons are not either.
-        if (!resourcesDir.resolve("manifest.json").exists()) {
-            unzipBundledArchiveIfMissing("icons.zip", targetDirName = "icons", destDir = resourcesDir)
-            copyBundledFileIfMissing("manifest.json", resourcesDir)
+        val conflicts = findPwaAssetConflicts(projectDir, candidateDirPaths, bundledPwaAssets())
+        if (conflicts.isNotEmpty()) {
+            throw GradleException(pwaAssetConflictMessage(conflicts))
         }
 
-        ensureNecessaryHtmlTagsIn(resourcesDir.resolve("index.html"))
+        val candidateDirs = candidateDirPaths.map { File(projectDir, it) }
+
+        deployDir("registerServiceWorker.js", candidateDirs, indexHtmlDir)?.let { destDir ->
+            copyBundledFileIfMissing("registerServiceWorker.js", destDir)
+        }
+
+        // The bundled icons exist solely to back the bundled manifest.json, which
+        // references them: when the project keeps a manifest.json anywhere (its contents
+        // are never inspected), the bundled manifest is not copied, so the icons are not
+        // either.
+        deployDir("manifest.json", candidateDirs, indexHtmlDir)?.let { destDir ->
+            if (candidateDirs.none { it.resolve("icons").exists() }) {
+                unzipBundledArchiveIfMissing("icons.zip", targetDirName = "icons", destDir = destDir)
+            }
+            copyBundledFileIfMissing("manifest.json", destDir)
+        }
+
+        ensureNecessaryHtmlTagsIn(indexHtmlDir.resolve("index.html"))
+    }
+
+    /**
+     * Where to create the named bundled file, or null when the project already has it
+     * (rules 2-4; rule 1 has already rejected multiple copies).
+     */
+    private fun deployDir(
+        fileName: String,
+        candidateDirs: List<File>,
+        indexHtmlDir: File,
+    ): File? {
+        val projectDir = projectDirectory.get().asFile
+        return when {
+            candidateDirs.any { it.resolve(fileName).exists() } -> null
+            File(projectDir, siblingResourcesDirPath.get()).resolve(fileName).exists() ->
+                File(projectDir, ownResourcesDirPath.get())
+            else -> indexHtmlDir
+        }
+    }
+
+    /** Every file this task deploys into resources directories, keyed by its merged relative path. */
+    private fun bundledPwaAssets(): Map<String, ByteArray> {
+        val assets = linkedMapOf<String, ByteArray>()
+        listOf("registerServiceWorker.js", "manifest.json").forEach { fileName ->
+            assets[fileName] = bundledResource(fileName).openStream().use { it.readBytes() }
+        }
+        forEachBundledZipEntry("icons.zip") { entry, zis ->
+            if (!entry.isDirectory) {
+                assets[entry.name] = zis.readBytes()
+            }
+        }
+        return assets
     }
 
     private fun bundledResource(fileName: String): URL =
@@ -82,11 +144,20 @@ abstract class InitComposePwa : DefaultTask() {
     ) {
         // An existing directory is never overwritten.
         if (destDir.resolve(targetDirName).exists()) return
+        forEachBundledZipEntry(archiveFileName) { entry, zis ->
+            writeEntry(zis, entry, destDir)
+        }
+    }
+
+    private fun forEachBundledZipEntry(
+        archiveFileName: String,
+        action: (ZipEntry, ZipInputStream) -> Unit,
+    ) {
         bundledResource(archiveFileName).openStream().use { inputStream ->
             ZipInputStream(inputStream).use { zis ->
                 var entry = zis.nextEntry
                 while (entry != null) {
-                    writeEntry(zis, entry, destDir)
+                    action(entry, zis)
                     zis.closeEntry()
                     entry = zis.nextEntry
                 }

@@ -137,7 +137,7 @@ jobs:
         working-directory: test-projects/web-app
         run: ../../gradlew wasmJsBrowserDistribution jsBrowserDistribution
 
-      - name: Assert each page got its own web assets
+      - name: Assert each page got its own PWA assets
         run: |
           for buildDir in wasmJs js; do
             test -f "test-projects/web-app/build/dist/$buildDir/productionExecutable/serviceWorker.js" || { echo "::error::serviceWorker.js Not Found for $buildDir"; exit 1; }
@@ -153,6 +153,44 @@ jobs:
           for other in webMain commonMain; do
             test ! -e "test-projects/web-app/src/$other/resources" || { echo "::error::files were generated into $other"; exit 1; }
           done
+
+  test-spread-assets:
+    name: should work even if PWA assets are scattered across source sets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
+
+      - name: Spread index.html and the project's own PWA assets across source sets
+        run: |
+          mkdir -p test-projects/web-app/src/wasmJsMain/resources
+          mkdir -p test-projects/web-app/src/webMain/resources
+          mkdir -p test-projects/web-app/src/commonMain/resources/icons
+          cp test-projects/web-app/index.html test-projects/web-app/src/wasmJsMain/resources/index.html
+          echo '{ "name": "own manifest in webMain" }' > test-projects/web-app/src/webMain/resources/manifest.json
+          echo 'own icon in commonMain' > test-projects/web-app/src/commonMain/resources/icons/own-icon.png
+
+      - name: Build as PWA
+        working-directory: test-projects/web-app
+        run: ../../gradlew wasmJsBrowserDistribution
+
+      - name: Assert every asset was used from its own directory
+        run: |
+          src=test-projects/web-app/src
+          dist=test-projects/web-app/build/dist/wasmJs/productionExecutable
+          test -f "$src/wasmJsMain/resources/registerServiceWorker.js" || { echo '::error::registerServiceWorker.js was not created next to index.html'; exit 1; }
+          grep -q 'own manifest in webMain' "$src/webMain/resources/manifest.json" || { echo '::error::the project manifest.json was overwritten'; exit 1; }
+          test ! -e "$src/wasmJsMain/resources/manifest.json" || { echo '::error::a bundled manifest.json was created despite the webMain one'; exit 1; }
+          test ! -e "$src/wasmJsMain/resources/icons" || { echo '::error::bundled icons were created despite the commonMain ones'; exit 1; }
+          grep -q 'own manifest in webMain' "$dist/manifest.json" || { echo '::error::the merged page lost the webMain manifest.json'; exit 1; }
+          grep -q 'own icon in commonMain' "$dist/icons/own-icon.png" || { echo '::error::the merged page lost the commonMain icons'; exit 1; }
+          test -f "$dist/registerServiceWorker.js" || { echo '::error::registerServiceWorker.js Not Found in dist'; exit 1; }
+          test -f "$dist/serviceWorker.js" || { echo '::error::serviceWorker.js Not Found'; exit 1; }
 
   formatter:
     name: should not fight the formatter
@@ -192,7 +230,7 @@ jobs:
         run: npm run lint
 
   test-own-assets:
-    name: should keep the project's own web assets untouched
+    name: should not touch the project's own PWA assets
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -203,7 +241,7 @@ jobs:
       - name: Setup build
         uses: ./.github/actions/setup-build
 
-      - name: Seed index.html and the project's own web assets
+      - name: Seed index.html and the project's own PWA assets
         run: |
           resources=test-projects/web-app/src/webMain/resources
           mkdir -p "$resources/icons"
@@ -216,13 +254,56 @@ jobs:
         working-directory: test-projects/web-app
         run: ../../gradlew initComposePwaForWasm
 
-      - name: Assert every pre-existing web asset survived untouched
+      - name: Assert every pre-existing PWA asset survived untouched
         run: |
           resources=test-projects/web-app/src/webMain/resources
           grep -q 'own manifest' "$resources/manifest.json" || { echo '::error::manifest.json was overwritten'; exit 1; }
           grep -q 'own service worker registration' "$resources/registerServiceWorker.js" || { echo '::error::registerServiceWorker.js was overwritten'; exit 1; }
           test -f "$resources/icons/own-icon.png" || { echo "::error::the project's own icon was removed"; exit 1; }
           test ! -e "$resources/icons/icon-192x192.png" || { echo '::error::bundled icons were copied despite an existing manifest.json'; exit 1; }
+
+  test-cross-target-creation:
+    name: should not break a working build when creating missing PWA assets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
+
+      - name: Seed a shared index.html and wasm-only PWA assets
+        run: |
+          mkdir -p test-projects/web-app/src/webMain/resources
+          mkdir -p test-projects/web-app/src/wasmJsMain/resources/icons
+          cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
+          echo '// wasm-specific service worker registration' > test-projects/web-app/src/wasmJsMain/resources/registerServiceWorker.js
+          echo '{ "name": "wasm-specific manifest" }' > test-projects/web-app/src/wasmJsMain/resources/manifest.json
+          echo 'wasm-specific icon' > test-projects/web-app/src/wasmJsMain/resources/icons/icon-192x192.png
+
+      - name: Build both targets as PWAs
+        working-directory: test-projects/web-app
+        run: ../../gradlew wasmJsBrowserDistribution jsBrowserDistribution
+
+      - name: Assert the js target got its own copies and the shared directory stayed clean
+        run: |
+          src=test-projects/web-app/src
+          test -f "$src/jsMain/resources/registerServiceWorker.js" || { echo '::error::registerServiceWorker.js was not mirrored into jsMain'; exit 1; }
+          test -f "$src/jsMain/resources/manifest.json" || { echo '::error::manifest.json was not mirrored into jsMain'; exit 1; }
+          test -f "$src/jsMain/resources/icons/icon-192x192.png" || { echo '::error::icons were not mirrored into jsMain'; exit 1; }
+          test ! -e "$src/webMain/resources/registerServiceWorker.js" || { echo '::error::registerServiceWorker.js leaked into the shared webMain'; exit 1; }
+          test ! -e "$src/webMain/resources/manifest.json" || { echo '::error::manifest.json leaked into the shared webMain'; exit 1; }
+          test ! -e "$src/webMain/resources/icons" || { echo '::error::icons leaked into the shared webMain'; exit 1; }
+          grep -q 'wasm-specific' "$src/wasmJsMain/resources/registerServiceWorker.js" || { echo '::error::the wasm-specific registerServiceWorker.js was overwritten'; exit 1; }
+          grep -q 'wasm-specific manifest' test-projects/web-app/build/dist/wasmJs/productionExecutable/manifest.json || { echo '::error::the wasm page lost its own manifest'; exit 1; }
+          if grep -q 'wasm-specific' test-projects/web-app/build/dist/js/productionExecutable/manifest.json; then
+            echo '::error::the js page was built with the wasm-specific manifest'; exit 1
+          fi
+          for buildDir in wasmJs js; do
+            test -f "test-projects/web-app/build/dist/$buildDir/productionExecutable/serviceWorker.js" || { echo "::error::serviceWorker.js Not Found for $buildDir"; exit 1; }
+          done
 
   test-missing-index-html:
     name: should fail helpfully when index.html is missing
@@ -265,6 +346,43 @@ jobs:
           done
           if grep -q 'src/wasmJsMain/resources/index.html' build-output-js.log; then
             echo '::error::a js build must not search the wasm target source set'; exit 1
+          fi
+
+  test-duplicated-assets:
+    name: should fail helpfully when the same PWA asset is in two source sets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Setup build
+        uses: ./.github/actions/setup-build
+
+      # The layout issue #47 reported: the project's own copy next to index.html, plus an
+      # untouched leftover from an old ComposePWA version in another source set.
+      - name: Seed the same PWA asset in two source sets
+        run: |
+          mkdir -p test-projects/web-app/src/commonMain/resources
+          mkdir -p test-projects/web-app/src/webMain/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/commonMain/resources/index.html
+          echo '// own service worker registration' > test-projects/web-app/src/commonMain/resources/registerServiceWorker.js
+          cp plugin/src/main/resources/registerServiceWorker.js test-projects/web-app/src/webMain/resources/registerServiceWorker.js
+
+      - name: Build expecting the conflict report
+        working-directory: test-projects/web-app
+        run: |
+          if ../../gradlew wasmJsBrowserDistribution > build-output.log 2>&1; then
+            echo '::error::the build unexpectedly succeeded with duplicated PWA assets'
+            exit 1
+          fi
+          grep -q 'ComposePWA found the same PWA asset in more than one resources directory' build-output.log || { echo '::error::the conflict report is missing'; tail -50 build-output.log; exit 1; }
+          grep -q 'registerServiceWorker.js is in:' build-output.log || { echo '::error::the conflicting file is not named'; exit 1; }
+          grep -qF -- '- src/webMain/resources/registerServiceWorker.js (identical to the bundled default; safe to delete)' build-output.log || { echo '::error::the untouched leftover is not marked safe to delete'; exit 1; }
+          grep -qE -- '- src/commonMain/resources/registerServiceWorker.js$' build-output.log || { echo '::error::the customized copy is missing or mislabeled'; exit 1; }
+          if grep -q 'is a duplicate but no duplicate handling strategy has been set' build-output.log; then
+            echo '::error::the build reached the cryptic Gradle duplicate error instead of failing early'; exit 1
           fi
 
   unit-tests:
