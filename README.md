@@ -89,9 +89,10 @@ four rules, in order:
    Copies identical to the bundled defaults are marked safe to delete.
 2. If the file already exists in one of the searched directories, it is used as is,
    wherever it lives, and is never overwritten.
-3. If it is missing, but the other web target keeps its own copy in
-   `src/wasmJsMain/resources` or `src/jsMain/resources`, the file is created in this
-   target's own resources directory, following that per-target convention.
+3. If it is missing, but the other web target keeps the file in its own resources
+   directory (`src/wasmJsMain/resources` or `src/jsMain/resources`), the file is
+   created in this target's own resources directory, following that per-target
+   convention.
 4. Otherwise, the file is created next to your `index.html`.
 
 If you already have a `manifest.json`, the bundled `icons/` are not copied either — they
