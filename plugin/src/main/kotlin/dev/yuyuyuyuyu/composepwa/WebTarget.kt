@@ -20,6 +20,13 @@ internal enum class WebTarget(
     val initTaskName: String = "initComposePwaFor$name"
     val buildAsPwaTaskName: String = "build${name}AsPwa"
     val browserDistributionTaskName: String = "${targetName}BrowserDistribution"
+
+    /** This target's own source-set resources directory — the one the sibling target never sees. */
+    val ownResourcesDirPath: String = "src/$targetSourceSetName/resources"
+
     val candidateResourcesDirPaths: List<String> =
-        listOf("webMain", targetSourceSetName, "commonMain").map { "src/$it/resources" }
+        listOf("src/webMain/resources", ownResourcesDirPath, "src/commonMain/resources")
+
+    /** The other web target; its [ownResourcesDirPath] signals a per-target file convention. */
+    val sibling: WebTarget get() = if (this == Wasm) Js else Wasm
 }

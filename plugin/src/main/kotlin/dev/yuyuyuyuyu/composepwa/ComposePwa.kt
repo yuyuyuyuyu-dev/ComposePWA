@@ -21,7 +21,7 @@ class ComposePwa : Plugin<Project> {
         }
 
         // Gradle may run the two targets' tasks in parallel under the configuration
-        // cache, but they share state Gradle cannot see: both init tasks can stage the
+        // cache, but they share state Gradle cannot see: both init tasks can write to the
         // same resources directory (webMain/commonMain layouts), and both workbox tasks
         // install workbox-cli into the same npx cache entry, corrupting it
         // (TAR_ENTRY_ERROR). Everything here is cheap, so serialize the js pipeline
@@ -43,9 +43,11 @@ class ComposePwa : Plugin<Project> {
         project.tasks.register(target.initTaskName, InitComposePwa::class.java) { task ->
             task.group = TASK_GROUP
             task.description =
-                "Copies the PWA web assets next to the ${target.name} target's index.html and tags it."
+                "Deploys the ${target.name} target's PWA assets and tags its index.html."
             task.projectDirectory.set(project.layout.projectDirectory)
             task.candidateResourcesDirPaths.set(target.candidateResourcesDirPaths)
+            task.ownResourcesDirPath.set(target.ownResourcesDirPath)
+            task.siblingResourcesDirPath.set(target.sibling.ownResourcesDirPath)
             task.workboxConfigFileName.set(target.workboxConfigFileName)
         }
     }
@@ -63,8 +65,8 @@ class ComposePwa : Plugin<Project> {
         }
     }
 
-    // Makes each web target's processResources depend on its init task, so the staged
-    // files take part in that target's resource merge.
+    // Makes each web target's processResources depend on its init task, so the files it
+    // deploys take part in that target's resource merge.
     private fun registerInitTasksAsResources(project: Project) {
         project.extensions.configure(KotlinMultiplatformExtension::class.java) { kmpExt ->
             WebTarget.entries.forEach { target ->

@@ -70,13 +70,26 @@ resources directories that feed its target, and uses the one that contains the f
 - `jsBrowserDistribution`: `src/webMain/resources`, `src/jsMain/resources`,
   `src/commonMain/resources`
 
-Files that already exist are left untouched. If you already have a `manifest.json`, the
-bundled `icons/` are not copied either — they only exist to back the bundled manifest.
+Each file the plugin provides — `registerServiceWorker.js`, `manifest.json`, and the
+bundled `icons/` — then follows four rules, in order:
+
+1. If the same file is in two of the searched directories, the build fails with a report
+   naming every copy: Gradle merges those directories into one page and cannot pick one.
+   Copies identical to the bundled defaults are marked safe to delete.
+2. If the file already exists in one of the searched directories, it is used as is,
+   wherever it lives, and is never overwritten.
+3. If it is missing, but the other web target keeps its own copy in
+   `src/wasmJsMain/resources` or `src/jsMain/resources`, the file is created in this
+   target's own resources directory, following that per-target convention.
+4. Otherwise, the file is created next to your `index.html`.
+
+If you already have a `manifest.json`, the bundled `icons/` are not copied either — they
+only exist to back the bundled manifest.
 
 When you run the `wasmJsBrowserDistribution` task, this plugin automatically does the following:
 
 - Creates `workbox-config-for-wasm.js` in the project directory.
-- Creates these files next to your `index.html`:
+- Creates these files, following the rules above:
   - `manifest.json`
   - `registerServiceWorker.js`
   - `icons/*`
@@ -85,7 +98,7 @@ When you run the `wasmJsBrowserDistribution` task, this plugin automatically doe
 When you run the `jsBrowserDistribution` task, this plugin automatically does the following:
 
 - Creates `workbox-config-for-js.js` in the project directory.
-- Creates these files next to your `index.html`:
+- Creates these files, following the rules above:
   - `manifest.json`
   - `registerServiceWorker.js`
   - `icons/*`
@@ -106,8 +119,8 @@ And you can check out a live example here:
 You can edit the following files to customize your PWA:
 
 - `workbox-config-for-wasm.js` / `workbox-config-for-js.js`
-- `manifest.json` (next to your `index.html`)
-- `icons/*` (next to your `index.html`)
+- `manifest.json` (next to your `index.html` by default)
+- `icons/*` (next to your `index.html` by default)
 
 ## Custom icon
 
