@@ -62,16 +62,27 @@ Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable
 
 ## What this plugin does
 
-The plugin first locates your web app's `index.html`. Each build searches only the
-resources directories that feed its target, and uses the one that contains the file:
+When you run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task, this
+plugin automatically does the following:
+
+- Creates `workbox-config-for-wasm.js` / `workbox-config-for-js.js` in the project
+  directory.
+- Creates `manifest.json`, `registerServiceWorker.js`, and `icons/*` next to your
+  `index.html`, skipping every file you already have.
+- Adds the necessary tags to your `index.html`.
+
+Each build searches only the resources directories that feed its target for
+`index.html` and the files above:
 
 - `wasmJsBrowserDistribution`: `src/webMain/resources`, `src/wasmJsMain/resources`,
   `src/commonMain/resources`
 - `jsBrowserDistribution`: `src/webMain/resources`, `src/jsMain/resources`,
   `src/commonMain/resources`
 
-Each file the plugin provides — `registerServiceWorker.js`, `manifest.json`, and the
-bundled `icons/` — then follows four rules, in order:
+### Where the files may live
+
+You don't have to keep everything in one place. Each file the plugin provides follows
+four rules, in order:
 
 1. If the same file is in two of the searched directories, the build fails with a report
    naming every copy: Gradle merges those directories into one page and cannot pick one.
@@ -85,24 +96,6 @@ bundled `icons/` — then follows four rules, in order:
 
 If you already have a `manifest.json`, the bundled `icons/` are not copied either — they
 only exist to back the bundled manifest.
-
-When you run the `wasmJsBrowserDistribution` task, this plugin automatically does the following:
-
-- Creates `workbox-config-for-wasm.js` in the project directory.
-- Creates these files, following the rules above:
-  - `manifest.json`
-  - `registerServiceWorker.js`
-  - `icons/*`
-- Adds the necessary tags to your `index.html`.
-
-When you run the `jsBrowserDistribution` task, this plugin automatically does the following:
-
-- Creates `workbox-config-for-js.js` in the project directory.
-- Creates these files, following the rules above:
-  - `manifest.json`
-  - `registerServiceWorker.js`
-  - `icons/*`
-- Adds the necessary tags to your `index.html`.
 
 ## Deploy to GitHub Pages
 
