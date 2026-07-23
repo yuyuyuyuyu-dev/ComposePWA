@@ -9,7 +9,8 @@ node_modules/
 # Local scratch workspace (contents are git-ignored).
 tmp/
 
-# Runtime state of the layout test app (files CI copies/generates; not committed).
+# Runtime state of the test app (files CI copies/generates; not committed). The
+# "should not fight the formatter" job checks its own outputs past this.
 test-projects/web-app/src/*/resources/
 
 # Lockfiles & Gradle wrapper

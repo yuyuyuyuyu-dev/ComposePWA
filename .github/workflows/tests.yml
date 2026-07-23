@@ -33,32 +33,35 @@ jobs:
       - name: Setup build
         uses: ./.github/actions/setup-build
 
+      - name: Copy index.html into webMain resources
+        run: |
+          mkdir -p test-projects/web-app/src/webMain/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
+
       - name: Build ${{ matrix.target-name }} as PWA
-        working-directory: example
-        run: ./gradlew :webApp:${{ matrix.gradle-task }}
+        working-directory: test-projects/web-app
+        run: ../../gradlew ${{ matrix.gradle-task }}
 
       - name: Assert ${{ matrix.target-name }} PWA generated files
         run: |
-          test -f example/webApp/build/dist/${{ matrix.build-dir }}/productionExecutable/serviceWorker.js || { echo '::error::serviceWorker.js Not Found'; exit 1; }
-          test -f example/webApp/${{ matrix.config-file }} || { echo '::error::${{ matrix.config-file }} Not Found'; exit 1; }
-          test -f example/webApp/src/webMain/resources/manifest.json || { echo '::error::manifest.json Not Found'; exit 1; }
-          test -f example/webApp/src/webMain/resources/registerServiceWorker.js || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
+          resources=test-projects/web-app/src/webMain/resources
+          dist=test-projects/web-app/build/dist/${{ matrix.build-dir }}/productionExecutable
 
-          test -f example/webApp/src/webMain/resources/icons/icon-72x72.png || { echo '::error::icons/icon-72x72.png Not Found'; exit 1; }
-          test -f example/webApp/src/webMain/resources/icons/icon-96x96.png || { echo '::error::icons/icon-96x96.png Not Found'; exit 1; }
-          test -f example/webApp/src/webMain/resources/icons/icon-128x128.png || { echo '::error::icons/icon-128x128.png Not Found'; exit 1; }
-          test -f example/webApp/src/webMain/resources/icons/icon-144x144.png || { echo '::error::icons/icon-144x144.png Not Found'; exit 1; }
-          test -f example/webApp/src/webMain/resources/icons/icon-152x152.png || { echo '::error::icons/icon-152x152.png Not Found'; exit 1; }
-          test -f example/webApp/src/webMain/resources/icons/icon-192x192.png || { echo '::error::icons/icon-192x192.png Not Found'; exit 1; }
-          test -f example/webApp/src/webMain/resources/icons/icon-384x384.png || { echo '::error::icons/icon-384x384.png Not Found'; exit 1; }
-          test -f example/webApp/src/webMain/resources/icons/icon-512x512.png || { echo '::error::icons/icon-512x512.png Not Found'; exit 1; }
+          test -f "$dist/serviceWorker.js" || { echo '::error::serviceWorker.js Not Found'; exit 1; }
+          test -f test-projects/web-app/${{ matrix.config-file }} || { echo '::error::${{ matrix.config-file }} Not Found'; exit 1; }
+          test -f "$resources/manifest.json" || { echo '::error::manifest.json Not Found'; exit 1; }
+          test -f "$resources/registerServiceWorker.js" || { echo '::error::registerServiceWorker.js Not Found'; exit 1; }
 
-          grep -q 'registerServiceWorker.js' example/webApp/src/webMain/resources/index.html || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
-          grep -q 'manifest.json' example/webApp/src/webMain/resources/index.html || { echo '::error::manifest.json is missing from index.html'; exit 1; }
+          for size in 72x72 96x96 128x128 144x144 152x152 192x192 384x384 512x512; do
+            test -f "$resources/icons/icon-$size.png" || { echo "::error::icons/icon-$size.png Not Found"; exit 1; }
+          done
 
-          test ! -e example/webApp/src/webMain/resources/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in resources'; exit 1; }
-          test ! -e example/webApp/src/webMain/resources/icons/.DS_Store || { echo '::error::.DS_Store metadata file should not exist in icons'; exit 1; }
-          test ! -e example/webApp/build/dist/${{ matrix.build-dir }}/productionExecutable/__MACOSX || { echo '::error::__MACOSX metadata folder should not exist in dist'; exit 1; }
+          grep -q 'registerServiceWorker.js' "$resources/index.html" || { echo '::error::registerServiceWorker.js is missing from index.html'; exit 1; }
+          grep -q 'manifest.json' "$resources/index.html" || { echo '::error::manifest.json is missing from index.html'; exit 1; }
+
+          test ! -e "$resources/__MACOSX" || { echo '::error::__MACOSX metadata folder should not exist in resources'; exit 1; }
+          test ! -e "$resources/icons/.DS_Store" || { echo '::error::.DS_Store metadata file should not exist in icons'; exit 1; }
+          test ! -e "$dist/__MACOSX" || { echo '::error::__MACOSX metadata folder should not exist in dist'; exit 1; }
 
   test-layouts:
     name: should put the PWA files next to index.html in ${{ matrix.source-set }}
@@ -213,21 +216,35 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Run the plugin against the example app so it copies its resources and
-      # ensures the PWA tags in index.html, exactly as a consumer's build would.
+      # index-with-pwa-tags.html is the shape a consumer's index.html has from the
+      # second build onwards: the plugin's tags, already reformatted by Prettier.
+      - name: Seed an already-tagged, formatter-clean index.html
+        run: |
+          mkdir -p test-projects/web-app/src/webMain/resources
+          cp test-projects/web-app/index-with-pwa-tags.html test-projects/web-app/src/webMain/resources/index.html
+
       - name: Generate ComposePWA outputs
-        working-directory: example
-        run: ./gradlew :webApp:initComposePwaForWasm :webApp:initComposePwaForJs
+        working-directory: test-projects/web-app
+        run: ../../gradlew initComposePwaForWasm initComposePwaForJs
 
-      # One side of the fight: the plugin must not rewrite any committed,
-      # formatter-clean file (index.html in particular). A non-empty diff fails here.
-      - name: Verify the plugin left tracked files untouched
-        run: git diff --exit-code
+      # One side of the fight: the plugin must not rewrite a formatter-clean file that
+      # already has the tags — it has to recognize them in the formatter's shape, not
+      # only in the shape it writes them.
+      - name: Verify the plugin left index.html untouched
+        run: |
+          cmp test-projects/web-app/index-with-pwa-tags.html test-projects/web-app/src/webMain/resources/index.html || { echo '::error::the plugin rewrote an already-tagged index.html'; exit 1; }
+          git diff --exit-code
 
-      # The other side: the formatters must find nothing to change in what the
-      # plugin just generated.
+      # The other side: the formatters must find nothing to change in what the plugin
+      # just generated. The generated resources are git-ignored runtime state, so
+      # Prettier skips them in the repo-wide run and needs to be pointed at them.
       - name: Run formatters & linters on the generated outputs
-        run: npm run lint
+        run: |
+          npm run lint
+          npx prettier --check --ignore-path /dev/null \
+            test-projects/web-app/src/webMain/resources/index.html \
+            test-projects/web-app/src/webMain/resources/manifest.json \
+            test-projects/web-app/src/webMain/resources/registerServiceWorker.js
 
   test-own-assets:
     name: should not touch the project's own PWA assets
