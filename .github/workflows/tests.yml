@@ -236,15 +236,11 @@ jobs:
           git diff --exit-code
 
       # The other side: the formatters must find nothing to change in what the plugin
-      # just generated. The generated resources are git-ignored runtime state, so
-      # Prettier skips them in the repo-wide run and needs to be pointed at them.
+      # just generated. ESLint reaches those files where they land — unlike Prettier it
+      # does not read .gitignore — and the tags it wrote into index.html are already
+      # covered by the byte comparison above.
       - name: Run formatters & linters on the generated outputs
-        run: |
-          npm run lint
-          npx prettier --check --ignore-path /dev/null \
-            test-projects/web-app/src/webMain/resources/index.html \
-            test-projects/web-app/src/webMain/resources/manifest.json \
-            test-projects/web-app/src/webMain/resources/registerServiceWorker.js
+        run: npm run lint
 
   test-own-assets:
     name: should not touch the project's own PWA assets

@@ -1,11 +1,4 @@
-This is a Kotlin Multiplatform project targeting Web, built as a PWA by the
-[ComposePWA](../README.md) plugin.
-
-Everything the plugin creates — `workbox-config-for-wasm.js`, `workbox-config-for-js.js`,
-and `manifest.json`, `registerServiceWorker.js`, `icons/*` next to
-[index.html](./webApp/src/webMain/resources/index.html) — is committed here, the way a
-real app keeps them: they are yours to edit, and the plugin never overwrites a file you
-already have.
+This is a Kotlin Multiplatform project targeting Web.
 
 - [/shared](./shared/src) is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
