@@ -3,7 +3,7 @@ androidx-lifecycle = "2.11.0"
 composeMultiplatform = "1.11.1"
 junit = "4.13.2"
 kotlin = "2.4.10"
-kotlin-wrappers = "2026.7.4"
+kotlin-wrappers = "2026.7.5"
 material3 = "1.12.0-alpha03"
 
 [libraries]
