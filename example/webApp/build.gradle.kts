@@ -5,9 +5,9 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 
-    // Builds this web app as a PWA. Resolved from source via includeBuild("../plugin")
-    // in settings.gradle.kts, so there is no version and no Gradle Plugin Portal lookup.
-    id("dev.yuyuyuyuyu.composepwa")
+    // Builds this web app as a PWA. Resolved from the Gradle Plugin Portal, exactly as a
+    // real consumer project would.
+    alias(libs.plugins.composePwa)
 }
 
 kotlin {
