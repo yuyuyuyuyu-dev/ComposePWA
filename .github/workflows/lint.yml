@@ -9,7 +9,7 @@ on:
 
 jobs:
   kotlin:
-    name: ktlint & Detekt (Kotlin)
+    name: ktlint, Detekt & version catalog (Gradle)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -32,6 +32,13 @@ jobs:
 
       - name: Lint Kotlin (Gradle plugin)
         run: ./gradlew :plugin:ktlintCheck :plugin:detekt
+
+      # versionCatalogFormat rewrites the catalog in place and has no check
+      # mode, so the diff against the committed file is the assertion.
+      - name: Check version catalog formatting
+        run: |
+          ./gradlew versionCatalogFormat
+          git diff --exit-code gradle/libs.versions.toml
 
   web:
     name: Prettier & linters (web assets)

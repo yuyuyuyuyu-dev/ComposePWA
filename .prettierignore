@@ -18,7 +18,7 @@ gradlew
 gradlew.bat
 gradle/wrapper/
 
-# Handled by other tools (ktlint, taplo) or not formattable
+# Handled by other tools (ktlint, versionCatalogFormat) or not formattable
 *.kt
 *.kts
 *.toml
