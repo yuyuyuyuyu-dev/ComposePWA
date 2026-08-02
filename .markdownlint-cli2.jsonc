@@ -7,13 +7,10 @@
     "MD033": false
   },
   "globs": ["**/*.md"],
-  "ignores": [
-    "**/node_modules/**",
-    "**/build/**",
-    ".gradle/**",
-    ".idea/**",
-    ".kotlin/**",
-    "example/**",
-    "tmp/**"
-  ]
+  // Covers build outputs, tool caches and the tmp/ scratch workspace — including the
+  // nested tmp/.gitignore.
+  "gitignore": true,
+  // A drop-in user project: it stays exactly as the IDE template generates it, so that
+  // readers can tell at a glance what the plugin produced.
+  "ignores": ["example/**"]
 }

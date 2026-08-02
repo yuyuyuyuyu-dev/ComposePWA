@@ -1,26 +1,13 @@
-# Build outputs & tool caches
-**/build/
-.gradle/
-.idea/
-.kotlin/
-.claude/
-node_modules/
+# Prettier reads .gitignore by default, so this file only lists what that misses.
 
-# Local scratch workspace (contents are git-ignored).
+# A drop-in user project: it stays exactly as the IDE template generates it, so that
+# readers can tell at a glance what the plugin produced. No formatter or linter runs
+# over it.
+example/
+
+# Ignored by a nested .gitignore (tmp/.gitignore); Prettier reads only the root one.
 tmp/
 
-# Runtime state of the layout test app (files CI copies/generates; not committed).
-test-projects/web-app/src/*/resources/
-
-# Lockfiles & Gradle wrapper
-kotlin-js-store/
-gradlew
-gradlew.bat
-gradle/wrapper/
-
-# Handled by other tools (ktlint, versionCatalogFormat) or not formattable
-*.kt
-*.kts
-*.toml
-*.xml
-LICENSE
+# Claude Code's local settings: not committed, and known only to the developer's
+# global gitignore, which Prettier does not read either.
+.claude/

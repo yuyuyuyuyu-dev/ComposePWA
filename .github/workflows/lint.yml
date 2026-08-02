@@ -40,11 +40,28 @@ jobs:
           ./gradlew versionCatalogFormat
           git diff --exit-code gradle/libs.versions.toml
 
+  # Each checker gets its own job so that a push that violates several of them reports
+  # every violation at once instead of stopping at the first tool.
   web:
-    name: Prettier & linters (web assets)
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Prettier (web assets)
+            command: npx --no -- prettier --check .
+          - name: ESLint (JS, JSON & YAML)
+            command: npx --no -- eslint .
+          # HTMLHint has no ignore-file mechanism of any kind, so what it skips can only
+          # be said on the command line.
+          - name: HTMLHint (HTML)
+            command: npx --no -- htmlhint "**/*.html" --ignore
+              "**/build/**,**/node_modules/**,tmp/**,example/**,test-projects/web-app/src/**"
+          - name: markdownlint (Markdown)
+            command: npx --no -- markdownlint-cli2
     steps:
       - name: Clone Repository
         uses: actions/checkout@v7
@@ -58,8 +75,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run formatters & linters
-        run: npm run lint
+      # `npx --no` fails when the tool is missing from node_modules instead of quietly
+      # fetching a different version from the registry.
+      - name: ${{ matrix.name }}
+        run: ${{ matrix.command }}
 
   actions:
     name: actionlint (GitHub Actions)

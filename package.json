@@ -2,19 +2,8 @@
   "name": "composepwa-tooling",
   "version": "0.0.0",
   "private": true,
-  "description": "Formatter & linter tooling for the ComposePWA repository (web assets).",
+  "description": "Formatter & linter tooling for the ComposePWA repository (web assets). This file pins the tools; how each one is invoked lives in .github/workflows/lint.yml and tests.yml.",
   "license": "Apache-2.0",
-  "scripts": {
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "lint:eslint": "eslint .",
-    "lint:css": "stylelint \"**/*.css\"",
-    "lint:html": "htmlhint \"**/*.html\" --ignore \"**/build/**,**/node_modules/**,tmp/**,test-projects/web-app/src/**\"",
-    "lint:md": "markdownlint-cli2",
-    "lint:actions": "actionlint",
-    "lint": "npm run format:check && npm run lint:eslint && npm run lint:css && npm run lint:html && npm run lint:md",
-    "fix": "npm run format && eslint . --fix && stylelint \"**/*.css\" --fix && markdownlint-cli2 --fix"
-  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@eslint/json": "^2.0.0",
@@ -23,8 +12,6 @@
     "globals": "^17.6.0",
     "htmlhint": "^1.9.2",
     "markdownlint-cli2": "^0.22.1",
-    "prettier": "^3.8.4",
-    "stylelint": "^17.13.0",
-    "stylelint-config-standard": "^40.0.0"
+    "prettier": "^3.8.4"
   }
 }

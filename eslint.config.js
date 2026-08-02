@@ -9,18 +9,19 @@ const json = jsonModule.default ?? jsonModule;
 module.exports = [
   {
     ignores: [
+      // A drop-in user project: it stays exactly as the IDE template generates it, so
+      // that readers can tell at a glance what the plugin produced.
+      "example/**",
+      // ESLint does not read .gitignore, so the git-ignored paths that hold lintable
+      // files are listed here — all except the assets the plugin emits into
+      // test-projects/web-app/src/*/resources/, which stay linted where the plugin wrote
+      // them (.github/workflows/tests.yml relies on that). The blocks below give those
+      // files their runtime globals.
       "**/build/**",
-      "**/node_modules/**",
-      "**/.gradle/**",
-      "**/.idea/**",
-      "**/.kotlin/**",
-      ".claude/**",
-      "**/kotlin-js-store/**",
-      "package-lock.json",
       "tmp/**",
-      // NOTE: the JS assets the ComposePWA plugin emits (registerServiceWorker.js,
-      // workbox-config-*.js) are intentionally NOT ignored — they are checked by the
-      // "ComposePWA output" CI job, which configures them as browser/Node scripts below.
+      "**/.idea/**",
+      ".claude/**",
+      "package-lock.json",
     ],
   },
 
