@@ -235,12 +235,30 @@ jobs:
           cmp test-projects/web-app/index-with-pwa-tags.html test-projects/web-app/src/webMain/resources/index.html || { echo '::error::the plugin rewrote an already-tagged index.html'; exit 1; }
           git diff --exit-code
 
-      # The other side: the formatters must find nothing to change in what the plugin
-      # just generated. ESLint reaches those files where they land — unlike Prettier it
-      # does not read .gitignore — and the tags it wrote into index.html are already
-      # covered by the byte comparison above.
-      - name: Run formatters & linters on the generated outputs
-        run: npm run lint
+      # The other side: the formatters must find nothing to change in what the plugin just
+      # generated. Every path below is git-ignored, so each tool is named the generated
+      # files explicitly and told to disregard its ignore rules — left to their defaults,
+      # Prettier reads .gitignore and reports the files as clean without reading them, and
+      # ESLint downgrades them to a "File ignored" warning and still exits 0.
+      - name: Verify the generated assets do not fight Prettier
+        run: |
+          npx --no -- prettier --check --ignore-path /dev/null \
+            test-projects/web-app/src/webMain/resources/index.html \
+            test-projects/web-app/src/webMain/resources/manifest.json \
+            test-projects/web-app/src/webMain/resources/registerServiceWorker.js \
+            test-projects/web-app/workbox-config-for-wasm.js \
+            test-projects/web-app/workbox-config-for-js.js
+
+      - name: Verify the generated assets do not fight ESLint
+        run: |
+          npx --no -- eslint --no-ignore \
+            test-projects/web-app/src/webMain/resources/manifest.json \
+            test-projects/web-app/src/webMain/resources/registerServiceWorker.js \
+            test-projects/web-app/workbox-config-for-wasm.js \
+            test-projects/web-app/workbox-config-for-js.js
+
+      - name: Verify the generated index.html does not fight HTMLHint
+        run: npx --no -- htmlhint test-projects/web-app/src/webMain/resources/index.html
 
   test-own-assets:
     name: should not touch the project's own PWA assets
