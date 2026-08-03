@@ -12,6 +12,6 @@
     "globals": "^17.6.0",
     "htmlhint": "^1.9.2",
     "markdownlint-cli2": "^0.22.1",
-    "prettier": "^3.8.4"
+    "prettier": "^3.9.6"
   }
 }
