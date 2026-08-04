@@ -34,7 +34,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
