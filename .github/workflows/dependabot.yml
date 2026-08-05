@@ -27,4 +27,4 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Send dependencies to Dependabot
-        uses: gradle/actions/dependency-submission@v6.2.0
+        uses: gradle/actions/dependency-submission@v6.3.0
