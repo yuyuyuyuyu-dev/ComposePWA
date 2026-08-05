@@ -7,7 +7,7 @@ kotlin = "2.4.10"
 ktlint = "14.2.0"
 nodeGradle = "7.1.0"
 vanniktechMavenPublish = "0.37.0"
-versionCatalogUpdate = "1.1.0"
+versionCatalogUpdate = "1.1.1"
 
 [libraries]
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
