@@ -8,7 +8,7 @@
     "@eslint/js": "^10.0.1",
     "@eslint/json": "^2.0.1",
     "eslint": "^10.5.0",
-    "eslint-plugin-yml": "^3.6.0",
+    "eslint-plugin-yml": "^3.8.1",
     "globals": "^17.11.0",
     "htmlhint": "^1.9.2",
     "markdownlint-cli2": "^0.23.2",
