@@ -1,10 +1,10 @@
 [versions]
 androidx-lifecycle = "2.11.0"
-composeMultiplatform = "1.11.1"
+composeMultiplatform = "1.12.0"
 composePwa = "0.7.0-alpha03"
 junit = "4.13.2"
 kotlin = "2.4.10"
-kotlin-wrappers = "2026.8.1"
+kotlin-wrappers = "2026.8.4"
 material3 = "1.12.0-alpha03"
 
 [libraries]
