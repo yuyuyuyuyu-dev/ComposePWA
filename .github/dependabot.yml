@@ -5,21 +5,41 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 1
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "gradle"
     directory: "/example"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 1
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 1
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 1
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
