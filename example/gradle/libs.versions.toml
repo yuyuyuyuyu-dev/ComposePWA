@@ -3,9 +3,9 @@ androidx-lifecycle = "2.11.0"
 composeMultiplatform = "1.12.0"
 composePwa = "0.7.0-alpha03"
 junit = "4.13.2"
-kotlin = "2.4.10"
+kotlin = "2.4.20"
 kotlin-wrappers = "2026.9.1"
-material3 = "1.12.0-alpha03"
+material3 = "1.13.0-alpha01"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
