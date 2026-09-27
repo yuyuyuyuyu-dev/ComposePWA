@@ -19,12 +19,11 @@ This Gradle plugin builds your Compose Multiplatform web app as a progressive we
 
 ## Why it was built
 
-When I turned my first Compose Multiplatform web app into a PWA, I hated the
-thought of having to run the `workbox` command after every build, so I wrote a
-Gradle task to automate it. When I made my second Compose Multiplatform web
-app, I hated the thought of having to copy and paste that task into every new
-web app and maintain each copy separately. So I decided to make the task
-reusable by turning it into a Gradle plugin. That is how this plugin came to be.
+When I turned my first Compose Multiplatform web app into a PWA, I didn't want
+to run the `workbox` command after every build, so I wrote a Gradle task to
+automate it. But when I made my second app, I didn't want to copy and paste
+that task into every new web app and maintain each copy separately.
+So, I built this plugin.
 
 ## What it does
 
