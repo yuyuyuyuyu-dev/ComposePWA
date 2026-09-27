@@ -7,60 +7,24 @@
 
 This Gradle plugin builds your Compose Multiplatform web app as a progressive web app (PWA).
 
-## Prerequisites
+**Table of Contents**
 
-- Node.js (The author uses [Volta](https://volta.sh/) to install Node.js)
+- [Why it was built](#why-it-was-built)
+- [What it does](#what-it-does)
+- [How to use](#how-to-use)
+- [Tips](#tips)
+- [Dependencies & Acknowledgments](#dependencies--acknowledgments)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Installation
+## Why it was built
 
-gradle/libs.versions.toml
+最初にCompose Multiplatformで作ったWebアプリをPWA化した時、ビルドするたびに `workbox` コマンドを実行しなければいけないと思うととても憂鬱になったので、それを自動化するためにGradleタスクを定義しました。
+2個目のCompose Multiplatform製Webアプリを作った時、今後Webアプリを作るたびにGradleタスクをコピペしてそれぞれで管理しなければならないと思うととても憂鬱になりました。
+なのでGradleプラグインを使ってGradleタスクを使いまわせるようにしようと思い立ちました。
+そのような経緯でこのプラグインは出来上がりました。
 
-```diff
-[versions]
-// ...
-
-+ composePwa = "x.x.x" // Please replace with the latest version.
-
-[libraries]
-// ...
-
-[plugins]
-// ...
-
-+ composePwa = { id = "dev.yuyuyuyuyu.composepwa", version.ref = "composePwa" }
-```
-
-composeApp/build.gradle.kts
-
-```diff
-// ...
-
-plugins {
-    // ...
-
-+   alias(libs.plugins.composePwa)
-}
-```
-
-## How to use
-
-Just apply the plugin and run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task as
-usual.
-
-```bash
-./gradlew :composeApp:wasmJsBrowserDistribution
-```
-
-or
-
-```bash
-./gradlew :composeApp:jsBrowserDistribution
-```
-
-Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable` or
-`composeApp/build/dist/js/productionExecutable`.
-
-## What this plugin does
+## What it does
 
 When you run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task, this
 plugin automatically does the following:
@@ -79,26 +43,61 @@ Each build searches only the resources directories that feed its target for
 - `jsBrowserDistribution`: `src/webMain/resources`, `src/jsMain/resources`,
   `src/commonMain/resources`
 
-### Where the files may live
+## How to use
 
-You don't have to keep everything in one place. Each file the plugin provides follows
-four rules, in order:
+### Prerequisites
 
-1. If the same file is in two of the searched directories, the build fails with a report
-   naming every copy: Gradle merges those directories into one page and cannot pick one.
-   Copies identical to the bundled defaults are marked safe to delete.
-2. If the file already exists in one of the searched directories, it is used as is,
-   wherever it lives, and is never overwritten.
-3. If it is missing, but the other web target keeps the file in its own resources
-   directory (`src/wasmJsMain/resources` or `src/jsMain/resources`), the file is
-   created in this target's own resources directory, following that per-target
-   convention.
-4. Otherwise, the file is created next to your `index.html`.
+- Node.js (The author uses [Volta](https://volta.sh/) to install Node.js)
 
-If you already have a `manifest.json`, the bundled `icons/` are not copied either — they
-only exist to back the bundled manifest.
+### Installation
 
-## Deploy to GitHub Pages
+gradle/libs.versions.toml
+
+```toml
+[versions]
+composePwa = "x.x.x" // Please replace with the latest version.
+
+[plugins]
+composePwa = { id = "dev.yuyuyuyuyu.composepwa", version.ref = "composePwa" }
+```
+
+composeApp/build.gradle.kts
+
+```kotlin
+plugins {
+    alias(libs.plugins.composePwa)
+}
+```
+
+### 実行方法
+
+Just apply the plugin and run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task as
+usual.
+
+```bash
+./gradlew :composeApp:wasmJsBrowserDistribution
+```
+
+or
+
+```bash
+./gradlew :composeApp:jsBrowserDistribution
+```
+
+Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable` or
+`composeApp/build/dist/js/productionExecutable`.
+
+### カスタマイズ方法
+
+You can edit the following files to customize your PWA:
+
+- `workbox-config-for-wasm.js` / `workbox-config-for-js.js`
+- `manifest.json` (next to your `index.html` by default)
+- `icons/*` (next to your `index.html` by default)
+
+## Tips
+
+### Deploy to GitHub Pages
 
 You can find a sample GitHub Actions workflow for deploying your PWA to GitHub Pages here:
 
@@ -108,15 +107,7 @@ And you can check out a live example here:
 
 <https://compose-pwa-example.yuyuyuyuyu.dev>
 
-## How to customize your PWA
-
-You can edit the following files to customize your PWA:
-
-- `workbox-config-for-wasm.js` / `workbox-config-for-js.js`
-- `manifest.json` (next to your `index.html` by default)
-- `icons/*` (next to your `index.html` by default)
-
-## Custom icon
+### Custom icon
 
 If you want to generate PWA icons from your own icon, you can
 use [ngx-pwa-icons](https://github.com/pverhaert/ngx-pwa-icons) like this.
@@ -125,11 +116,16 @@ use [ngx-pwa-icons](https://github.com/pverhaert/ngx-pwa-icons) like this.
 npx ngx-pwa-icons
 ```
 
-## Contributing
+## Dependencies & Acknowledgments
 
-This plugin exists to make turning a Compose Multiplatform web app into a PWA as
-effortless as possible — I couldn't be bothered to run `workbox-cli` by hand,
-and published it so anyone could skip that chore too.
+This plugin depends on the following open-source projects.<br />
+Thanks to these projects!
+
+- [Jsoup](https://jsoup.org/) (MIT License) - Used to modify HTML files.
+- [Node Gradle Plugin](https://github.com/node-gradle/gradle-node-plugin) (Apache License 2.0) - Used to call the `npx` command.
+- [Workbox](https://developer.chrome.com/docs/workbox) / `workbox-cli` (MIT License) - Used via `npx` to generate the Service Worker for the PWA.
+
+## Contributing
 
 - **Bug reports and bug-fix PRs are very welcome.**
 - **Thinking about a new feature? Please open an issue first.** I'd love to talk
@@ -149,15 +145,6 @@ npm install && npm run fix        # web assets
 ```
 
 What runs (and how) is defined in `package.json` and `.github/workflows/`.
-
-## Dependencies & Acknowledgments
-
-This plugin depends on the following open-source projects.<br />
-Thanks to these projects!
-
-- [Jsoup](https://jsoup.org/) (MIT License) - Used to modify HTML files.
-- [Node Gradle Plugin](https://github.com/node-gradle/gradle-node-plugin) (Apache License 2.0) - Used to call the `npx` command.
-- [Workbox](https://developer.chrome.com/docs/workbox) / `workbox-cli` (MIT License) - Used via `npx` to generate the Service Worker for the PWA.
 
 ## License
 
