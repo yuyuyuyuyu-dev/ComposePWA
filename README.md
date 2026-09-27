@@ -141,12 +141,15 @@ Before opening a pull request, run the auto-fixers and make sure the Lint check
 is green:
 
 ```bash
-npm install && npm run fix        # web assets
-./gradlew ktlintFormat            # Kotlin & Gradle scripts
-./gradlew -p plugin ktlintFormat
+npm ci
+npx prettier --write .
+npx eslint --fix .
+npx markdownlint-cli2 --fix
+./gradlew ktlintFormat versionCatalogFormat
 ```
 
-What runs (and how) is defined in `package.json` and `.github/workflows/`.
+See [.github/workflows/lint.yml](.github/workflows/lint.yml) for everything the
+Lint check runs.
 
 ## License
 
