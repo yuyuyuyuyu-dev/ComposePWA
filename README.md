@@ -7,7 +7,7 @@
 
 This Gradle plugin builds your Compose Multiplatform web app as a progressive web app (PWA).
 
-**Table of Contents**
+## Table of Contents
 
 - [Why it was built](#why-it-was-built)
 - [What it does](#what-it-does)
@@ -19,10 +19,12 @@ This Gradle plugin builds your Compose Multiplatform web app as a progressive we
 
 ## Why it was built
 
-最初にCompose Multiplatformで作ったWebアプリをPWA化した時、ビルドするたびに `workbox` コマンドを実行しなければいけないと思うととても憂鬱になったので、それを自動化するためにGradleタスクを定義しました。
-2個目のCompose Multiplatform製Webアプリを作った時、今後Webアプリを作るたびにGradleタスクをコピペしてそれぞれで管理しなければならないと思うととても憂鬱になりました。
-なのでGradleプラグインを使ってGradleタスクを使いまわせるようにしようと思い立ちました。
-そのような経緯でこのプラグインは出来上がりました。
+When I turned my first Compose Multiplatform web app into a PWA, I hated the
+thought of having to run the `workbox` command after every build, so I wrote a
+Gradle task to automate it. When I made my second Compose Multiplatform web
+app, I hated the thought of having to copy and paste that task into every new
+web app and maintain each copy separately. So I decided to make the task
+reusable by turning it into a Gradle plugin. That is how this plugin came to be.
 
 ## What it does
 
@@ -55,7 +57,7 @@ gradle/libs.versions.toml
 
 ```toml
 [versions]
-composePwa = "x.x.x" // Please replace with the latest version.
+composePwa = "x.x.x" # Please replace with the latest version.
 
 [plugins]
 composePwa = { id = "dev.yuyuyuyuyu.composepwa", version.ref = "composePwa" }
@@ -69,7 +71,7 @@ plugins {
 }
 ```
 
-### 実行方法
+### How to run
 
 Just apply the plugin and run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task as
 usual.
@@ -87,7 +89,7 @@ or
 Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable` or
 `composeApp/build/dist/js/productionExecutable`.
 
-### カスタマイズ方法
+### How to customize
 
 You can edit the following files to customize your PWA:
 
