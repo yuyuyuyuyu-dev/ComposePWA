@@ -90,7 +90,7 @@ You can edit the following files to customize your PWA:
 - `manifest.json` (next to your `index.html` by default)
 - `icons/*` (next to your `index.html` by default)
 
-### Additional info
+### Tips
 
 #### Deploy to GitHub Pages
 
