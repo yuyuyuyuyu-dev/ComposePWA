@@ -36,6 +36,7 @@ The resource files are `manifest.json`, `registerServiceWorker.js`, and
 `icons/*`, and they are created next to your `index.html`.
 The config file is `workbox-config-for-wasm.js` or `workbox-config-for-js.js`,
 and it is created directly in the project directory.
+Files you already have are never overwritten.
 The service worker has to be recreated on every build, so it is generated
 directly in the build output directory.
 
