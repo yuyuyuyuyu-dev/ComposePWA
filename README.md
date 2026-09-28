@@ -28,7 +28,8 @@ So, I built this plugin.
 ## What it does
 
 When you run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task, this
-plugin automatically does the following:
+plugin does everything needed to turn your web app into a PWA.
+Specifically, it does the following:
 
 - Creates `workbox-config-for-wasm.js` / `workbox-config-for-js.js` in the project
   directory.
