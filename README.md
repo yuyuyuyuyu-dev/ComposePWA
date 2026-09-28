@@ -12,7 +12,6 @@ A Gradle plugin that builds your Compose Multiplatform web app as a progressive 
 - [Why it was built](#why-it-was-built)
 - [What it does](#what-it-does)
 - [How to use](#how-to-use)
-- [Additional info](#additional-info)
 - [Dependencies & Acknowledgments](#dependencies--acknowledgments)
 - [Contributing](#contributing)
 - [License](#license)
@@ -91,9 +90,9 @@ You can edit the following files to customize your PWA:
 - `manifest.json` (next to your `index.html` by default)
 - `icons/*` (next to your `index.html` by default)
 
-## Additional info
+### Additional info
 
-### Deploy to GitHub Pages
+#### Deploy to GitHub Pages
 
 You can find a sample GitHub Actions workflow for deploying your PWA to GitHub Pages here:
 
@@ -103,7 +102,7 @@ And you can check out a live example here:
 
 <https://compose-pwa-example.yuyuyuyuyu.dev>
 
-### Custom icon
+#### Custom icon
 
 If you want to generate PWA icons from your own icon, you can
 use [ngx-pwa-icons](https://github.com/pverhaert/ngx-pwa-icons) like this.
