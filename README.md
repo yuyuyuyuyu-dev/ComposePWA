@@ -12,7 +12,7 @@ A Gradle plugin that builds your Compose Multiplatform web app as a progressive 
 - [Why it was built](#why-it-was-built)
 - [What it does](#what-it-does)
 - [How to use](#how-to-use)
-- [Optional extras](#optional-extras)
+- [Additional info](#additional-info)
 - [Dependencies & Acknowledgments](#dependencies--acknowledgments)
 - [Contributing](#contributing)
 - [License](#license)
@@ -91,7 +91,7 @@ You can edit the following files to customize your PWA:
 - `manifest.json` (next to your `index.html` by default)
 - `icons/*` (next to your `index.html` by default)
 
-## Optional extras
+## Additional info
 
 ### Deploy to GitHub Pages
 
