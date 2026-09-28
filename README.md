@@ -5,100 +5,94 @@
 [![Lint](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/lint.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/lint.yml)
 <a href="https://jetc.dev/issues/273.html"><img src="https://img.shields.io/badge/As_Seen_In-jetc.dev_Newsletter_Issue_%23273-blue?logo=Jetpack+Compose&amp;logoColor=white" alt="As Seen In - jetc.dev Newsletter Issue #273"></a>
 
-This Gradle plugin builds your Compose Multiplatform web app as a progressive web app (PWA).
+A Gradle plugin that builds your Compose Multiplatform web app as a progressive web app (PWA).
 
-## Prerequisites
+## Table of Contents
+
+- [Why it was built](#why-it-was-built)
+- [What it does](#what-it-does)
+- [How to use](#how-to-use)
+- [Dependencies & Acknowledgments](#dependencies--acknowledgments)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Why it was built
+
+When I turned my first Compose Multiplatform web app into a PWA, I didn't want
+to run the `workbox` command after every build, so I wrote a Gradle task to
+automate it. But when I made my second app, I didn't want to copy and paste
+that task into every new web app and maintain each copy separately.
+So, I built this plugin.
+
+## What it does
+
+When you run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task, this
+plugin does everything needed to turn your web app into a PWA.
+Before the build, it automatically creates the required but missing resource
+files and config file, and adds the necessary tags to your `index.html`.
+After the build, it creates the service worker.
+The resource files are `manifest.json`, `registerServiceWorker.js`, and
+`icons/*`, and they are created next to your `index.html`.
+The config file is `workbox-config-for-wasm.js` or `workbox-config-for-js.js`,
+and it is created directly in the project directory.
+The service worker has to be recreated on every build, so it is generated
+directly in the build output directory.
+
+## How to use
+
+### Prerequisites
 
 - Node.js (The author uses [Volta](https://volta.sh/) to install Node.js)
 
-## Installation
+### Installation
 
 gradle/libs.versions.toml
 
-```diff
+```toml
 [versions]
-// ...
-
-+ composePwa = "x.x.x" // Please replace with the latest version.
-
-[libraries]
-// ...
+composePwa = "x.x.x" # Please replace with the latest version.
 
 [plugins]
-// ...
-
-+ composePwa = { id = "dev.yuyuyuyuyu.composepwa", version.ref = "composePwa" }
+composePwa = { id = "dev.yuyuyuyuyu.composepwa", version.ref = "composePwa" }
 ```
 
-composeApp/build.gradle.kts
+webApp/build.gradle.kts
 
-```diff
-// ...
-
+```kotlin
 plugins {
-    // ...
-
-+   alias(libs.plugins.composePwa)
+    alias(libs.plugins.composePwa)
 }
 ```
 
-## How to use
+### How to run
 
 Just apply the plugin and run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task as
 usual.
 
 ```bash
-./gradlew :composeApp:wasmJsBrowserDistribution
+./gradlew :webApp:wasmJsBrowserDistribution
 ```
 
 or
 
 ```bash
-./gradlew :composeApp:jsBrowserDistribution
+./gradlew :webApp:jsBrowserDistribution
 ```
 
-Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable` or
-`composeApp/build/dist/js/productionExecutable`.
+Your PWA will be generated in `webApp/build/dist/wasmJs/productionExecutable` or
+`webApp/build/dist/js/productionExecutable`.
 
-## What this plugin does
+### How to customize
 
-When you run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task, this
-plugin automatically does the following:
+You can edit the following files to customize your PWA:
 
-- Creates `workbox-config-for-wasm.js` / `workbox-config-for-js.js` in the project
-  directory.
-- Creates `manifest.json`, `registerServiceWorker.js`, and `icons/*` next to your
-  `index.html`, skipping every file you already have.
-- Adds the necessary tags to your `index.html`.
+- `workbox-config-for-wasm.js` / `workbox-config-for-js.js`
+- `manifest.json` (next to your `index.html` by default)
+- `icons/*` (next to your `index.html` by default)
 
-Each build searches only the resources directories that feed its target for
-`index.html` and the files above:
+### Tips
 
-- `wasmJsBrowserDistribution`: `src/webMain/resources`, `src/wasmJsMain/resources`,
-  `src/commonMain/resources`
-- `jsBrowserDistribution`: `src/webMain/resources`, `src/jsMain/resources`,
-  `src/commonMain/resources`
-
-### Where the files may live
-
-You don't have to keep everything in one place. Each file the plugin provides follows
-four rules, in order:
-
-1. If the same file is in two of the searched directories, the build fails with a report
-   naming every copy: Gradle merges those directories into one page and cannot pick one.
-   Copies identical to the bundled defaults are marked safe to delete.
-2. If the file already exists in one of the searched directories, it is used as is,
-   wherever it lives, and is never overwritten.
-3. If it is missing, but the other web target keeps the file in its own resources
-   directory (`src/wasmJsMain/resources` or `src/jsMain/resources`), the file is
-   created in this target's own resources directory, following that per-target
-   convention.
-4. Otherwise, the file is created next to your `index.html`.
-
-If you already have a `manifest.json`, the bundled `icons/` are not copied either — they
-only exist to back the bundled manifest.
-
-## Deploy to GitHub Pages
+#### Deploy to GitHub Pages
 
 You can find a sample GitHub Actions workflow for deploying your PWA to GitHub Pages here:
 
@@ -108,15 +102,7 @@ And you can check out a live example here:
 
 <https://compose-pwa-example.yuyuyuyuyu.dev>
 
-## How to customize your PWA
-
-You can edit the following files to customize your PWA:
-
-- `workbox-config-for-wasm.js` / `workbox-config-for-js.js`
-- `manifest.json` (next to your `index.html` by default)
-- `icons/*` (next to your `index.html` by default)
-
-## Custom icon
+#### Custom icon
 
 If you want to generate PWA icons from your own icon, you can
 use [ngx-pwa-icons](https://github.com/pverhaert/ngx-pwa-icons) like this.
@@ -125,11 +111,16 @@ use [ngx-pwa-icons](https://github.com/pverhaert/ngx-pwa-icons) like this.
 npx ngx-pwa-icons
 ```
 
-## Contributing
+## Dependencies & Acknowledgments
 
-This plugin exists to make turning a Compose Multiplatform web app into a PWA as
-effortless as possible — I couldn't be bothered to run `workbox-cli` by hand,
-and published it so anyone could skip that chore too.
+This plugin depends on the following open-source projects.<br />
+Thanks to these projects!
+
+- [Jsoup](https://jsoup.org/) (MIT License) - Used to modify HTML files.
+- [Node Gradle Plugin](https://github.com/node-gradle/gradle-node-plugin) (Apache License 2.0) - Used to call the `npx` command.
+- [Workbox](https://developer.chrome.com/docs/workbox) / `workbox-cli` (MIT License) - Used via `npx` to generate the Service Worker for the PWA.
+
+## Contributing
 
 - **Bug reports and bug-fix PRs are very welcome.**
 - **Thinking about a new feature? Please open an issue first.** I'd love to talk
@@ -143,21 +134,15 @@ Before opening a pull request, run the auto-fixers and make sure the Lint check
 is green:
 
 ```bash
-npm install && npm run fix        # web assets
-./gradlew ktlintFormat            # Kotlin & Gradle scripts
-./gradlew -p plugin ktlintFormat
+npm ci
+npx prettier --write .
+npx eslint --fix .
+npx markdownlint-cli2 --fix
+./gradlew ktlintFormat versionCatalogFormat
 ```
 
-What runs (and how) is defined in `package.json` and `.github/workflows/`.
-
-## Dependencies & Acknowledgments
-
-This plugin depends on the following open-source projects.<br />
-Thanks to these projects!
-
-- [Jsoup](https://jsoup.org/) (MIT License) - Used to modify HTML files.
-- [Node Gradle Plugin](https://github.com/node-gradle/gradle-node-plugin) (Apache License 2.0) - Used to call the `npx` command.
-- [Workbox](https://developer.chrome.com/docs/workbox) / `workbox-cli` (MIT License) - Used via `npx` to generate the Service Worker for the PWA.
+See [.github/workflows/lint.yml](.github/workflows/lint.yml) for everything the
+Lint check runs.
 
 ## License
 
