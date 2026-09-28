@@ -29,22 +29,15 @@ So, I built this plugin.
 
 When you run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task, this
 plugin does everything needed to turn your web app into a PWA.
-Specifically, it does the following:
-
-- Creates `workbox-config-for-wasm.js` / `workbox-config-for-js.js` in the project
-  directory.
-- Creates `manifest.json`, `registerServiceWorker.js`, and `icons/*` next to your
-  `index.html`, skipping every file you already have.
-- Adds the necessary tags to your `index.html`.
-- Generates the service worker (`serviceWorker.js`) with Workbox after the build.
-
-Each build searches only the resources directories that feed its target for
-`index.html` and the files above:
-
-- `wasmJsBrowserDistribution`: `src/webMain/resources`, `src/wasmJsMain/resources`,
-  `src/commonMain/resources`
-- `jsBrowserDistribution`: `src/webMain/resources`, `src/jsMain/resources`,
-  `src/commonMain/resources`
+Before the build, it automatically creates the required resource files and
+config file, and adds the necessary tags to your `index.html`.
+After the build, it creates the service worker.
+The resource files are `manifest.json`, `registerServiceWorker.js`, and
+`icons/*`, and they are created next to your `index.html`.
+The config file is `workbox-config-for-wasm.js` or `workbox-config-for-js.js`,
+and it is created directly in the project directory.
+The service worker has to be recreated on every build, so it is generated
+directly in the build output directory.
 
 ## How to use
 
