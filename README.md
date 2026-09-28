@@ -18,25 +18,18 @@ A Gradle plugin that builds your Compose Multiplatform web app as a progressive 
 
 ## Why it was built
 
-When I turned my first Compose Multiplatform web app into a PWA, I didn't want
-to run the `workbox` command after every build, so I wrote a Gradle task to
-automate it. But when I made my second app, I didn't want to copy and paste
-that task into every new web app and maintain each copy separately.
+When I turned my first Compose Multiplatform web app into a PWA, I didn't want to run the `workbox` command after every build, so I wrote a Gradle task to automate it.
+But when I made my second app, I didn't want to copy and paste that task into every new web app and maintain each copy separately.
 So, I built this plugin.
 
 ## What it does
 
-When you run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task, this
-plugin does everything needed to turn your web app into a PWA.
-Before the build, it automatically creates the required but missing resource
-files and config file, and adds the necessary tags to your `index.html`.
+When you run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task, this plugin does everything needed to turn your web app into a PWA.
+Before the build, it automatically creates the required but missing resource files and config file, and adds the necessary tags to your `index.html`.
 After the build, it creates the service worker.
-The resource files are `manifest.json`, `registerServiceWorker.js`, and
-`icons/*`, and they are created next to your `index.html`.
-The config file is `workbox-config-for-wasm.js` or `workbox-config-for-js.js`,
-and it is created directly in the project directory.
-The service worker has to be recreated on every build, so it is generated
-directly in the build output directory.
+The resource files are `manifest.json`, `registerServiceWorker.js`, and `icons/*`, and they are created next to your `index.html`.
+The config file is `workbox-config-for-wasm.js` or `workbox-config-for-js.js`, and it is created directly in the project directory.
+The service worker has to be recreated on every build, so it is generated directly in the build output directory.
 
 ## How to use
 
@@ -66,8 +59,7 @@ plugins {
 
 ### How to run
 
-Just apply the plugin and run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task as
-usual.
+Just apply the plugin and run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task as usual.
 
 ```bash
 ./gradlew :webApp:wasmJsBrowserDistribution
@@ -79,8 +71,7 @@ or
 ./gradlew :webApp:jsBrowserDistribution
 ```
 
-Your PWA will be generated in `webApp/build/dist/wasmJs/productionExecutable` or
-`webApp/build/dist/js/productionExecutable`.
+Your PWA will be generated in `webApp/build/dist/wasmJs/productionExecutable` or `webApp/build/dist/js/productionExecutable`.
 
 ### How to customize
 
@@ -104,8 +95,7 @@ And you can check out a live example here:
 
 #### Custom icon
 
-If you want to generate PWA icons from your own icon, you can
-use [ngx-pwa-icons](https://github.com/pverhaert/ngx-pwa-icons) like this.
+If you want to generate PWA icons from your own icon, you can use [ngx-pwa-icons](https://github.com/pverhaert/ngx-pwa-icons) like this.
 
 ```bash
 npx ngx-pwa-icons
@@ -123,15 +113,10 @@ Thanks to these projects!
 ## Contributing
 
 - **Bug reports and bug-fix PRs are very welcome.**
-- **Thinking about a new feature? Please open an issue first.** I'd love to talk
-  it through before you write any code — partly to check it fits the "make PWAs
-  effortless" goal, and partly because I'm still figuring out what's in scope
-  for this project.
-- **New features should come with tests**, so that if something breaks later, the
-  tests — not my memory — say how it's supposed to behave.
+- **Thinking about a new feature? Please open an issue first.** I'd love to talk it through before you write any code — partly to check it fits the "make PWAs effortless" goal, and partly because I'm still figuring out what's in scope for this project.
+- **New features should come with tests**, so that if something breaks later, the tests — not my memory — say how it's supposed to behave.
 
-Before opening a pull request, run the auto-fixers and make sure the Lint check
-is green:
+Before opening a pull request, run the auto-fixers and make sure the Lint check is green:
 
 ```bash
 npm ci
@@ -141,8 +126,7 @@ npx markdownlint-cli2 --fix
 ./gradlew ktlintFormat versionCatalogFormat
 ```
 
-See [.github/workflows/lint.yml](.github/workflows/lint.yml) for everything the
-Lint check runs.
+See [.github/workflows/lint.yml](.github/workflows/lint.yml) for everything the Lint check runs.
 
 ## License
 

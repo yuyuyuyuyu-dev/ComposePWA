@@ -1,7 +1,6 @@
 {
   "config": {
     "default": true,
-    // Line length is governed by Prettier (prose is wrapped manually).
     "MD013": false,
     // Inline HTML is required for README badges and images.
     "MD033": false
