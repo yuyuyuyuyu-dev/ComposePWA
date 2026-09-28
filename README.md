@@ -18,7 +18,8 @@ A Gradle plugin that builds your Compose Multiplatform web app as a progressive 
 
 ## Why it was built
 
-When I turned my first Compose Multiplatform web app into a PWA, I didn't want to run the `workbox` command after every build, so I wrote a Gradle task to automate it. But when I made my second app, I didn't want to copy and paste that task into every new web app and maintain each copy separately.
+When I turned my first Compose Multiplatform web app into a PWA, I didn't want to run the `workbox` command after every build, so I wrote a Gradle task to automate it.
+But when I made my second app, I didn't want to copy and paste that task into every new web app and maintain each copy separately.
 So, I built this plugin.
 
 ## What it does
@@ -112,7 +113,8 @@ Thanks to these projects!
 ## Contributing
 
 - **Bug reports and bug-fix PRs are very welcome.**
-- **Thinking about a new feature? Please open an issue first.** I'd love to talk it through before you write any code — partly to check it fits the "make PWAs effortless" goal, and partly because I'm still figuring out what's in scope for this project.
+- **Thinking about a new feature? Please open an issue first.**
+  I'd love to talk it through before you write any code — partly to check it fits the "make PWAs effortless" goal, and partly because I'm still figuring out what's in scope for this project.
 - **New features should come with tests**, so that if something breaks later, the tests — not my memory — say how it's supposed to behave.
 
 Before opening a pull request, run the auto-fixers and make sure the Lint check is green:
