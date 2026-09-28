@@ -36,6 +36,7 @@ Specifically, it does the following:
 - Creates `manifest.json`, `registerServiceWorker.js`, and `icons/*` next to your
   `index.html`, skipping every file you already have.
 - Adds the necessary tags to your `index.html`.
+- Generates the service worker (`serviceWorker.js`) with Workbox after the build.
 
 Each build searches only the resources directories that feed its target for
 `index.html` and the files above:
