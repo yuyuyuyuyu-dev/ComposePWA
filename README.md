@@ -5,7 +5,7 @@
 [![Lint](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/lint.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/lint.yml)
 <a href="https://jetc.dev/issues/273.html"><img src="https://img.shields.io/badge/As_Seen_In-jetc.dev_Newsletter_Issue_%23273-blue?logo=Jetpack+Compose&amp;logoColor=white" alt="As Seen In - jetc.dev Newsletter Issue #273"></a>
 
-This Gradle plugin builds your Compose Multiplatform web app as a progressive web app (PWA).
+A Gradle plugin that builds your Compose Multiplatform web app as a progressive web app (PWA).
 
 ## Table of Contents
 
