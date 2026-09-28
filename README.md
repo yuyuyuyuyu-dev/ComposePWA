@@ -56,7 +56,7 @@ composePwa = "x.x.x" # Please replace with the latest version.
 composePwa = { id = "dev.yuyuyuyuyu.composepwa", version.ref = "composePwa" }
 ```
 
-composeApp/build.gradle.kts
+webApp/build.gradle.kts
 
 ```kotlin
 plugins {
@@ -70,17 +70,17 @@ Just apply the plugin and run the `wasmJsBrowserDistribution` or `jsBrowserDistr
 usual.
 
 ```bash
-./gradlew :composeApp:wasmJsBrowserDistribution
+./gradlew :webApp:wasmJsBrowserDistribution
 ```
 
 or
 
 ```bash
-./gradlew :composeApp:jsBrowserDistribution
+./gradlew :webApp:jsBrowserDistribution
 ```
 
-Your PWA will be generated in `composeApp/build/dist/wasmJs/productionExecutable` or
-`composeApp/build/dist/js/productionExecutable`.
+Your PWA will be generated in `webApp/build/dist/wasmJs/productionExecutable` or
+`webApp/build/dist/js/productionExecutable`.
 
 ### How to customize
 
