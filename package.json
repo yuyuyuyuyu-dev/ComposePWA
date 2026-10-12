@@ -6,9 +6,9 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@eslint/json": "^2.1.0",
+    "@eslint/json": "^2.1.1",
     "eslint": "^10.12.0",
-    "eslint-plugin-yml": "^3.8.1",
+    "eslint-plugin-yml": "^3.9.0",
     "globals": "^17.13.0",
     "htmlhint": "^1.9.2",
     "markdownlint-cli2": "^0.23.3",
