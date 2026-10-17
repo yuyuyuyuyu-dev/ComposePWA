@@ -2,7 +2,7 @@
   "name": "composepwa-tooling",
   "version": "0.0.0",
   "private": true,
-  "description": "Formatter & linter tooling for the ComposePWA repository (web assets). This file pins the tools; how each one is invoked lives in .github/workflows/lint.yml and tests.yml.",
+  "description": "Formatter & linter tooling for the ComposePWA repository (web assets). This file pins the tools; how each one is invoked lives in .github/workflows/lint.yml and specs.yml.",
   "license": "Apache-2.0",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
