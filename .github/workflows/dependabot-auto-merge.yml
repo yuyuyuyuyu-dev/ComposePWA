@@ -20,7 +20,7 @@ jobs:
       # Settings > Secrets and variables > Dependabot, not the Actions secrets.
       - name: Create a token for the GitHub App
         id: app-token
-        uses: actions/create-github-app-token@v3.2.0
+        uses: actions/create-github-app-token@v3.3.0
         with:
           client-id: ${{ secrets.AUTO_MERGE_APP_CLIENT_ID }}
           private-key: ${{ secrets.AUTO_MERGE_APP_PRIVATE_KEY }}
