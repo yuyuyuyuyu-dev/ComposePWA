@@ -8,8 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Each checker gets its own job so that a push that violates several of them reports
-  # every violation at once instead of stopping at the first tool.
   gradle:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
@@ -23,8 +21,6 @@ jobs:
             command: ./gradlew :plugin:ktlintCheck
           - name: Detekt (Kotlin)
             command: ./gradlew :plugin:detekt
-          # versionCatalogFormat rewrites the catalog in place and has no check
-          # mode, so the diff against the committed file is the assertion.
           - name: version-catalog-update (version catalog)
             command: ./gradlew versionCatalogFormat && git diff --exit-code gradle/libs.versions.toml
     steps:
@@ -36,8 +32,6 @@ jobs:
         with:
           java-version: "21"
           distribution: "jetbrains"
-        # The JetBrains distribution resolves its version via the GitHub API;
-        # authenticate so it isn't throttled by the 60 req/hour/IP limit.
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
@@ -60,8 +54,6 @@ jobs:
             command: npx --no -- prettier --check .
           - name: ESLint (JS, JSON & YAML)
             command: npx --no -- eslint .
-          # HTMLHint has no ignore-file mechanism of any kind, so what it skips can only
-          # be said on the command line.
           - name: HTMLHint (HTML)
             command: npx --no -- htmlhint "**/*.html" --ignore
               "**/build/**,**/node_modules/**,tmp/**,example/**,test-projects/web-app/src/**"
@@ -80,8 +72,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # `npx --no` fails when the tool is missing from node_modules instead of quietly
-      # fetching a different version from the registry.
       - name: ${{ matrix.name }}
         run: ${{ matrix.command }}
 
