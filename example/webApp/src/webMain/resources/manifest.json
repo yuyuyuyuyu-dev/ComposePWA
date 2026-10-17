@@ -1,6 +1,6 @@
 {
   "name": "Compose Multiplatform PWA",
-  "short_name": "Compose PWA",
+  "short_name": "ComposePWA",
   "theme_color": "#FFFBFE",
   "background_color": "#FFFBFE",
   "display": "standalone",

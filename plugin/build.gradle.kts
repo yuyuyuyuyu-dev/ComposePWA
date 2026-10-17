@@ -29,9 +29,9 @@ gradlePlugin {
     vcsUrl = "https://github.com/yu-ko-ba/ComposePWA"
 
     plugins {
-        create("Compose PWA") {
+        create("ComposePWA") {
             id = "dev.yuyuyuyuyu.composepwa"
-            displayName = "Compose PWA"
+            displayName = "ComposePWA"
             description =
                 "This Gradle plugin provides a Gradle Task, that build your Compose Multiplatform Web App as a PWA."
             tags = listOf("compose multiplatform", "web", "pwa")
