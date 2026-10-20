@@ -25,8 +25,8 @@ version = (findProperty("version") as String?)
     ?: "0.0.0-SNAPSHOT"
 
 gradlePlugin {
-    website = "https://github.com/yu-ko-ba/ComposePWA#readme"
-    vcsUrl = "https://github.com/yu-ko-ba/ComposePWA"
+    website = "https://github.com/yuyuyuyuyu-dev/ComposePWA#readme"
+    vcsUrl = "https://github.com/yuyuyuyuyu-dev/ComposePWA"
 
     plugins {
         create("ComposePWA") {
