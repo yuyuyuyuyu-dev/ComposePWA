@@ -30,7 +30,7 @@ Before the build, it automatically creates the required but missing resource fil
 After the build, it creates the service worker.
 The resource files are `manifest.json`, `registerServiceWorker.js`, and `icons/*`, and they are created next to your `index.html`.
 The config file is `workbox-config-for-wasm.js` or `workbox-config-for-js.js`, and it is created directly in the project directory.
-The config file is passed as is to the `workbox-cli generateSW` command.
+This plugin runs the `workbox-cli generateSW` command, passing the config file to it as is.
 The service worker has to be recreated on every build, so it is generated directly in the build output directory.
 
 ## How to use
