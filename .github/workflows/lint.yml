@@ -32,11 +32,11 @@ jobs:
       matrix:
         include:
           - name: Prettier (web assets)
-            command: npx --no -- prettier --check plugin/src/main/resources "test-projects/web-app/*.html"
+            command: npm run prettier -- --check
           - name: ESLint (JS & JSON)
-            command: npx --no -- eslint plugin/src/main/resources
+            command: npm run eslint
           - name: HTMLHint (HTML)
-            command: npx --no -- htmlhint "test-projects/web-app/*.html"
+            command: npm run htmlhint
     steps:
       - name: Clone Repository
         uses: actions/checkout@v7
