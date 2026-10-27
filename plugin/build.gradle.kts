@@ -10,9 +10,8 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
-detekt {
-    buildUponDefaultConfig = true
-    config.setFrom(file("../detekt.yml"))
+ktlint {
+    version = libs.versions.ktlintCli.get()
 }
 
 kotlin {

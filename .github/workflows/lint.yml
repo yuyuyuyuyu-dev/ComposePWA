@@ -8,38 +8,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  gradle:
-    name: ${{ matrix.name }}
-    runs-on: ubuntu-latest
+  oxfmt:
+    name: Oxfmt
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: ktlint (Kotlin)
-            command: ./gradlew :plugin:ktlintCheck
-          - name: Detekt (Kotlin)
-            command: ./gradlew :plugin:detekt
-          - name: version-catalog-update (version catalog)
-            command: ./gradlew versionCatalogFormat && git diff --exit-code gradle/libs.versions.toml
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v7
+    uses: yuyuyuyuyu-dev/repo-config/.github/workflows/oxfmt.yml@main
 
-      - name: Setup JDK
-        uses: actions/setup-java@v6.1.0
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6.4.0
-
-      - name: ${{ matrix.name }}
-        run: ${{ matrix.command }}
+  kotlin-lint:
+    name: Kotlin lint
+    permissions:
+      contents: read
+    uses: yuyuyuyuyu-dev/repo-config/.github/workflows/kotlin-lint.yml@main
+    with:
+      jdk-distribution: zulu
+      jdk-version: "21"
 
   web:
     name: ${{ matrix.name }}
@@ -51,14 +33,11 @@ jobs:
       matrix:
         include:
           - name: Prettier (web assets)
-            command: npx --no -- prettier --check .
-          - name: ESLint (JS, JSON & YAML)
-            command: npx --no -- eslint .
+            command: npx --no -- prettier --check plugin/src/main/resources "test-projects/web-app/*.html"
+          - name: ESLint (JS & JSON)
+            command: npx --no -- eslint plugin/src/main/resources
           - name: HTMLHint (HTML)
-            command: npx --no -- htmlhint "**/*.html" --ignore
-              "**/build/**,**/node_modules/**,tmp/**,example/**,test-projects/web-app/src/**"
-          - name: markdownlint (Markdown)
-            command: npx --no -- markdownlint-cli2
+            command: npx --no -- htmlhint "test-projects/web-app/*.html"
     steps:
       - name: Clone Repository
         uses: actions/checkout@v7

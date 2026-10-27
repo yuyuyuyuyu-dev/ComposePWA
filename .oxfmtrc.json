@@ -1,0 +1,8 @@
+{
+  "ignorePatterns": [
+    "plugin/src/main/resources/",
+    "test-projects/web-app/*.html",
+    "example/",
+    "gradle/libs.versions.toml"
+  ]
+}

@@ -99,10 +99,17 @@ abstract class InitComposePwa : DefaultTask() {
     ): File? {
         val projectDir = projectDirectory.get().asFile
         return when {
-            candidateDirs.any { it.resolve(fileName).exists() } -> null
-            File(projectDir, siblingResourcesDirPath.get()).resolve(fileName).exists() ->
+            candidateDirs.any { it.resolve(fileName).exists() } -> {
+                null
+            }
+
+            File(projectDir, siblingResourcesDirPath.get()).resolve(fileName).exists() -> {
                 File(projectDir, ownResourcesDirPath.get())
-            else -> indexHtmlDir
+            }
+
+            else -> {
+                indexHtmlDir
+            }
         }
     }
 
