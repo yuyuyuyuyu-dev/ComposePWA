@@ -20,8 +20,7 @@ jobs:
       contents: read
     uses: yuyuyuyuyu-dev/repo-config/.github/workflows/kotlin-lint.yml@main
     with:
-      jdk-distribution: zulu
-      jdk-version: "21"
+      compose-multiplatform: true
 
   web:
     name: ${{ matrix.name }}

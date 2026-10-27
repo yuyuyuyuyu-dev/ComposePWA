@@ -33,8 +33,7 @@ jobs:
       - name: Set up the JDK and Gradle
         uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
         with:
-          distribution: zulu
-          version: "21"
+          compose-multiplatform: true
 
       - name: Copy index.html into webMain resources
         run: |
@@ -95,8 +94,7 @@ jobs:
       - name: Set up the JDK and Gradle
         uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
         with:
-          distribution: zulu
-          version: "21"
+          compose-multiplatform: true
 
       - name: Copy index.html into ${{ matrix.source-set }} resources
         run: |
@@ -135,8 +133,7 @@ jobs:
       - name: Set up the JDK and Gradle
         uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
         with:
-          distribution: zulu
-          version: "21"
+          compose-multiplatform: true
 
       - name: Copy index.html into both per-target resources
         run: |
@@ -178,8 +175,7 @@ jobs:
       - name: Set up the JDK and Gradle
         uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
         with:
-          distribution: zulu
-          version: "21"
+          compose-multiplatform: true
 
       - name: Spread index.html and the project's own PWA assets across source sets
         run: |
@@ -219,8 +215,7 @@ jobs:
       - name: Set up the JDK and Gradle
         uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
         with:
-          distribution: zulu
-          version: "21"
+          compose-multiplatform: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
@@ -287,8 +282,7 @@ jobs:
       - name: Set up the JDK and Gradle
         uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
         with:
-          distribution: zulu
-          version: "21"
+          compose-multiplatform: true
 
       - name: Seed index.html and the project's own PWA assets
         run: |
@@ -323,8 +317,7 @@ jobs:
       - name: Set up the JDK and Gradle
         uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
         with:
-          distribution: zulu
-          version: "21"
+          compose-multiplatform: true
 
       - name: Seed a shared index.html and wasm-only PWA assets
         run: |
@@ -369,8 +362,7 @@ jobs:
       - name: Set up the JDK and Gradle
         uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
         with:
-          distribution: zulu
-          version: "21"
+          compose-multiplatform: true
 
       # The committed test app deliberately has no index.html in any source set.
       - name: Build Wasm without an index.html anywhere
@@ -415,8 +407,7 @@ jobs:
       - name: Set up the JDK and Gradle
         uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
         with:
-          distribution: zulu
-          version: "21"
+          compose-multiplatform: true
 
       # The layout issue #47 reported: the project's own copy next to index.html, plus an
       # untouched leftover from an old ComposePWA version in another source set.

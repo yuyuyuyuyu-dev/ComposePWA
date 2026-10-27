@@ -12,8 +12,7 @@ jobs:
       - name: Set up the JDK and Gradle
         uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
         with:
-          distribution: zulu
-          version: "21"
+          compose-multiplatform: true
       - name: Resolve version from release tag
         id: version
         run: |
