@@ -252,7 +252,7 @@ jobs:
       # ESLint downgrades them to a "File ignored" warning and still exits 0.
       - name: Verify the generated assets do not fight Prettier
         run: |
-          npx --no -- prettier --check --ignore-path /dev/null \
+          npm run prettier -- --check --ignore-path /dev/null \
             test-projects/web-app/src/webMain/resources/index.html \
             test-projects/web-app/src/webMain/resources/manifest.json \
             test-projects/web-app/src/webMain/resources/registerServiceWorker.js \
@@ -261,14 +261,14 @@ jobs:
 
       - name: Verify the generated assets do not fight ESLint
         run: |
-          npx --no -- eslint --no-ignore \
+          npm run eslint -- --no-ignore \
             test-projects/web-app/src/webMain/resources/manifest.json \
             test-projects/web-app/src/webMain/resources/registerServiceWorker.js \
             test-projects/web-app/workbox-config-for-wasm.js \
             test-projects/web-app/workbox-config-for-js.js
 
       - name: Verify the generated index.html does not fight HTMLHint
-        run: npx --no -- htmlhint test-projects/web-app/src/webMain/resources/index.html
+        run: npm run htmlhint -- test-projects/web-app/src/webMain/resources/index.html
 
   test-own-assets:
     name: should not touch the project's own PWA assets

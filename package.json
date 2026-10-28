@@ -1,24 +1,23 @@
 {
-  "name": "composepwa-tooling",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Formatter & linter tooling for the ComposePWA repository (web assets). This file pins the tools; how each one is invoked lives in .github/workflows/lint.yml and specs.yml.",
-  "license": "Apache-2.0",
-  "scripts": {
-    "oxfmt": "oxfmt",
-    "prettier": "prettier plugin/src/main/resources \"test-projects/web-app/*.html\"",
-    "eslint": "eslint plugin/src/main/resources",
-    "htmlhint": "htmlhint \"test-projects/web-app/*.html\"",
-    "lint": "npm run eslint && npm run htmlhint",
-    "format": "npm run oxfmt && npm run prettier -- --write && npm run eslint -- --fix"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@eslint/json": "^2.1.1",
-    "eslint": "^10.13.0",
-    "globals": "^17.13.0",
-    "htmlhint": "^1.9.2",
-    "oxfmt": "0.74.0",
-    "prettier": "^3.9.10"
-  }
+	"name": "composepwa-tooling",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Formatter & linter tooling for the ComposePWA repository (web assets). This file pins the tools; how each one is invoked lives in .github/workflows/lint.yml and specs.yml.",
+	"license": "Apache-2.0",
+	"scripts": {
+		"prettier": "prettier",
+		"eslint": "eslint",
+		"htmlhint": "htmlhint",
+		"lint": "biome lint && eslint plugin/src/main/resources && htmlhint \"test-projects/web-app/*.html\"",
+		"format": "biome check --write && prettier --write plugin/src/main/resources \"test-projects/web-app/*.html\" && eslint --fix plugin/src/main/resources"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.6.3",
+		"@eslint/js": "^10.0.1",
+		"@eslint/json": "^2.1.1",
+		"eslint": "^10.13.0",
+		"globals": "^17.13.0",
+		"htmlhint": "^1.9.2",
+		"prettier": "^3.9.10"
+	}
 }

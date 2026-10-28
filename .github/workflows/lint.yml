@@ -8,11 +8,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  oxfmt:
-    name: Oxfmt
+  biome:
+    name: Biome
     permissions:
       contents: read
-    uses: yuyuyuyuyu-dev/repo-config/.github/workflows/oxfmt.yml@main
+    uses: yuyuyuyuyu-dev/repo-config/.github/workflows/biome.yml@main
 
   kotlin-lint:
     name: Kotlin lint
@@ -32,11 +32,11 @@ jobs:
       matrix:
         include:
           - name: Prettier (web assets)
-            command: npm run prettier -- --check
+            command: npm run prettier -- --check plugin/src/main/resources "test-projects/web-app/*.html"
           - name: ESLint (JS & JSON)
-            command: npm run eslint
+            command: npm run eslint -- plugin/src/main/resources
           - name: HTMLHint (HTML)
-            command: npm run htmlhint
+            command: npm run htmlhint -- "test-projects/web-app/*.html"
     steps:
       - name: Clone Repository
         uses: actions/checkout@v7
