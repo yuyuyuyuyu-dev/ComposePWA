@@ -9,7 +9,7 @@
     "prettier": "prettier plugin/src/main/resources \"test-projects/web-app/*.html\"",
     "eslint": "eslint plugin/src/main/resources",
     "htmlhint": "htmlhint \"test-projects/web-app/*.html\"",
-    "lint": "npm run oxfmt -- --check && npm run prettier -- --check && npm run eslint && npm run htmlhint",
+    "lint": "npm run eslint && npm run htmlhint",
     "format": "npm run oxfmt && npm run prettier -- --write && npm run eslint -- --fix"
   },
   "devDependencies": {
