@@ -1,17 +1,23 @@
 {
-  "name": "composepwa-tooling",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Formatter & linter tooling for the ComposePWA repository (web assets). This file pins the tools; how each one is invoked lives in .github/workflows/lint.yml and specs.yml.",
-  "license": "Apache-2.0",
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@eslint/json": "^2.1.1",
-    "eslint": "^10.13.0",
-    "eslint-plugin-yml": "^3.9.0",
-    "globals": "^17.13.0",
-    "htmlhint": "^1.9.2",
-    "markdownlint-cli2": "^0.24.0",
-    "prettier": "^3.9.10"
-  }
+	"name": "composepwa-tooling",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Formatter & linter tooling for the ComposePWA repository (web assets). This file pins the tools; how each one is invoked lives in .github/workflows/lint.yml and specs.yml.",
+	"license": "Apache-2.0",
+	"scripts": {
+		"prettier": "prettier",
+		"eslint": "eslint",
+		"htmlhint": "htmlhint",
+		"lint": "biome lint && eslint plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.js plugin/src/main/resources/workbox-config-for-wasm.js && htmlhint \"test-projects/web-app/*.html\"",
+		"format": "biome check --write && prettier --write plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.js plugin/src/main/resources/workbox-config-for-wasm.js \"test-projects/web-app/*.html\" && eslint --fix plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.js plugin/src/main/resources/workbox-config-for-wasm.js"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.6.3",
+		"@eslint/js": "^10.0.1",
+		"@eslint/json": "^2.1.1",
+		"eslint": "^10.13.0",
+		"globals": "^17.13.0",
+		"htmlhint": "^1.9.2",
+		"prettier": "^3.9.10"
+	}
 }

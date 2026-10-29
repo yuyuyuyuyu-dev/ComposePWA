@@ -30,8 +30,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup build
-        uses: ./.github/actions/setup-build
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
 
       - name: Copy index.html into webMain resources
         run: |
@@ -89,8 +91,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup build
-        uses: ./.github/actions/setup-build
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
 
       - name: Copy index.html into ${{ matrix.source-set }} resources
         run: |
@@ -126,8 +130,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup build
-        uses: ./.github/actions/setup-build
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
 
       - name: Copy index.html into both per-target resources
         run: |
@@ -166,8 +172,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup build
-        uses: ./.github/actions/setup-build
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
 
       - name: Spread index.html and the project's own PWA assets across source sets
         run: |
@@ -204,8 +212,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup build
-        uses: ./.github/actions/setup-build
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
@@ -242,7 +252,7 @@ jobs:
       # ESLint downgrades them to a "File ignored" warning and still exits 0.
       - name: Verify the generated assets do not fight Prettier
         run: |
-          npx --no -- prettier --check --ignore-path /dev/null \
+          npm run prettier -- --check --ignore-path /dev/null \
             test-projects/web-app/src/webMain/resources/index.html \
             test-projects/web-app/src/webMain/resources/manifest.json \
             test-projects/web-app/src/webMain/resources/registerServiceWorker.js \
@@ -251,14 +261,14 @@ jobs:
 
       - name: Verify the generated assets do not fight ESLint
         run: |
-          npx --no -- eslint --no-ignore \
+          npm run eslint -- --no-ignore \
             test-projects/web-app/src/webMain/resources/manifest.json \
             test-projects/web-app/src/webMain/resources/registerServiceWorker.js \
             test-projects/web-app/workbox-config-for-wasm.js \
             test-projects/web-app/workbox-config-for-js.js
 
       - name: Verify the generated index.html does not fight HTMLHint
-        run: npx --no -- htmlhint test-projects/web-app/src/webMain/resources/index.html
+        run: npm run htmlhint -- test-projects/web-app/src/webMain/resources/index.html
 
   test-own-assets:
     name: should not touch the project's own PWA assets
@@ -269,8 +279,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup build
-        uses: ./.github/actions/setup-build
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
 
       - name: Seed index.html and the project's own PWA assets
         run: |
@@ -302,8 +314,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup build
-        uses: ./.github/actions/setup-build
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
 
       - name: Seed a shared index.html and wasm-only PWA assets
         run: |
@@ -345,8 +359,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup build
-        uses: ./.github/actions/setup-build
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
 
       # The committed test app deliberately has no index.html in any source set.
       - name: Build Wasm without an index.html anywhere
@@ -388,8 +404,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup build
-        uses: ./.github/actions/setup-build
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
 
       # The layout issue #47 reported: the project's own copy next to index.html, plus an
       # untouched leftover from an old ComposePWA version in another source set.

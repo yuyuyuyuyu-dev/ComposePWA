@@ -8,7 +8,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  gradle:
+  biome:
+    name: Biome
+    permissions:
+      contents: read
+    uses: yuyuyuyuyu-dev/repo-config/.github/workflows/biome.yml@main
+
+  kotlin-lint:
+    name: Kotlin lint
+    permissions:
+      contents: read
+    uses: yuyuyuyuyu-dev/repo-config/.github/workflows/kotlin-lint.yml@main
+    with:
+      compose-multiplatform: true
+
+  assets-for-users:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     permissions:
@@ -17,48 +31,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: ktlint (Kotlin)
-            command: ./gradlew :plugin:ktlintCheck
-          - name: Detekt (Kotlin)
-            command: ./gradlew :plugin:detekt
-          - name: version-catalog-update (version catalog)
-            command: ./gradlew versionCatalogFormat && git diff --exit-code gradle/libs.versions.toml
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v7
-
-      - name: Setup JDK
-        uses: actions/setup-java@v6.1.0
-        with:
-          java-version: "21"
-          distribution: "jetbrains"
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6.4.0
-
-      - name: ${{ matrix.name }}
-        run: ${{ matrix.command }}
-
-  web:
-    name: ${{ matrix.name }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Prettier (web assets)
-            command: npx --no -- prettier --check .
-          - name: ESLint (JS, JSON & YAML)
-            command: npx --no -- eslint .
-          - name: HTMLHint (HTML)
-            command: npx --no -- htmlhint "**/*.html" --ignore
-              "**/build/**,**/node_modules/**,tmp/**,example/**,test-projects/web-app/src/**"
-          - name: markdownlint (Markdown)
-            command: npx --no -- markdownlint-cli2
+          - name: Prettier (assets for users)
+            command: >-
+              npm run prettier -- --check
+              plugin/src/main/resources/manifest.json
+              plugin/src/main/resources/registerServiceWorker.js
+              plugin/src/main/resources/workbox-config-for-js.js
+              plugin/src/main/resources/workbox-config-for-wasm.js
+              "test-projects/web-app/*.html"
+          - name: ESLint (assets for users)
+            command: >-
+              npm run eslint --
+              plugin/src/main/resources/manifest.json
+              plugin/src/main/resources/registerServiceWorker.js
+              plugin/src/main/resources/workbox-config-for-js.js
+              plugin/src/main/resources/workbox-config-for-wasm.js
+          - name: HTMLHint (assets for users)
+            command: npm run htmlhint -- "test-projects/web-app/*.html"
     steps:
       - name: Clone Repository
         uses: actions/checkout@v7

@@ -122,9 +122,8 @@ Before opening a pull request, run the auto-fixers and make sure the Lint check 
 
 ```bash
 npm ci
-npx prettier --write .
-npx eslint --fix .
-npx markdownlint-cli2 --fix
+npm run format
+npm run lint
 ./gradlew ktlintFormat versionCatalogFormat
 ```
 

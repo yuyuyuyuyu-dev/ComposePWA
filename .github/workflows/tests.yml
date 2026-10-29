@@ -17,8 +17,10 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v7
 
-      - name: Setup build
-        uses: ./.github/actions/setup-build
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
 
       - name: Run plugin tests
         run: ./gradlew :plugin:test

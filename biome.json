@@ -1,0 +1,19 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.6.3/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"includes": [
+			"**",
+			"!example",
+			"!plugin/src/main/resources/manifest.json",
+			"!plugin/src/main/resources/registerServiceWorker.js",
+			"!plugin/src/main/resources/workbox-config-for-js.js",
+			"!plugin/src/main/resources/workbox-config-for-wasm.js",
+			"!test-projects/**/*.html"
+		]
+	}
+}
