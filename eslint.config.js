@@ -5,16 +5,6 @@ const json = jsonModule.default ?? jsonModule;
 
 module.exports = [
 	{
-		ignores: [
-			"**/*.js",
-			"**/*.json",
-			"!plugin/src/main/resources/manifest.json",
-			"!plugin/src/main/resources/registerServiceWorker.js",
-			"!plugin/src/main/resources/workbox-config-for-js.js",
-			"!plugin/src/main/resources/workbox-config-for-wasm.js",
-		],
-	},
-	{
 		files: ["**/*.js"],
 		...js.configs.recommended,
 	},

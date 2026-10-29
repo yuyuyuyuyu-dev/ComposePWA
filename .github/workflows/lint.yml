@@ -32,9 +32,9 @@ jobs:
       matrix:
         include:
           - name: Prettier (assets for users)
-            command: npm run prettier -- --check .
+            command: npm run prettier -- --check plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.js plugin/src/main/resources/workbox-config-for-wasm.js "test-projects/web-app/*.html"
           - name: ESLint (assets for users)
-            command: npm run eslint
+            command: npm run eslint -- plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.js plugin/src/main/resources/workbox-config-for-wasm.js
           - name: HTMLHint (assets for users)
             command: npm run htmlhint -- "test-projects/web-app/*.html"
     steps:
