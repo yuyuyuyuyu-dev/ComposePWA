@@ -10,7 +10,7 @@
 			"**",
 			"!example",
 			"!plugin/src/main/resources",
-			"!test-projects/web-app/*.html"
+			"!test-projects/**/*.html"
 		]
 	}
 }
