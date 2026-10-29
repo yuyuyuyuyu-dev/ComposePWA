@@ -22,7 +22,7 @@ jobs:
     with:
       compose-multiplatform: true
 
-  web:
+  assets-for-users:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     permissions:
@@ -31,11 +31,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Prettier (web assets)
+          - name: Prettier (assets for users)
             command: npm run prettier -- --check plugin/src/main/resources "test-projects/web-app/*.html"
-          - name: ESLint (JS & JSON)
+          - name: ESLint (assets for users)
             command: npm run eslint -- plugin/src/main/resources
-          - name: HTMLHint (HTML)
+          - name: HTMLHint (assets for users)
             command: npm run htmlhint -- "test-projects/web-app/*.html"
     steps:
       - name: Clone Repository
