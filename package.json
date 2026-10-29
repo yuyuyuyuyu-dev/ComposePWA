@@ -8,8 +8,8 @@
 		"prettier": "prettier",
 		"eslint": "eslint",
 		"htmlhint": "htmlhint",
-		"lint": "biome lint && eslint plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.js plugin/src/main/resources/workbox-config-for-wasm.js && htmlhint \"test-projects/web-app/*.html\"",
-		"format": "biome check --write && prettier --write plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.js plugin/src/main/resources/workbox-config-for-wasm.js \"test-projects/web-app/*.html\" && eslint --fix plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.js plugin/src/main/resources/workbox-config-for-wasm.js"
+		"lint": "biome lint && eslint && htmlhint \"test-projects/web-app/*.html\"",
+		"format": "biome check --write && prettier --write . && eslint --fix"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.3",
