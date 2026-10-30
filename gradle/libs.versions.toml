@@ -8,7 +8,7 @@ ktlint = "14.2.0"
 ktlintCli = "1.8.0"
 nodeGradle = "7.1.0"
 vanniktechMavenPublish = "0.37.0"
-versionCatalogUpdate = "1.1.1"
+versionCatalogUpdate = "1.1.2"
 
 [libraries]
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
