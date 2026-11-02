@@ -4,7 +4,7 @@ composeMultiplatform = "1.12.2"
 composePwa = "0.7.0"
 junit = "4.13.2"
 kotlin = "2.4.21"
-kotlin-wrappers = "2026.10.4"
+kotlin-wrappers = "2026.10.5"
 material3 = "1.13.0-alpha02"
 
 [libraries]
