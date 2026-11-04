@@ -5,7 +5,7 @@ composePwa = "0.7.0"
 junit = "4.13.2"
 kotlin = "2.4.21"
 kotlin-wrappers = "2026.10.6"
-material3 = "1.13.0-alpha02"
+material3 = "1.13.0-beta01"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
