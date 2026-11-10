@@ -38,6 +38,7 @@ The service worker has to be recreated on every build, so it is generated direct
 ### Prerequisites
 
 - Node.js (The author uses [Volta](https://volta.sh/) to install Node.js)
+- pnpm, only if your project uses it: when the nearest `package.json` between your Gradle project and its root project names `pnpm` in `devEngines.packageManager`, the plugin runs `workbox-cli` with `pnpm dlx` instead of `npx`
 
 ### Installation
 
@@ -109,8 +110,8 @@ This plugin depends on the following open-source projects.<br />
 Thanks to these projects!
 
 - [Jsoup](https://jsoup.org/) (MIT License) - Used to modify HTML files.
-- [Node Gradle Plugin](https://github.com/node-gradle/gradle-node-plugin) (Apache License 2.0) - Used to call the `npx` command.
-- [Workbox](https://developer.chrome.com/docs/workbox) / `workbox-cli` (MIT License) - Used via `npx` to generate the Service Worker for the PWA.
+- [Node Gradle Plugin](https://github.com/node-gradle/gradle-node-plugin) (Apache License 2.0) - Used to call the `npx` or `pnpm dlx` command.
+- [Workbox](https://developer.chrome.com/docs/workbox) / `workbox-cli` (MIT License) - Used via `npx` or `pnpm dlx` to generate the Service Worker for the PWA.
 
 ## Contributing
 
