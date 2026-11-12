@@ -12,7 +12,7 @@ class ComposePwa : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply("com.github.node-gradle.node")
 
-        val packageManager = detectPackageManager(project.projectDir, project.rootDir)
+        val packageManager = detectPackageManager(project.projectDir)
         if (packageManager == PackageManager.Pnpm) {
             skipPnpmSetupUnlessNodeIsDownloaded(project)
         }

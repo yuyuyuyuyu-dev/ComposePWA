@@ -9,29 +9,24 @@ internal enum class PackageManager {
     Pnpm,
 }
 
-internal fun detectPackageManager(
-    projectDir: File,
-    rootDir: File,
-): PackageManager {
-    val packageJson =
-        generateSequence(projectDir.canonicalFile) { dir ->
-            dir.parentFile.takeIf { dir != rootDir.canonicalFile }
-        }.map { File(it, "package.json") }
-            .firstOrNull { it.isFile }
-            ?: return PackageManager.Npm
+internal fun detectPackageManager(projectDir: File): PackageManager {
+    val packageJson = findNpmProjectDir(projectDir.canonicalFile)?.let(::readPackageJson)
 
-    return if (declaresPnpm(packageJson.readText(Charsets.UTF_8))) PackageManager.Pnpm else PackageManager.Npm
+    return if (packageJson != null && declaresPnpm(packageJson)) PackageManager.Pnpm else PackageManager.Npm
 }
 
-private fun declaresPnpm(packageJsonText: String): Boolean {
-    val packageJson =
-        try {
-            JsonSlurper().parseText(packageJsonText)
-        } catch (_: JsonException) {
-            return false
-        }
+internal fun readPackageJson(dir: File): Map<*, *>? {
+    val packageJson = File(dir, "package.json")
 
-    val devEngines = (packageJson as? Map<*, *>)?.get("devEngines") as? Map<*, *>
+    return try {
+        packageJson.takeIf { it.isFile }?.let { JsonSlurper().parseText(it.readText(Charsets.UTF_8)) as? Map<*, *> }
+    } catch (_: JsonException) {
+        null
+    }
+}
+
+private fun declaresPnpm(packageJson: Map<*, *>): Boolean {
+    val devEngines = packageJson["devEngines"] as? Map<*, *>
     val declaredPackageManagers =
         when (val packageManager = devEngines?.get("packageManager")) {
             is Map<*, *> -> listOf(packageManager)

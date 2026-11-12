@@ -37,8 +37,7 @@ The service worker has to be recreated on every build, so it is generated direct
 
 ### Prerequisites
 
-- Node.js (The author uses [Volta](https://volta.sh/) to install Node.js)
-- pnpm, only if your project uses it: when the nearest `package.json` between your Gradle project and its root project names `pnpm` in `devEngines.packageManager`, the plugin runs `workbox-cli` with `pnpm dlx` instead of `npx`
+- Node.js (The plugin runs `workbox-cli` with `npx`, which comes with Node.js. The author uses [Volta](https://volta.sh/) to install Node.js)
 
 ### Installation
 
@@ -95,6 +94,11 @@ You can find a sample GitHub Actions workflow for deploying your PWA to GitHub P
 And you can check out a live example here:
 
 <https://compose-pwa-example.yuyuyuyuyu.dev>
+
+#### Projects that use pnpm
+
+If your project's `package.json` names `pnpm` in `devEngines.packageManager`, the plugin runs `workbox-cli` with `pnpm dlx` instead of `npx`, so pnpm needs to be installed.
+The plugin finds that `package.json` the same way npm does, starting from the directory of the module that applies the plugin.
 
 #### Custom icon
 
