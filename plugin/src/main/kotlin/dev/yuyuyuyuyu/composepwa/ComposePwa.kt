@@ -74,6 +74,7 @@ class ComposePwa : Plugin<Project> {
                     )
                 },
             )
+            task.execOverrides(::keepGlobalNpmConfig)
             task.doFirst { emptyNpmPrefixDir.get().asFile.mkdirs() }
         }
     }
