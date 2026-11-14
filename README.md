@@ -37,7 +37,7 @@ The service worker has to be recreated on every build, so it is generated direct
 
 ### Prerequisites
 
-- Node.js (The plugin runs `workbox-cli` with `npx`, which comes with Node.js. The author uses [Volta](https://volta.sh/) to install Node.js)
+- Node.js (The plugin runs `workbox-cli` with npm, which comes with Node.js. The author uses [Volta](https://volta.sh/) to install Node.js)
 
 ### Installation
 
@@ -95,10 +95,10 @@ And you can check out a live example here:
 
 <https://compose-pwa-example.yuyuyuyuyu.dev>
 
-#### Projects that use pnpm
+#### Projects that use another package manager
 
-If your project's `package.json` names `pnpm` in `devEngines.packageManager`, the plugin runs `workbox-cli` with `pnpm dlx` instead of `npx`, so pnpm needs to be installed.
-The plugin finds that `package.json` the same way npm does, starting from the directory of the module that applies the plugin.
+The plugin always runs `workbox-cli` with npm, even if your project's `package.json` asks for another package manager such as pnpm.
+It does not read the `package.json`, `.npmrc`, or `node_modules` in your project, so npm settings such as a private registry have to be in your user `~/.npmrc`.
 
 #### Custom icon
 
@@ -114,8 +114,8 @@ This plugin depends on the following open-source projects.<br />
 Thanks to these projects!
 
 - [Jsoup](https://jsoup.org/) (MIT License) - Used to modify HTML files.
-- [Node Gradle Plugin](https://github.com/node-gradle/gradle-node-plugin) (Apache License 2.0) - Used to call the `npx` or `pnpm dlx` command.
-- [Workbox](https://developer.chrome.com/docs/workbox) / `workbox-cli` (MIT License) - Used via `npx` or `pnpm dlx` to generate the Service Worker for the PWA.
+- [Node Gradle Plugin](https://github.com/node-gradle/gradle-node-plugin) (Apache License 2.0) - Used to call the `npm exec` command.
+- [Workbox](https://developer.chrome.com/docs/workbox) / `workbox-cli` (MIT License) - Used via `npm exec` to generate the Service Worker for the PWA.
 
 ## Contributing
 

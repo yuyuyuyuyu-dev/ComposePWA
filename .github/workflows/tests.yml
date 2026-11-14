@@ -22,10 +22,5 @@ jobs:
         with:
           compose-multiplatform: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: "24"
-
       - name: Run plugin tests
         run: ./gradlew :plugin:test

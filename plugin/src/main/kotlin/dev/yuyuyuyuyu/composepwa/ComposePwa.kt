@@ -1,8 +1,6 @@
 package dev.yuyuyuyuyu.composepwa
 
-import com.github.gradle.node.NodeExtension
-import com.github.gradle.node.npm.task.NpxTask
-import com.github.gradle.node.pnpm.task.PnpmTask
+import com.github.gradle.node.npm.task.NpmTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -12,14 +10,9 @@ class ComposePwa : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply("com.github.node-gradle.node")
 
-        val packageManager = detectPackageManager(project.projectDir)
-        if (packageManager == PackageManager.Pnpm) {
-            skipPnpmSetupUnlessNodeIsDownloaded(project)
-        }
-
         WebTarget.entries.forEach { target ->
             registerInitComposePwaTask(project, target)
-            registerBuildAsPwaTask(project, target, packageManager)
+            registerBuildAsPwaTask(project, target)
 
             project.tasks.matching { it.name == target.browserDistributionTaskName }.configureEach { task ->
                 task.dependsOn(target.initTaskName)
@@ -62,36 +55,26 @@ class ComposePwa : Plugin<Project> {
     private fun registerBuildAsPwaTask(
         project: Project,
         target: WebTarget,
-        packageManager: PackageManager,
     ) {
-        val generateSwArgs = listOf("generateSW", target.workboxConfigFileName)
-        val buildAsPwaTask =
-            when (packageManager) {
-                PackageManager.Npm -> {
-                    project.tasks.register(target.buildAsPwaTaskName, NpxTask::class.java) { task ->
-                        task.command.set("workbox-cli")
-                        task.args.set(generateSwArgs)
-                    }
-                }
-
-                PackageManager.Pnpm -> {
-                    project.tasks.register(target.buildAsPwaTaskName, PnpmTask::class.java) { task ->
-                        task.pnpmCommand.set(listOf("dlx", "workbox-cli"))
-                        task.args.set(generateSwArgs)
-                    }
-                }
-            }
-        buildAsPwaTask.configure { task ->
+        val emptyNpmPrefixDir = project.layout.buildDirectory.dir(EMPTY_NPM_PREFIX_DIR_PATH)
+        project.tasks.register(target.buildAsPwaTaskName, NpmTask::class.java) { task ->
             task.group = TASK_GROUP
             task.description = "Builds the ${target.name} browser distribution as a PWA."
             task.dependsOn(target.browserDistributionTaskName, target.initTaskName)
-        }
-    }
-
-    private fun skipPnpmSetupUnlessNodeIsDownloaded(project: Project) {
-        val nodeExtension = project.extensions.getByType(NodeExtension::class.java)
-        project.tasks.named(PNPM_SETUP_TASK_NAME).configure { task ->
-            task.onlyIf { nodeExtension.download.get() }
+            task.npmCommand.set(listOf("exec"))
+            task.args.set(
+                emptyNpmPrefixDir.map { prefixDir ->
+                    listOf(
+                        "--prefix",
+                        prefixDir.asFile.absolutePath,
+                        "--",
+                        "workbox-cli",
+                        "generateSW",
+                        target.workboxConfigFileName,
+                    )
+                },
+            )
+            task.doFirst { emptyNpmPrefixDir.get().asFile.mkdirs() }
         }
     }
 
@@ -109,6 +92,6 @@ class ComposePwa : Plugin<Project> {
 
     private companion object {
         const val TASK_GROUP = "ComposePWA"
-        const val PNPM_SETUP_TASK_NAME = "pnpmSetup"
+        const val EMPTY_NPM_PREFIX_DIR_PATH = "composepwa/empty-npm-prefix"
     }
 }
