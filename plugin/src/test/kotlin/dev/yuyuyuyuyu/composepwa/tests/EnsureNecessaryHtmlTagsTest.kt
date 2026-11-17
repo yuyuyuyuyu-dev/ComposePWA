@@ -1,12 +1,12 @@
-package dev.yuyuyuyuyu.composepwa
+package dev.yuyuyuyuyu.composepwa.tests
 
+import dev.yuyuyuyuyu.composepwa.ensureNecessaryHtmlTags
 import org.junit.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertSame
 
-/** The [ensureNecessaryHtmlTags] function's contract; the plugin-level spec lives in tests.yml. */
 class EnsureNecessaryHtmlTagsTest {
     @Test
     fun `should return the same instance when both tags are already present`() {

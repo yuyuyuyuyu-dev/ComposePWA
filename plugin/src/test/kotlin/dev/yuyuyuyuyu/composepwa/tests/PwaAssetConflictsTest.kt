@@ -1,5 +1,8 @@
-package dev.yuyuyuyuyu.composepwa
+package dev.yuyuyuyuyu.composepwa.tests
 
+import dev.yuyuyuyuyu.composepwa.WebTarget
+import dev.yuyuyuyuyu.composepwa.findPwaAssetConflicts
+import dev.yuyuyuyuyu.composepwa.pwaAssetConflictMessage
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -9,7 +12,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-/** The duplicate-asset report's contract; the plugin-level spec lives in tests.yml. */
 class PwaAssetConflictsTest {
     @get:Rule
     val projectDir = TemporaryFolder()

@@ -1,9 +1,7 @@
 # ComposePWA
 
 [![Publish](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/publish.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/publish.yml)
-[![Tests](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/tests.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/tests.yml)
-[![Specs](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/specs.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/specs.yml)
-[![Lint](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/lint.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/lint.yml)
+[![CI](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/ci.yml/badge.svg)](https://github.com/yuyuyuyuyu-dev/ComposePWA/actions/workflows/ci.yml)
 <a href="https://jetc.dev/issues/273.html"><img src="https://img.shields.io/badge/As_Seen_In-jetc.dev_Newsletter_Issue_%23273-blue?logo=Jetpack+Compose&amp;logoColor=white" alt="As Seen In - jetc.dev Newsletter Issue #273"></a>
 
 A Gradle plugin that builds your Compose Multiplatform web app as a progressive web app (PWA).
@@ -118,7 +116,7 @@ Thanks to these projects!
 - **Thinking about a new feature? Please open an issue first.** I'd love to talk it through before you write any code — partly to check it fits the "make PWAs effortless" goal, and partly because I'm still figuring out what's in scope for this project.
 - **New features should come with tests**, so that if something breaks later, the tests — not my memory — say how it's supposed to behave.
 
-Before opening a pull request, run the auto-fixers and make sure the Lint check is green:
+Before opening a pull request, run the auto-fixers and make sure the CI check is green:
 
 ```bash
 npm ci
@@ -127,7 +125,7 @@ npm run lint
 ./gradlew ktlintFormat versionCatalogFormat
 ```
 
-See [.github/workflows/lint.yml](.github/workflows/lint.yml) for everything the Lint check runs.
+See [.github/workflows/ci.yml](.github/workflows/ci.yml) for everything the CI check runs.
 
 ## License
 
