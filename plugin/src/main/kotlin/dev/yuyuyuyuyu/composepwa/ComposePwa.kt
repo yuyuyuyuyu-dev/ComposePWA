@@ -1,6 +1,6 @@
 package dev.yuyuyuyuyu.composepwa
 
-import com.github.gradle.node.npm.task.NpxTask
+import com.github.gradle.node.npm.task.NpmTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -56,12 +56,25 @@ class ComposePwa : Plugin<Project> {
         project: Project,
         target: WebTarget,
     ) {
-        project.tasks.register(target.buildAsPwaTaskName, NpxTask::class.java) { task ->
+        val emptyNpmPrefixDir = project.layout.buildDirectory.dir(EMPTY_NPM_PREFIX_DIR_PATH)
+        project.tasks.register(target.buildAsPwaTaskName, NpmTask::class.java) { task ->
             task.group = TASK_GROUP
             task.description = "Builds the ${target.name} browser distribution as a PWA."
-            task.dependsOn("npmInstall", target.browserDistributionTaskName, target.initTaskName)
-            task.command.set("workbox-cli")
-            task.args.set(listOf("generateSW", target.workboxConfigFileName))
+            task.dependsOn(target.browserDistributionTaskName, target.initTaskName)
+            task.npmCommand.set(listOf("exec"))
+            task.args.set(
+                emptyNpmPrefixDir.map { prefixDir ->
+                    listOf(
+                        "--prefix",
+                        prefixDir.asFile.absolutePath,
+                        "--",
+                        "workbox-cli",
+                        "generateSW",
+                        target.workboxConfigFileName,
+                    )
+                },
+            )
+            task.doFirst { emptyNpmPrefixDir.get().asFile.mkdirs() }
         }
     }
 
@@ -79,5 +92,6 @@ class ComposePwa : Plugin<Project> {
 
     private companion object {
         const val TASK_GROUP = "ComposePWA"
+        const val EMPTY_NPM_PREFIX_DIR_PATH = "composepwa/empty-npm-prefix"
     }
 }
