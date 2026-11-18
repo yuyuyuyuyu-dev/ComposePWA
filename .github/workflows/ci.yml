@@ -1,4 +1,4 @@
-name: Lint
+name: CI
 
 on:
   push:
@@ -75,3 +75,26 @@ jobs:
 
       - name: Lint workflows with actionlint
         uses: raven-actions/actionlint@v2
+
+  kotlin-test:
+    name: kotlin-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
+
+      - name: Run kotlin-test
+        run: ./gradlew :plugin:test
+
+  specs:
+    name: Specs
+    permissions:
+      contents: read
+    uses: ./.github/workflows/specs.yml
