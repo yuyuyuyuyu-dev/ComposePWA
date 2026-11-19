@@ -36,16 +36,16 @@ jobs:
               npm run prettier -- --check
               plugin/src/main/resources/manifest.json
               plugin/src/main/resources/registerServiceWorker.js
-              plugin/src/main/resources/workbox-config-for-js.js
-              plugin/src/main/resources/workbox-config-for-wasm.js
+              plugin/src/main/resources/workbox-config-for-js.cjs
+              plugin/src/main/resources/workbox-config-for-wasm.cjs
               "test-projects/web-app/*.html"
           - name: ESLint (assets for users)
             command: >-
               npm run eslint --
               plugin/src/main/resources/manifest.json
               plugin/src/main/resources/registerServiceWorker.js
-              plugin/src/main/resources/workbox-config-for-js.js
-              plugin/src/main/resources/workbox-config-for-wasm.js
+              plugin/src/main/resources/workbox-config-for-js.cjs
+              plugin/src/main/resources/workbox-config-for-wasm.cjs
           - name: HTMLHint (assets for users)
             command: npm run htmlhint -- "test-projects/web-app/*.html"
     steps:

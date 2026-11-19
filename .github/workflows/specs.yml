@@ -16,11 +16,11 @@ jobs:
           - target-name: "Wasm"
             gradle-task: "wasmJsBrowserDistribution"
             build-dir: "wasmJs"
-            config-file: "workbox-config-for-wasm.js"
+            config-file: "workbox-config-for-wasm.cjs"
           - target-name: "JS"
             gradle-task: "jsBrowserDistribution"
             build-dir: "js"
-            config-file: "workbox-config-for-js.js"
+            config-file: "workbox-config-for-js.cjs"
 
     steps:
       - name: Clone Repository
@@ -252,16 +252,16 @@ jobs:
             test-projects/web-app/src/webMain/resources/index.html \
             test-projects/web-app/src/webMain/resources/manifest.json \
             test-projects/web-app/src/webMain/resources/registerServiceWorker.js \
-            test-projects/web-app/workbox-config-for-wasm.js \
-            test-projects/web-app/workbox-config-for-js.js
+            test-projects/web-app/workbox-config-for-wasm.cjs \
+            test-projects/web-app/workbox-config-for-js.cjs
 
       - name: Verify the generated assets do not fight ESLint
         run: |
           npm run eslint -- --no-ignore \
             test-projects/web-app/src/webMain/resources/manifest.json \
             test-projects/web-app/src/webMain/resources/registerServiceWorker.js \
-            test-projects/web-app/workbox-config-for-wasm.js \
-            test-projects/web-app/workbox-config-for-js.js
+            test-projects/web-app/workbox-config-for-wasm.cjs \
+            test-projects/web-app/workbox-config-for-js.cjs
 
       - name: Verify the generated index.html does not fight HTMLHint
         run: npm run htmlhint -- test-projects/web-app/src/webMain/resources/index.html

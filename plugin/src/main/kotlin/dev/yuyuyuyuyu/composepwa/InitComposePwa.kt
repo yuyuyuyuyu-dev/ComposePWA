@@ -55,12 +55,16 @@ abstract class InitComposePwa : DefaultTask() {
     @get:Input
     abstract val workboxConfigFileName: Property<String>
 
+    @get:Input
+    abstract val oldWorkboxConfigFileName: Property<String>
+
     @TaskAction
     fun deployPwaFiles() {
         val projectDir = projectDirectory.get().asFile
         val candidateDirPaths = candidateResourcesDirPaths.get()
         val indexHtmlDir = File(projectDir, resolveTargetResourcesDirPath(projectDir, candidateDirPaths))
 
+        failIfOldWorkboxConfigExists(projectDir, oldWorkboxConfigFileName.get(), workboxConfigFileName.get())
         copyBundledFileIfMissing(workboxConfigFileName.get(), projectDir)
 
         val conflicts = findPwaAssetConflicts(projectDir, candidateDirPaths, bundledPwaAssets())
