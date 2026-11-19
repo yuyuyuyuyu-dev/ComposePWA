@@ -23,11 +23,11 @@ So, I built this plugin.
 
 ## What it does
 
-When you run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task, this plugin does everything needed to turn your web app into a PWA.
+When you run the `wasmJsBrowserDistribution`, `jsBrowserDistribution`, or `composeCompatibilityBrowserDistribution` task, this plugin does everything needed to turn your web app into a PWA.
 Before the build, it automatically creates the required but missing resource files and config file, and adds the necessary tags to your `index.html`.
 After the build, it creates the service worker.
 The resource files are `manifest.json`, `registerServiceWorker.js`, and `icons/*`, and they are created next to your `index.html`.
-The config file is `workbox-config-for-wasm.cjs` or `workbox-config-for-js.cjs`, and it is created directly in the project directory.
+The config file is `workbox-config-for-wasm.cjs`, `workbox-config-for-js.cjs`, or `workbox-config-for-compatibility.cjs`, and it is created directly in the project directory.
 The config file is passed as is to the `workbox-cli generateSW` command.
 The service worker has to be recreated on every build, so it is generated directly in the build output directory.
 
@@ -59,7 +59,7 @@ plugins {
 
 ### How to run
 
-Just apply the plugin and run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task as usual.
+Just apply the plugin and run the `wasmJsBrowserDistribution`, `jsBrowserDistribution`, or `composeCompatibilityBrowserDistribution` task as usual.
 
 ```bash
 ./gradlew :webApp:wasmJsBrowserDistribution
@@ -71,13 +71,19 @@ or
 ./gradlew :webApp:jsBrowserDistribution
 ```
 
-Your PWA will be generated in `webApp/build/dist/wasmJs/productionExecutable` or `webApp/build/dist/js/productionExecutable`.
+or
+
+```bash
+./gradlew :webApp:composeCompatibilityBrowserDistribution
+```
+
+Your PWA will be generated in `webApp/build/dist/wasmJs/productionExecutable`, `webApp/build/dist/js/productionExecutable`, or `webApp/build/dist/composeWebCompatibility/productionExecutable`.
 
 ### How to customize
 
 You can edit the following files to customize your PWA:
 
-- `workbox-config-for-wasm.cjs` / `workbox-config-for-js.cjs`
+- `workbox-config-for-wasm.cjs` / `workbox-config-for-js.cjs` / `workbox-config-for-compatibility.cjs`
 - `manifest.json` (next to your `index.html` by default)
 - `icons/*` (next to your `index.html` by default)
 
