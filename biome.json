@@ -11,8 +11,11 @@
 			"!example",
 			"!plugin/src/main/resources/manifest.json",
 			"!plugin/src/main/resources/registerServiceWorker.js",
+			"!plugin/src/main/resources/serviceWorker.js",
 			"!plugin/src/main/resources/workbox-config-for-js.js",
 			"!plugin/src/main/resources/workbox-config-for-wasm.js",
+			"!plugin/src/main/resources/workbox-inject-manifest-config-for-js.js",
+			"!plugin/src/main/resources/workbox-inject-manifest-config-for-wasm.js",
 			"!test-projects/**/*.html"
 		]
 	}

@@ -10,9 +10,12 @@ class ComposePwa : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply("com.github.node-gradle.node")
 
+        val extension = project.extensions.create(EXTENSION_NAME, ComposePwaExtension::class.java)
+        extension.workboxMode.convention(WorkboxMode.GenerateSW)
+
         WebTarget.entries.forEach { target ->
-            registerInitComposePwaTask(project, target)
-            registerBuildAsPwaTask(project, target)
+            registerInitComposePwaTask(project, target, extension)
+            registerBuildAsPwaTask(project, target, extension)
 
             project.tasks.matching { it.name == target.browserDistributionTaskName }.configureEach { task ->
                 task.dependsOn(target.initTaskName)
@@ -39,6 +42,7 @@ class ComposePwa : Plugin<Project> {
     private fun registerInitComposePwaTask(
         project: Project,
         target: WebTarget,
+        extension: ComposePwaExtension,
     ) {
         project.tasks.register(target.initTaskName, InitComposePwa::class.java) { task ->
             task.group = TASK_GROUP
@@ -48,13 +52,14 @@ class ComposePwa : Plugin<Project> {
             task.candidateResourcesDirPaths.set(target.candidateResourcesDirPaths)
             task.ownResourcesDirPath.set(target.ownResourcesDirPath)
             task.siblingResourcesDirPath.set(target.sibling.ownResourcesDirPath)
-            task.workboxConfigFileName.set(target.workboxConfigFileName)
+            task.workboxFileNames.set(extension.workboxMode.map(target::workboxFileNames))
         }
     }
 
     private fun registerBuildAsPwaTask(
         project: Project,
         target: WebTarget,
+        extension: ComposePwaExtension,
     ) {
         val emptyNpmPrefixDir = project.layout.buildDirectory.dir(EMPTY_NPM_PREFIX_DIR_PATH)
         project.tasks.register(target.buildAsPwaTaskName, NpmTask::class.java) { task ->
@@ -63,14 +68,14 @@ class ComposePwa : Plugin<Project> {
             task.dependsOn(target.browserDistributionTaskName, target.initTaskName)
             task.npmCommand.set(listOf("exec"))
             task.args.set(
-                emptyNpmPrefixDir.map { prefixDir ->
+                emptyNpmPrefixDir.zip(extension.workboxMode) { prefixDir, mode ->
                     listOf(
                         "--prefix",
                         prefixDir.asFile.absolutePath,
                         "--",
                         "workbox-cli",
-                        "generateSW",
-                        target.workboxConfigFileName,
+                        mode.command,
+                        target.workboxConfigFileName(mode),
                     )
                 },
             )
@@ -91,6 +96,7 @@ class ComposePwa : Plugin<Project> {
     }
 
     private companion object {
+        const val EXTENSION_NAME = "composePwa"
         const val TASK_GROUP = "ComposePWA"
         const val EMPTY_NPM_PREFIX_DIR_PATH = "composepwa/empty-npm-prefix"
     }
