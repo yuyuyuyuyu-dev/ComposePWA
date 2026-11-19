@@ -98,3 +98,9 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/specs.yml
+
+  tests:
+    name: Tests
+    permissions:
+      contents: read
+    uses: ./.github/workflows/tests.yml

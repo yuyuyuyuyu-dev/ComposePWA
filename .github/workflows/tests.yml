@@ -1,0 +1,110 @@
+name: Tests
+
+on:
+  workflow_call:
+
+jobs:
+  pnpm-init:
+    name: pnpm init (${{ matrix.workaround }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - workaround: "kotlin.js.yarn=false"
+            command: echo 'kotlin.js.yarn=false' >> gradle.properties
+          - workaround: "SKIP_YARN_COREPACK_CHECK=1"
+            command: echo 'SKIP_YARN_COREPACK_CHECK=1' >> "$GITHUB_ENV"
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: latest
+
+      - name: Run pnpm init in the test project
+        working-directory: test-projects/web-app
+        run: pnpm init
+
+      - name: Assert pnpm init wrote the fields this test is about
+        working-directory: test-projects/web-app
+        run: |
+          cat package.json
+          jq -e '.type == "module"' package.json > /dev/null || { echo '::error::pnpm init no longer writes "type": "module"'; exit 1; }
+          jq -e '.devEngines.packageManager.name == "pnpm"' package.json > /dev/null || { echo '::error::pnpm init no longer writes devEngines.packageManager'; exit 1; }
+          jq -e '.packageManager | startswith("pnpm@")' package.json > /dev/null || { echo '::error::pnpm init no longer writes packageManager'; exit 1; }
+
+      - name: Apply ${{ matrix.workaround }}
+        working-directory: test-projects/web-app
+        run: ${{ matrix.command }}
+
+      - name: Copy index.html into webMain resources
+        run: |
+          mkdir -p test-projects/web-app/src/webMain/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
+
+      - name: Build both targets as PWAs
+        working-directory: test-projects/web-app
+        run: ../../gradlew wasmJsBrowserDistribution jsBrowserDistribution
+
+      - name: Assert both service workers were generated
+        run: |
+          for buildDir in wasmJs js; do
+            test -f "test-projects/web-app/build/dist/$buildDir/productionExecutable/serviceWorker.js" || { echo "::error::serviceWorker.js Not Found for $buildDir"; exit 1; }
+          done
+
+  old-workbox-config:
+    name: old workbox config (${{ matrix.target-name }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target-name: "Wasm"
+            gradle-task: "wasmJsBrowserDistribution"
+            config-base-name: "workbox-config-for-wasm"
+          - target-name: "JS"
+            gradle-task: "jsBrowserDistribution"
+            config-base-name: "workbox-config-for-js"
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
+
+      - name: Seed index.html and an edited config under the old name
+        run: |
+          mkdir -p test-projects/web-app/src/webMain/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
+          echo '// edited config' > test-projects/web-app/${{ matrix.config-base-name }}.js
+
+      - name: Build expecting the rename message
+        working-directory: test-projects/web-app
+        run: |
+          if ../../gradlew ${{ matrix.gradle-task }} > build-output.log 2>&1; then
+            echo '::error::the build unexpectedly succeeded with the old config'
+            exit 1
+          fi
+          grep -qF 'Rename ${{ matrix.config-base-name }}.js to ${{ matrix.config-base-name }}.cjs' build-output.log || { echo '::error::the rename message is missing'; tail -50 build-output.log; exit 1; }
+
+      - name: Assert the old config was left alone and no new one was created
+        working-directory: test-projects/web-app
+        run: |
+          grep -q 'edited config' ${{ matrix.config-base-name }}.js || { echo '::error::the old config was changed'; exit 1; }
+          test ! -e ${{ matrix.config-base-name }}.cjs || { echo '::error::a default config was created next to the old one'; exit 1; }
