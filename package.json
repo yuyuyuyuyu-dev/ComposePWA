@@ -9,8 +9,8 @@
 		"prettier": "prettier",
 		"eslint": "eslint",
 		"htmlhint": "htmlhint",
-		"lint": "biome lint && eslint plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.cjs plugin/src/main/resources/workbox-config-for-wasm.cjs && htmlhint \"test-projects/web-app/*.html\"",
-		"format": "biome check --write && prettier --write plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.cjs plugin/src/main/resources/workbox-config-for-wasm.cjs \"test-projects/web-app/*.html\" && eslint --fix plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.cjs plugin/src/main/resources/workbox-config-for-wasm.cjs"
+		"lint": "biome lint && eslint plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.cjs plugin/src/main/resources/workbox-config-for-wasm.cjs plugin/src/main/resources/workbox-config-for-compatibility.cjs && htmlhint \"test-projects/web-app/*.html\"",
+		"format": "biome check --write && prettier --write plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.cjs plugin/src/main/resources/workbox-config-for-wasm.cjs plugin/src/main/resources/workbox-config-for-compatibility.cjs \"test-projects/web-app/*.html\" && eslint --fix plugin/src/main/resources/manifest.json plugin/src/main/resources/registerServiceWorker.js plugin/src/main/resources/workbox-config-for-js.cjs plugin/src/main/resources/workbox-config-for-wasm.cjs plugin/src/main/resources/workbox-config-for-compatibility.cjs"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.7",

@@ -108,3 +108,35 @@ jobs:
         run: |
           grep -q 'edited config' ${{ matrix.config-base-name }}.js || { echo '::error::the old config was changed'; exit 1; }
           test ! -e ${{ matrix.config-base-name }}.cjs || { echo '::error::a default config was created next to the old one'; exit 1; }
+
+  compatibility-distribution:
+    name: compatibility distribution
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
+
+      - name: Copy index.html into webMain resources
+        run: |
+          mkdir -p test-projects/web-app/src/webMain/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
+
+      - name: Build the compatibility distribution
+        working-directory: test-projects/web-app
+        run: ../../gradlew composeCompatibilityBrowserDistribution
+
+      - name: Assert the service worker precaches both apps
+        run: |
+          dist=test-projects/web-app/build/dist/composeWebCompatibility/productionExecutable
+          test -f test-projects/web-app/workbox-config-for-compatibility.cjs || { echo '::error::workbox-config-for-compatibility.cjs Not Found'; exit 1; }
+          test -f "$dist/serviceWorker.js" || { echo '::error::serviceWorker.js Not Found'; exit 1; }
+          for app in originWasmWeb-app.js originJsWeb-app.js; do
+            grep -qF "\"$app\"" "$dist/serviceWorker.js" || { echo "::error::$app is not precached"; exit 1; }
+          done

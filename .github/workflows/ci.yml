@@ -38,6 +38,7 @@ jobs:
               plugin/src/main/resources/registerServiceWorker.js
               plugin/src/main/resources/workbox-config-for-js.cjs
               plugin/src/main/resources/workbox-config-for-wasm.cjs
+              plugin/src/main/resources/workbox-config-for-compatibility.cjs
               "test-projects/web-app/*.html"
           - name: ESLint (assets for users)
             command: >-
@@ -46,6 +47,7 @@ jobs:
               plugin/src/main/resources/registerServiceWorker.js
               plugin/src/main/resources/workbox-config-for-js.cjs
               plugin/src/main/resources/workbox-config-for-wasm.cjs
+              plugin/src/main/resources/workbox-config-for-compatibility.cjs
           - name: HTMLHint (assets for users)
             command: npm run htmlhint -- "test-projects/web-app/*.html"
     steps:
