@@ -81,6 +81,19 @@ You can edit the following files to customize your PWA:
 - `manifest.json` (next to your `index.html` by default)
 - `icons/*` (next to your `index.html` by default)
 
+If you want to write your own service worker, switch Workbox to `injectManifest` mode:
+
+```kotlin
+import dev.yuyuyuyuyu.composepwa.WorkboxMode
+
+composePwa {
+    workboxMode = WorkboxMode.InjectManifest
+}
+```
+
+In this mode, the plugin creates `serviceWorker.js` and `workbox-inject-manifest-config-for-wasm.js` / `workbox-inject-manifest-config-for-js.js` in the project directory if they are missing, and passes the config file to the `workbox-cli injectManifest` command.
+You can edit `serviceWorker.js` as you like, as long as it keeps `self.__WB_MANIFEST`, where Workbox injects the list of files to precache.
+
 ### Tips
 
 #### Deploy to GitHub Pages

@@ -16,7 +16,14 @@ module.exports = [
 		},
 	},
 	{
-		files: ["**/workbox-config-*.js"],
+		files: ["**/serviceWorker.js"],
+		languageOptions: {
+			sourceType: "script",
+			globals: { ...globals.serviceworker, workbox: "readonly" },
+		},
+	},
+	{
+		files: ["**/workbox-config-*.js", "**/workbox-inject-manifest-config-*.js"],
 		languageOptions: {
 			sourceType: "commonjs",
 			globals: { ...globals.node },

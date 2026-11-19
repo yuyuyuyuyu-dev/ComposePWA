@@ -10,11 +10,23 @@ package dev.yuyuyuyuyu.composepwa
  */
 internal enum class WebTarget(
     val targetName: String,
-    val workboxConfigFileName: String,
+    private val workboxConfigSuffix: String,
 ) {
-    Wasm("wasmJs", "workbox-config-for-wasm.js"),
-    Js("js", "workbox-config-for-js.js"),
+    Wasm("wasmJs", "for-wasm.js"),
+    Js("js", "for-js.js"),
     ;
+
+    fun workboxConfigFileName(mode: WorkboxMode): String =
+        when (mode) {
+            WorkboxMode.GenerateSW -> "workbox-config-$workboxConfigSuffix"
+            WorkboxMode.InjectManifest -> "workbox-inject-manifest-config-$workboxConfigSuffix"
+        }
+
+    fun workboxFileNames(mode: WorkboxMode): List<String> =
+        when (mode) {
+            WorkboxMode.GenerateSW -> listOf(workboxConfigFileName(mode))
+            WorkboxMode.InjectManifest -> listOf(workboxConfigFileName(mode), SERVICE_WORKER_SOURCE_FILE_NAME)
+        }
 
     val targetSourceSetName: String = "${targetName}Main"
     val initTaskName: String = "initComposePwaFor$name"
@@ -29,4 +41,8 @@ internal enum class WebTarget(
 
     /** The other web target; its [ownResourcesDirPath] signals a per-target file convention. */
     val sibling: WebTarget get() = if (this == Wasm) Js else Wasm
+
+    private companion object {
+        const val SERVICE_WORKER_SOURCE_FILE_NAME = "serviceWorker.js"
+    }
 }
