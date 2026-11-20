@@ -444,7 +444,7 @@ jobs:
         with:
           arrange: |
             apt-get update
-            DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends openjdk-21-jdk-headless nodejs npm
+            DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends openjdk-21-jdk-headless nodejs npm libatomic1
             mkdir -p test-projects/web-app/src/webMain/resources
             cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
           act: |
