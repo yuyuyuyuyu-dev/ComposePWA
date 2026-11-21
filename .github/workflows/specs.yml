@@ -453,4 +453,7 @@ jobs:
           allowlist: |
             /root/.gradle/*
             /root/.npm/*
+            /root/.kotlin/*
+            /usr/local/share/.cache/*
+            /root/.config/configstore/update-notifier-workbox-cli.json
             /tmp/*
