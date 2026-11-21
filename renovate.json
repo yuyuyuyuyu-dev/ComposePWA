@@ -1,0 +1,8 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"github>yuyuyuyuyu-dev/repo-config",
+		"github>yuyuyuyuyu-dev/repo-config:compose-multiplatform"
+	],
+	"ignorePaths": ["test-projects/**"]
+}
