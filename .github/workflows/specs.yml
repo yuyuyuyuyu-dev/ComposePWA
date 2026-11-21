@@ -448,14 +448,8 @@ jobs:
             mkdir -p test-projects/web-app/src/webMain/resources
             cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
           act: |
-            touch /tmp/act-started
             cd test-projects/web-app
             ../../gradlew wasmJsBrowserDistribution jsBrowserDistribution
-            echo DIAGNOSTIC-BUILD-SUCCEEDED
-            find / -xdev \( -path /proc -o -path /sys -o -path /dev -o -path /workdir -o -path /root/.gradle -o -path /root/.npm -o -path /tmp \) -prune -o -cnewer /tmp/act-started -print > /tmp/outside
-            echo "DIAGNOSTIC-TOTAL $(wc -l < /tmp/outside)"
-            awk -F/ '{ print "/" $2 "/" $3 "/" $4 "/" $5 }' /tmp/outside | sort | uniq -c | sort -rn | head -60
-            exit 1
           allowlist: |
             /root/.gradle/*
             /root/.npm/*
