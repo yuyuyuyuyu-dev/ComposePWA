@@ -21,7 +21,6 @@ jobs:
       app-client-id: ${{ vars.PR_BOT_CLIENT_ID }}
       auto-merge: squash
       auto-merge-update-types: minor,patch
-      labels: dependencies
-      working-directory: example
+      project-directory: example
     secrets:
       app-private-key: ${{ secrets.PR_BOT_PRIVATE_KEY }}
