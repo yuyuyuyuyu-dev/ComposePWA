@@ -13,6 +13,7 @@
 			"!plugin/src/main/resources/registerServiceWorker.js",
 			"!plugin/src/main/resources/workbox-config-for-js.cjs",
 			"!plugin/src/main/resources/workbox-config-for-wasm.cjs",
+			"!plugin/src/main/resources/workbox-config-for-compatibility.cjs",
 			"!test-projects/**/*.html"
 		]
 	}

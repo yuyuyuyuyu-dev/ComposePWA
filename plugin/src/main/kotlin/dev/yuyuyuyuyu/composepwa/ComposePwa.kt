@@ -3,6 +3,7 @@ package dev.yuyuyuyuyu.composepwa
 import com.github.gradle.node.npm.task.NpmTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 @Suppress("unused")
@@ -12,13 +13,21 @@ class ComposePwa : Plugin<Project> {
 
         WebTarget.entries.forEach { target ->
             registerInitComposePwaTask(project, target)
-            registerBuildAsPwaTask(project, target)
+            registerBuildAsPwaTask(
+                project = project,
+                taskName = target.buildAsPwaTaskName,
+                distributionTaskName = target.browserDistributionTaskName,
+                initTaskName = target.initTaskName,
+                workboxConfigFileName = target.workboxConfigFileName,
+            )
 
             project.tasks.matching { it.name == target.browserDistributionTaskName }.configureEach { task ->
                 task.dependsOn(target.initTaskName)
                 task.finalizedBy(target.buildAsPwaTaskName)
             }
         }
+
+        registerCompatibilityTasks(project)
 
         // Gradle may run the two targets' tasks in parallel under the configuration
         // cache, but they share state Gradle cannot see: both init tasks can write to the
@@ -55,13 +64,16 @@ class ComposePwa : Plugin<Project> {
 
     private fun registerBuildAsPwaTask(
         project: Project,
-        target: WebTarget,
+        taskName: String,
+        distributionTaskName: String,
+        initTaskName: String,
+        workboxConfigFileName: String,
     ) {
         val emptyNpmPrefixDir = project.layout.buildDirectory.dir(EMPTY_NPM_PREFIX_DIR_PATH)
-        project.tasks.register(target.buildAsPwaTaskName, NpmTask::class.java) { task ->
+        project.tasks.register(taskName, NpmTask::class.java) { task ->
             task.group = TASK_GROUP
-            task.description = "Builds the ${target.name} browser distribution as a PWA."
-            task.dependsOn(target.browserDistributionTaskName, target.initTaskName)
+            task.description = "Builds the output of $distributionTaskName as a PWA."
+            task.dependsOn(distributionTaskName, initTaskName)
             task.npmCommand.set(listOf("exec"))
             task.args.set(
                 emptyNpmPrefixDir.map { prefixDir ->
@@ -71,12 +83,47 @@ class ComposePwa : Plugin<Project> {
                         "--",
                         "workbox-cli",
                         "generateSW",
-                        target.workboxConfigFileName,
+                        workboxConfigFileName,
                     )
                 },
             )
             task.doFirst { emptyNpmPrefixDir.get().asFile.mkdirs() }
         }
+    }
+
+    private fun registerCompatibilityTasks(project: Project) {
+        project.tasks.register(COMPATIBILITY_INIT_TASK_NAME, InitWorkboxConfig::class.java) { task ->
+            task.group = TASK_GROUP
+            task.description = "Creates the Workbox config for the compatibility distribution."
+            task.projectDirectory.set(project.layout.projectDirectory)
+            task.workboxConfigFileName.set(COMPATIBILITY_WORKBOX_CONFIG_FILE_NAME)
+            skipWhenCompatibilityOutputIsEmpty(project, task)
+        }
+        registerBuildAsPwaTask(
+            project = project,
+            taskName = COMPATIBILITY_BUILD_AS_PWA_TASK_NAME,
+            distributionTaskName = COMPATIBILITY_DISTRIBUTION_TASK_NAME,
+            initTaskName = COMPATIBILITY_INIT_TASK_NAME,
+            workboxConfigFileName = COMPATIBILITY_WORKBOX_CONFIG_FILE_NAME,
+        )
+        project.tasks.named(COMPATIBILITY_BUILD_AS_PWA_TASK_NAME).configure { task ->
+            skipWhenCompatibilityOutputIsEmpty(project, task)
+        }
+
+        project.tasks.matching { it.name == COMPATIBILITY_DISTRIBUTION_TASK_NAME }.configureEach { task ->
+            task.finalizedBy(COMPATIBILITY_BUILD_AS_PWA_TASK_NAME)
+            task.mustRunAfter(WebTarget.entries.map { it.buildAsPwaTaskName })
+        }
+    }
+
+    private fun skipWhenCompatibilityOutputIsEmpty(
+        project: Project,
+        task: Task,
+    ) {
+        task.inputs
+            .files(project.tasks.named(COMPATIBILITY_DISTRIBUTION_TASK_NAME).map { it.outputs.files.asFileTree })
+            .withPropertyName("compatibilityDistribution")
+            .skipWhenEmpty()
     }
 
     // Makes each web target's processResources depend on its init task, so the files it
@@ -94,5 +141,9 @@ class ComposePwa : Plugin<Project> {
     private companion object {
         const val TASK_GROUP = "ComposePWA"
         const val EMPTY_NPM_PREFIX_DIR_PATH = "composepwa/empty-npm-prefix"
+        const val COMPATIBILITY_DISTRIBUTION_TASK_NAME = "composeCompatibilityBrowserDistribution"
+        const val COMPATIBILITY_INIT_TASK_NAME = "initComposePwaForCompatibility"
+        const val COMPATIBILITY_BUILD_AS_PWA_TASK_NAME = "buildCompatibilityAsPwa"
+        const val COMPATIBILITY_WORKBOX_CONFIG_FILE_NAME = "workbox-config-for-compatibility.cjs"
     }
 }

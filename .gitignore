@@ -29,4 +29,5 @@ captures
 /test-projects/web-app/src/*/resources/
 /test-projects/web-app/workbox-config-for-wasm.cjs
 /test-projects/web-app/workbox-config-for-js.cjs
+/test-projects/web-app/workbox-config-for-compatibility.cjs
 /test-projects/web-app/kotlin-js-store/
