@@ -452,9 +452,9 @@ jobs:
             cd test-projects/web-app
             ../../gradlew wasmJsBrowserDistribution jsBrowserDistribution
             echo DIAGNOSTIC-BUILD-SUCCEEDED
-            find /root/.gradle /root/.npm /root/.kotlin /usr/local/share/.cache /root/.config /tmp -cnewer /act-started -print > /act-written
+            find /root/.npm /usr/local/share/.cache /tmp -cnewer /act-started -print > /act-written
             echo "DIAGNOSTIC-TOTAL $(wc -l < /act-written)"
-            awk -F/ '{ print "/" $2 "/" $3 "/" $4 "/" $5 "/" $6 }' /act-written | sed 's|/*$||' | sort | uniq -c | sort -k2 | head -150
+            awk -F/ '{ print "/" $2 "/" $3 "/" $4 "/" $5 "/" $6 }' /act-written | sed 's|/*$||' | sort | uniq -c | sort -k2 | head -300
             exit 1
           allowlist: |
             /root/.gradle/*
