@@ -140,3 +140,40 @@ jobs:
           for app in originWasmWeb-app.js originJsWeb-app.js; do
             grep -qF "\"$app\"" "$dist/serviceWorker.js" || { echo "::error::$app is not precached"; exit 1; }
           done
+
+  compatibility-distribution-wasm-only:
+    name: compatibility distribution (Wasm only)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
+
+      - name: Remove the JS target and copy index.html into webMain resources
+        run: |
+          perl -0pi -e 's/    js \{\n        browser\(\)\n        binaries.executable\(\)\n    \}\n\n//' test-projects/web-app/build.gradle.kts
+          if grep -qF 'js {' test-projects/web-app/build.gradle.kts; then
+            echo '::error::the JS target was not removed'; exit 1
+          fi
+          mkdir -p test-projects/web-app/src/webMain/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
+
+      - name: Build the compatibility distribution
+        working-directory: test-projects/web-app
+        run: |
+          if ! ../../gradlew composeCompatibilityBrowserDistribution --console=plain > build-output.log 2>&1; then
+            echo '::error::the build failed'; tail -50 build-output.log; exit 1
+          fi
+
+      - name: Assert ComposePWA did nothing for the skipped distribution
+        working-directory: test-projects/web-app
+        run: |
+          grep -qF '> Task :composeCompatibilityBrowserDistribution SKIPPED' build-output.log || { echo '::error::Compose did not skip the compatibility distribution'; exit 1; }
+          test ! -e workbox-config-for-compatibility.cjs || { echo '::error::workbox-config-for-compatibility.cjs was created'; exit 1; }
+          test ! -e build/dist/composeWebCompatibility || { echo '::error::the compatibility output directory was created'; exit 1; }

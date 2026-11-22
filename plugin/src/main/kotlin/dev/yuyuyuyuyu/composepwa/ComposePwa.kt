@@ -3,6 +3,7 @@ package dev.yuyuyuyuyu.composepwa
 import com.github.gradle.node.npm.task.NpmTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 @Suppress("unused")
@@ -96,6 +97,7 @@ class ComposePwa : Plugin<Project> {
             task.description = "Creates the Workbox config for the compatibility distribution."
             task.projectDirectory.set(project.layout.projectDirectory)
             task.workboxConfigFileName.set(COMPATIBILITY_WORKBOX_CONFIG_FILE_NAME)
+            skipWhenCompatibilityOutputIsEmpty(project, task)
         }
         registerBuildAsPwaTask(
             project = project,
@@ -104,11 +106,24 @@ class ComposePwa : Plugin<Project> {
             initTaskName = COMPATIBILITY_INIT_TASK_NAME,
             workboxConfigFileName = COMPATIBILITY_WORKBOX_CONFIG_FILE_NAME,
         )
+        project.tasks.named(COMPATIBILITY_BUILD_AS_PWA_TASK_NAME).configure { task ->
+            skipWhenCompatibilityOutputIsEmpty(project, task)
+        }
 
         project.tasks.matching { it.name == COMPATIBILITY_DISTRIBUTION_TASK_NAME }.configureEach { task ->
             task.finalizedBy(COMPATIBILITY_BUILD_AS_PWA_TASK_NAME)
             task.mustRunAfter(WebTarget.entries.map { it.buildAsPwaTaskName })
         }
+    }
+
+    private fun skipWhenCompatibilityOutputIsEmpty(
+        project: Project,
+        task: Task,
+    ) {
+        task.inputs
+            .files(project.tasks.named(COMPATIBILITY_DISTRIBUTION_TASK_NAME).map { it.outputs.files.asFileTree })
+            .withPropertyName("compatibilityDistribution")
+            .skipWhenEmpty()
     }
 
     // Makes each web target's processResources depend on its init task, so the files it
