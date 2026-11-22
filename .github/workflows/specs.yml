@@ -429,3 +429,54 @@ jobs:
           if grep -q 'is a duplicate but no duplicate handling strategy has been set' build-output.log; then
             echo '::error::the build reached the cryptic Gradle duplicate error instead of failing early'; exit 1
           fi
+
+  test-no-unexpected-changes:
+    name: should change nothing outside the project but the build tools' caches while building ${{ matrix.target-name }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target-name: "Wasm"
+            gradle-task: "wasmJsBrowserDistribution"
+            target-allowlist: "/root/.gradle/binaryen/*"
+          - target-name: "JS"
+            gradle-task: "jsBrowserDistribution"
+            target-allowlist: ""
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Build ${{ matrix.target-name }} as a PWA and assert nothing unexpected changed
+        uses: yuyuyuyuyu-dev/assert-no-unexpected-changes@v1
+        with:
+          arrange: |
+            apt-get update
+            DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends openjdk-21-jdk-headless nodejs npm libatomic1
+            mkdir -p test-projects/web-app/src/webMain/resources
+            cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
+          act: |
+            cd test-projects/web-app
+            ../../gradlew ${{ matrix.gradle-task }}
+          allowlist: |
+            /root/.config/configstore/update-notifier-workbox-cli.json
+            /root/.gradle/.tmp/*
+            /root/.gradle/caches/*
+            /root/.gradle/daemon/*
+            /root/.gradle/kotlin-profile/*
+            /root/.gradle/native/*
+            /root/.gradle/nodejs/*
+            /root/.gradle/notifications/*
+            /root/.gradle/wrapper/dists/*
+            /root/.gradle/yarn/*
+            /root/.kotlin/daemon/*
+            /root/.kotlin/kotlin-npm-tooling/*
+            /root/.npm/_cacache/*
+            /root/.npm/_logs/*
+            /root/.npm/_npx/*
+            /root/.npm/_update-notifier-last-checked
+            /tmp/*
+            /usr/local/share/.cache/yarn/*
+            ${{ matrix.target-allowlist }}
