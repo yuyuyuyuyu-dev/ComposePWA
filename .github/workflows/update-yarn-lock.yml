@@ -17,6 +17,6 @@ jobs:
       app-client-id: ${{ vars.PR_BOT_CLIENT_ID }}
       update-js-yarn-lock: true
       update-wasm-yarn-lock: true
-      working-directory: example
+      working-directories: example
     secrets:
       app-private-key: ${{ secrets.PR_BOT_PRIVATE_KEY }}
