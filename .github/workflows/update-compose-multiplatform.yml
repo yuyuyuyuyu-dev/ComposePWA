@@ -1,0 +1,26 @@
+name: Update Compose Multiplatform
+
+on:
+  schedule:
+    - cron: "31 7 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  update-compose-multiplatform:
+    name: Update Compose Multiplatform
+    permissions:
+      contents: read
+    uses: yuyuyuyuyu-dev/update-compose-multiplatform/.github/workflows/update-compose-multiplatform.yml@main
+    with:
+      update-js-yarn-lock: true
+      update-wasm-yarn-lock: true
+      jdk-distribution-to-update-yarn-lock: zulu
+      jdk-version-to-update-yarn-lock: "21"
+      app-client-id: ${{ vars.PR_BOT_CLIENT_ID }}
+      auto-merge: squash
+      auto-merge-update-types: minor,patch
+      project-directory-to-update: example
+    secrets:
+      app-private-key: ${{ secrets.PR_BOT_PRIVATE_KEY }}
