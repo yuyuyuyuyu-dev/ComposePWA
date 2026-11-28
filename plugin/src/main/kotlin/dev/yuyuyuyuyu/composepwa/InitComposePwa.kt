@@ -18,7 +18,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 /**
- * Deploys every file one web target's PWA needs: the workbox config in the project
+ * Deploys every file one web target's PWA needs: the Workbox files in the project
  * directory, and registerServiceWorker.js, manifest.json, and icons/ into the target's
  * resources directories, following four rules:
  *
@@ -53,7 +53,7 @@ abstract class InitComposePwa : DefaultTask() {
     abstract val siblingResourcesDirPath: Property<String>
 
     @get:Input
-    abstract val workboxConfigFileName: Property<String>
+    abstract val workboxFileNames: ListProperty<String>
 
     @TaskAction
     fun deployPwaFiles() {
@@ -61,7 +61,9 @@ abstract class InitComposePwa : DefaultTask() {
         val candidateDirPaths = candidateResourcesDirPaths.get()
         val indexHtmlDir = File(projectDir, resolveTargetResourcesDirPath(projectDir, candidateDirPaths))
 
-        copyBundledFileIfMissing(workboxConfigFileName.get(), projectDir)
+        workboxFileNames.get().forEach { fileName ->
+            copyBundledFileIfMissing(fileName, projectDir)
+        }
 
         val conflicts = findPwaAssetConflicts(projectDir, candidateDirPaths, bundledPwaAssets())
         if (conflicts.isNotEmpty()) {

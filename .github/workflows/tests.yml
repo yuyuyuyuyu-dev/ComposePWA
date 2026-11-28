@@ -1,0 +1,113 @@
+name: Tests
+
+on:
+  workflow_call:
+
+jobs:
+  inject-manifest:
+    name: injectManifest (${{ matrix.target-name }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target-name: "Wasm"
+            gradle-task: "wasmJsBrowserDistribution"
+            build-dir: "wasmJs"
+            config-file: "workbox-inject-manifest-config-for-wasm.js"
+            generate-sw-config-file: "workbox-config-for-wasm.js"
+          - target-name: "JS"
+            gradle-task: "jsBrowserDistribution"
+            build-dir: "js"
+            config-file: "workbox-inject-manifest-config-for-js.js"
+            generate-sw-config-file: "workbox-config-for-js.js"
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
+
+      - name: Copy index.html into webMain resources
+        run: |
+          mkdir -p test-projects/web-app/src/webMain/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
+
+      - name: Switch Workbox to injectManifest mode
+        working-directory: test-projects/web-app
+        run: |
+          {
+            echo 'import dev.yuyuyuyuyu.composepwa.WorkboxMode'
+            cat build.gradle.kts
+            printf '\ncomposePwa {\n    workboxMode = WorkboxMode.InjectManifest\n}\n'
+          } > build.gradle.kts.new
+          mv build.gradle.kts.new build.gradle.kts
+
+      - name: Build ${{ matrix.target-name }} as PWA
+        working-directory: test-projects/web-app
+        run: ../../gradlew ${{ matrix.gradle-task }}
+
+      - name: Assert the templates were created and the manifest was injected
+        run: |
+          project=test-projects/web-app
+          serviceWorker=$project/build/dist/${{ matrix.build-dir }}/productionExecutable/serviceWorker.js
+
+          cmp plugin/src/main/resources/serviceWorker.js "$project/serviceWorker.js" || { echo '::error::serviceWorker.js was not created from the template'; exit 1; }
+          cmp plugin/src/main/resources/${{ matrix.config-file }} "$project/${{ matrix.config-file }}" || { echo '::error::${{ matrix.config-file }} was not created from the template'; exit 1; }
+          test ! -e "$project/${{ matrix.generate-sw-config-file }}" || { echo '::error::the generateSW config was created in injectManifest mode'; exit 1; }
+
+          test -f "$serviceWorker" || { echo '::error::serviceWorker.js Not Found'; exit 1; }
+          grep -qF 'workbox.precaching.precacheAndRoute(' "$serviceWorker" || { echo '::error::serviceWorker.js was not built from the template'; exit 1; }
+          if grep -qF 'self.__WB_MANIFEST' "$serviceWorker"; then
+            echo '::error::the precache manifest was not injected'; exit 1
+          fi
+          grep -qF '"url":"index.html"' "$serviceWorker" || { echo '::error::index.html is missing from the precache manifest'; exit 1; }
+
+  inject-manifest-own-service-worker:
+    name: injectManifest with the project's own service worker
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v7
+
+      - name: Set up the JDK and Gradle
+        uses: yuyuyuyuyu-dev/repo-config/.github/actions/setup-jdk-and-gradle@main
+        with:
+          compose-multiplatform: true
+
+      - name: Seed index.html and the project's own service worker
+        run: |
+          mkdir -p test-projects/web-app/src/webMain/resources
+          cp test-projects/web-app/index.html test-projects/web-app/src/webMain/resources/index.html
+          printf '// own service worker\nconsole.log(self.__WB_MANIFEST);\n' > test-projects/web-app/serviceWorker.js
+          cp test-projects/web-app/serviceWorker.js own-service-worker.js
+
+      - name: Switch Workbox to injectManifest mode
+        working-directory: test-projects/web-app
+        run: |
+          {
+            echo 'import dev.yuyuyuyuyu.composepwa.WorkboxMode'
+            cat build.gradle.kts
+            printf '\ncomposePwa {\n    workboxMode = WorkboxMode.InjectManifest\n}\n'
+          } > build.gradle.kts.new
+          mv build.gradle.kts.new build.gradle.kts
+
+      - name: Build both targets as PWAs
+        working-directory: test-projects/web-app
+        run: ../../gradlew wasmJsBrowserDistribution jsBrowserDistribution
+
+      - name: Assert both service workers were built from the project's own one
+        run: |
+          cmp own-service-worker.js test-projects/web-app/serviceWorker.js || { echo "::error::the project's own serviceWorker.js was changed"; exit 1; }
+          for buildDir in wasmJs js; do
+            serviceWorker=test-projects/web-app/build/dist/$buildDir/productionExecutable/serviceWorker.js
+            grep -qF '// own service worker' "$serviceWorker" || { echo "::error::serviceWorker.js for $buildDir was not built from the project's own one"; exit 1; }
+            grep -qF '"url":"index.html"' "$serviceWorker" || { echo "::error::the precache manifest was not injected for $buildDir"; exit 1; }
+          done
