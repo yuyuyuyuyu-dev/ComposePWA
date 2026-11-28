@@ -10,11 +10,14 @@ package dev.yuyuyuyuyu.composepwa
  */
 internal enum class WebTarget(
     val targetName: String,
-    val workboxConfigFileName: String,
+    workboxConfigBaseName: String,
 ) {
-    Wasm("wasmJs", "workbox-config-for-wasm.js"),
-    Js("js", "workbox-config-for-js.js"),
+    Wasm("wasmJs", "workbox-config-for-wasm"),
+    Js("js", "workbox-config-for-js"),
     ;
+
+    val workboxConfigFileName: String = "$workboxConfigBaseName.cjs"
+    val oldWorkboxConfigFileName: String = "$workboxConfigBaseName.js"
 
     val targetSourceSetName: String = "${targetName}Main"
     val initTaskName: String = "initComposePwaFor$name"

@@ -5,7 +5,7 @@ const json = jsonModule.default ?? jsonModule;
 
 module.exports = [
 	{
-		files: ["**/*.js"],
+		files: ["**/*.js", "**/*.cjs"],
 		...js.configs.recommended,
 	},
 	{
@@ -16,7 +16,7 @@ module.exports = [
 		},
 	},
 	{
-		files: ["**/workbox-config-*.js"],
+		files: ["**/workbox-config-*.cjs"],
 		languageOptions: {
 			sourceType: "commonjs",
 			globals: { ...globals.node },

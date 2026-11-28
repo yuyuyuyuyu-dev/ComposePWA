@@ -27,7 +27,7 @@ When you run the `wasmJsBrowserDistribution` or `jsBrowserDistribution` task, th
 Before the build, it automatically creates the required but missing resource files and config file, and adds the necessary tags to your `index.html`.
 After the build, it creates the service worker.
 The resource files are `manifest.json`, `registerServiceWorker.js`, and `icons/*`, and they are created next to your `index.html`.
-The config file is `workbox-config-for-wasm.js` or `workbox-config-for-js.js`, and it is created directly in the project directory.
+The config file is `workbox-config-for-wasm.cjs` or `workbox-config-for-js.cjs`, and it is created directly in the project directory.
 The config file is passed as is to the `workbox-cli generateSW` command.
 The service worker has to be recreated on every build, so it is generated directly in the build output directory.
 
@@ -77,7 +77,7 @@ Your PWA will be generated in `webApp/build/dist/wasmJs/productionExecutable` or
 
 You can edit the following files to customize your PWA:
 
-- `workbox-config-for-wasm.js` / `workbox-config-for-js.js`
+- `workbox-config-for-wasm.cjs` / `workbox-config-for-js.cjs`
 - `manifest.json` (next to your `index.html` by default)
 - `icons/*` (next to your `index.html` by default)
 

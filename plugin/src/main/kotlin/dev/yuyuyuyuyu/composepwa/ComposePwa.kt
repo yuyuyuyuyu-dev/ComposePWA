@@ -49,6 +49,7 @@ class ComposePwa : Plugin<Project> {
             task.ownResourcesDirPath.set(target.ownResourcesDirPath)
             task.siblingResourcesDirPath.set(target.sibling.ownResourcesDirPath)
             task.workboxConfigFileName.set(target.workboxConfigFileName)
+            task.oldWorkboxConfigFileName.set(target.oldWorkboxConfigFileName)
         }
     }
 
